@@ -32,6 +32,10 @@ class AllNotesActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
+        setSupportActionBar(binding.toolbar)
+        val pageTitle = "My Notes"
+        supportActionBar?.setTitle(pageTitle)
+
         //init RecyclerView with empty list first. the list is populated in onResume
         viewManager = LinearLayoutManager(this)
         viewAdapter = AllNotesAdapter(allNotes, applicationContext)
@@ -51,11 +55,11 @@ class AllNotesActivity : AppCompatActivity() {
         val context = this
 
         GlobalScope.launch(Dispatchers.Main) {
-            val titles: List<NoteDescriptor> = async(Dispatchers.IO) {
+            val allNotes: List<NoteDescriptor> = async(Dispatchers.IO) {
                 return@async notesDao.getAllDescriptors()
             }.await()
-            allNotes = titles
-            Log.i("ljw", "got titles: " + titles.toString())
+//            allNotes = titles
+            Log.i("ljw", "got titles: $allNotes")
 
             viewAdapter = AllNotesAdapter(allNotes, context)
             binding.allNotesReyclerView.apply {
@@ -73,37 +77,4 @@ class AllNotesActivity : AppCompatActivity() {
         intent = Intent(applicationContext, CreateNoteActivity::class.java)
         startActivity(intent)
     }
-
-
-
-//    class AllNotesAdapter(private var myDataset: List<String>, context: Context) :
-//        RecyclerView.Adapter<AllNotesAdapter.MyViewHolder>() {
-//
-//        private var context = context
-//
-//        class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout)
-//
-//        override fun onCreateViewHolder(parent: ViewGroup,
-//                                        viewType: Int): AllNotesAdapter.MyViewHolder {
-//            val constraintLayout = LayoutInflater.from(parent.context)
-//                .inflate(R.layout.note_title, parent, false) as ConstraintLayout
-//
-//            return MyViewHolder(constraintLayout)
-//        }
-//
-//        override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-//            val titleTextView: TextView = holder.constraintLayout.findViewById(R.id.noteTitleTextView)
-//            val noteId = myDataset[position]
-//            titleTextView.text = noteId.substring(13)
-//            holder.constraintLayout.setOnClickListener { goToNoteDetails(noteId)}
-//        }
-//
-//        private fun goToNoteDetails(noteTitle: String) {
-//            val intent = Intent(context, ViewNoteActivity::class.java)
-//            intent.putExtra("noteTitle", noteTitle)
-//            context.startActivity(intent)
-//        }
-//
-//        override fun getItemCount() = myDataset.size
-//    }
 }

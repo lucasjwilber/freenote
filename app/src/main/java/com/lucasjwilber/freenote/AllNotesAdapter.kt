@@ -26,7 +26,7 @@ class AllNotesAdapter(private var myDataset: List<NoteDescriptor>, context: Cont
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val titleTextView: TextView = holder.constraintLayout.findViewById(R.id.noteTitleTextView)
         val title = myDataset[position].title
-        titleTextView.text = title //the first 13 chars are the timestamp
+        titleTextView.text = title
         holder.constraintLayout.setOnClickListener { goToNoteDetails(myDataset[position].id)}
     }
 

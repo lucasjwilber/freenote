@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <!--    Cafe palette    -->
+    <color name="coffeeLightest">#FFDFC1</color>
+    <color name="coffeeLight">#FBB675</color>
+    <color name="coffeeMedium">#DB893A</color>
+    <color name="coffeeDark">#B36112</color>
+    <color name="coffeeDarkest">#844000</color>
+
+    <color name="colorPrimary">#DB893A</color>
+    <color name="colorPrimaryDark">#844000</color>
+    <color name="colorAccent">#DB893A</color>
 </resources>

@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
@@ -33,7 +35,13 @@ class CreateNoteActivity : AppCompatActivity() {
         setContentView(view)
         val context = this
 
-        binding.saveNoteButton.setOnClickListener { saveNote() }
+        setSupportActionBar(binding.toolbar)
+        val pageTitle = "Create Note"
+        supportActionBar?.setTitle(pageTitle)
+        binding.toolbar.inflateMenu(R.menu.action_bar_menu)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+//        binding.saveNoteButton.setOnClickListener { saveNote() }
 
         val bundle: Bundle ?= intent.extras
         val message = bundle?.getInt("noteId")
@@ -46,8 +54,12 @@ class CreateNoteActivity : AppCompatActivity() {
                 val note: Note = async(Dispatchers.IO) {
                     return@async notesDao.getNoteById(message)
                 }.await()
-                val arrayOfSegments = note.segments?.split("{]")
-                segments = arrayOfSegments as ArrayList<String>
+
+                if (note.segments!!.isNotEmpty()) {
+                    val arrayOfSegments = note.segments?.split("|{]")
+                    segments = arrayOfSegments as ArrayList<String>
+                }
+
                 viewManager = LinearLayoutManager(context)
                 viewAdapter = NoteAdapter(segments)
                 binding.noteSegmentsRV.apply {
@@ -74,16 +86,32 @@ class CreateNoteActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.action_bar_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_save) {
+            saveNote()
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
 
     private fun saveNote() {
         val title: String = binding.noteTitleEditText.text.toString()
 
+        if (title.isEmpty()) {
+            //todo: toast
+            return
+        }
+
         val db = AppDatabase.getDatabase(this, CoroutineScope(Dispatchers.IO))
 
         var serializedSegments = ""
         for (string: String in segments) {
-            serializedSegments += "{]$string"
+            serializedSegments += "$string|{]"
         }
 
         val note = Note(noteId, title, serializedSegments)
@@ -143,11 +171,11 @@ class CreateNoteActivity : AppCompatActivity() {
 
         // Replace the contents of a view (invoked by the layout manager)
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-            // - get element from your dataset at this position
-            // - replace the contents of the view with that element
             if (getItemViewType(position) == SEGMENT) {
                 var textView: TextView = holder.constraintLayout.findViewById(R.id.segmentTextView)
                 textView.text = segments[position]
+                val deleteButton: Button = holder.constraintLayout.findViewById(R.id.segmentDeleteButton)
+                deleteButton.setOnClickListener { deleteSegment(position)}
 
             } else { //(getItemViewType(position) == NEW_SEGMENT)
                 var editText: EditText = holder.constraintLayout.findViewById(R.id.newSegmentEditText)
@@ -163,8 +191,19 @@ class CreateNoteActivity : AppCompatActivity() {
         private fun onNewSegmentSaveButtonClick(text: String) {
             segments.add(text)
             newSegmentEditText.text.clear()
-            notifyDataSetChanged()
+            this.notifyItemInserted(segments.size)
             Log.i("ljw", segments.toString())
+        }
+
+        private fun deleteSegment(position: Int) {
+            Log.i("ljw", "segments is $segments, position is $position")
+            segments.removeAt(position)
+
+            // notifyItemRemoved() is unreliable here because position here was set when the view was bound, so
+            // if new views/segments were created after this was bound then the position will be out of date
+            // which could lead to an outOfBounds exception. so notifyDataSetChanged() is used.
+            this.notifyDataSetChanged()
+            
         }
     }
 }
