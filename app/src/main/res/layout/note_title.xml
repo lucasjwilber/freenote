@@ -4,21 +4,22 @@
     android:id="@+id/noteTitleLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="2dp"
-    android:paddingBottom="2dp"
+    android:background="@drawable/border_bottom_note"
     android:paddingStart="8dp"
+    android:paddingTop="2dp"
     android:paddingEnd="8dp"
-    android:background="@drawable/border_bottom">
+    android:paddingBottom="2dp">
 
     <TextView
         android:id="@+id/noteTitleTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:padding="10dp"
         android:background="@color/coffeeLightest"
-        android:textSize="18sp"
+        android:padding="10dp"
         android:text="Note Title"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

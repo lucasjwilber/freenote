@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
 class AllNotesAdapter(private var myDataset: List<NoteDescriptor>, context: Context) :
@@ -31,7 +32,7 @@ class AllNotesAdapter(private var myDataset: List<NoteDescriptor>, context: Cont
     }
 
     private fun goToNoteDetails(noteId: Int) {
-        val intent = Intent(context, CreateNoteActivity::class.java)
+        val intent = Intent(context, EditNoteActivity::class.java)
         intent.putExtra("noteId", noteId)
         context.startActivity(intent)
     }

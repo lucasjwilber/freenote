@@ -3,87 +3,92 @@ package com.lucasjwilber.freenote
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.lucasjwilber.freenote.databinding.ActivityCreateNoteBinding
+import com.lucasjwilber.freenote.databinding.ActivityEditNoteBinding
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
-class CreateNoteActivity : AppCompatActivity() {
+class EditNoteActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityCreateNoteBinding
+    private lateinit var binding: ActivityEditNoteBinding
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
-    private var isNew = true
+    private var newNote = true
     private var noteId: Int? = null
-
     private var segments = ArrayList<String>()
+    class DeletedSegment(val position: Int, val text: String)
+    private var deletedSegments: Stack<DeletedSegment> = Stack()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityCreateNoteBinding.inflate(layoutInflater)
+        binding = ActivityEditNoteBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        val context = this
 
         setSupportActionBar(binding.toolbar)
         val pageTitle = "Create Note"
-        supportActionBar?.setTitle(pageTitle)
+        supportActionBar?.title = pageTitle
         binding.toolbar.inflateMenu(R.menu.action_bar_menu)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-//        binding.saveNoteButton.setOnClickListener { saveNote() }
+        binding.noteTitleTextView.setOnClickListener { editNoteTitle() }
 
         val bundle: Bundle ?= intent.extras
         val message = bundle?.getInt("noteId")
-        if (message != null) {
-            isNew = false
-            GlobalScope.launch(Dispatchers.Main) {
 
+        val context = this
+        viewManager = LinearLayoutManager(context)
+
+        if (message != null) { // if we got here from clicking on an existing note
+            newNote = false
+
+            val pageTitle = "Edit Note"
+            supportActionBar?.title = pageTitle
+
+
+            GlobalScope.launch(Dispatchers.Main) {
                 val notesDao = AppDatabase.getDatabase(application, CoroutineScope(Dispatchers.IO)).noteDao()
 
                 val note: Note = async(Dispatchers.IO) {
                     return@async notesDao.getNoteById(message)
                 }.await()
 
-                if (note.segments!!.isNotEmpty()) {
-                    val arrayOfSegments = note.segments?.split("|{]")
-                    segments = arrayOfSegments as ArrayList<String>
+                Log.i("ljw", "segments is ${note.segments.toString()}")
+                if (note.segments!!.length == 1) {
+                    segments.add(note.segments.toString())
+                } else if (note.segments!!.length > 1) {
+                    segments = note.segments?.split("|{]") as ArrayList<String>
                 }
 
-                viewManager = LinearLayoutManager(context)
-                viewAdapter = NoteAdapter(segments)
+                viewAdapter = NoteAdapter(segments, newNote, deletedSegments)
                 binding.noteSegmentsRV.apply {
                     setHasFixedSize(true)
                     layoutManager = viewManager
                     adapter = viewAdapter
                 }
 
-                binding.noteTitleEditText.setText(note.title)
+                binding.noteTitleTextView.setText(note.title)
                 noteId = note.id
+            }
+        } else { //if we got here from clicking the 'new note' button
+            binding.noteTitleEditText.requestFocus()
+
+            viewAdapter = NoteAdapter(segments, newNote, deletedSegments)
+            binding.noteSegmentsRV.apply {
+                setHasFixedSize(true)
+                layoutManager = viewManager
+                adapter = viewAdapter
             }
         }
 
-        viewManager = LinearLayoutManager(this)
-        viewAdapter = NoteAdapter(segments)
-        binding.noteSegmentsRV.apply {
-            // use this setting to improve performance if you know that changes
-            // in content do not change the layout size of the RecyclerView
-            setHasFixedSize(true)
-            // use a linear layout manager
-            layoutManager = viewManager
-            // specify an viewAdapter (see also next example)
-            adapter = viewAdapter
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -94,8 +99,29 @@ class CreateNoteActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.action_save) {
             saveNote()
+        } else if (item.itemId == R.id.action_undo) {
+            if (deletedSegments.isEmpty()) return false
+
+            undoSegmentDelete()
+
+            if (deletedSegments.isEmpty()) {
+                //todo: hide button or discolor it
+            }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun undoSegmentDelete() {
+        val delseg: DeletedSegment = deletedSegments.pop()
+        Log.i("ljw", delseg.text)
+        segments.add(delseg.position, delseg.text)
+
+        viewAdapter = NoteAdapter(segments, newNote, deletedSegments)
+        binding.noteSegmentsRV.apply {
+            setHasFixedSize(true)
+            layoutManager = viewManager
+            adapter = viewAdapter
+        }
     }
 
 
@@ -108,40 +134,37 @@ class CreateNoteActivity : AppCompatActivity() {
         }
 
         val db = AppDatabase.getDatabase(this, CoroutineScope(Dispatchers.IO))
-
-        var serializedSegments = ""
-        for (string: String in segments) {
-            serializedSegments += "$string|{]"
-        }
-
+        val serializedSegments = segments.joinToString("|{]")
         val note = Note(noteId, title, serializedSegments)
 
         GlobalScope.launch(Dispatchers.IO) {
-            if (isNew)
+            if (newNote)
                 db.noteDao().insert(note)
             else
                 db.noteDao().update(note)
         }
-        finish()
 
+        finish()
+    }
+
+    private fun editNoteTitle() {
+        binding.noteTitleTextView.visibility = View.GONE
+        binding.noteTitleEditText.setText(binding.noteTitleTextView.text.toString())
+        binding.noteTitleEditText.visibility = View.VISIBLE
     }
 
 
 
-    class NoteAdapter(private val segments: ArrayList<String>) :
+    class NoteAdapter(private val segments: ArrayList<String>, var newNote: Boolean, var deletedSegments: Stack<DeletedSegment>) :
         RecyclerView.Adapter<NoteAdapter.MyViewHolder>() {
 
         private val SEGMENT: Int = 0
         private val NEW_SEGMENT: Int = 1
         private lateinit var newSegmentEditText: EditText
+//        private class DeletedSegment(position: Int, text: String)
+//        private var deletedSegments: Stack<DeletedSegment> = deletedSegments
 
-        // Provide a reference to the views for each data item
-        // Complex data items may need more than one view per item, and
-        // you provide access to all the views for a data item in a view holder.
-        // Each data item is just a string in this case that is shown in a TextView.
-        class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout) {
-            //currently each viewholder type is just a constraint layout with no data
-        }
+        class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout) { }
 
         override fun getItemViewType(position: Int): Int {
             return if (position == segments.size)
@@ -150,7 +173,6 @@ class CreateNoteActivity : AppCompatActivity() {
                 SEGMENT
         }
 
-        // Create new views (invoked by the layout manager)
         override fun onCreateViewHolder(parent: ViewGroup,
                                         viewType: Int): MyViewHolder {
 
@@ -172,16 +194,18 @@ class CreateNoteActivity : AppCompatActivity() {
         // Replace the contents of a view (invoked by the layout manager)
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
             if (getItemViewType(position) == SEGMENT) {
-                var textView: TextView = holder.constraintLayout.findViewById(R.id.segmentTextView)
+                val textView: TextView = holder.constraintLayout.findViewById(R.id.segmentTextView)
                 textView.text = segments[position]
                 val deleteButton: Button = holder.constraintLayout.findViewById(R.id.segmentDeleteButton)
                 deleteButton.setOnClickListener { deleteSegment(position)}
 
             } else { //(getItemViewType(position) == NEW_SEGMENT)
-                var editText: EditText = holder.constraintLayout.findViewById(R.id.newSegmentEditText)
-                editText.requestFocus()
-                var saveButton: Button = holder.constraintLayout.findViewById(R.id.newSegmentSaveButton)
+                val editText: EditText = holder.constraintLayout.findViewById(R.id.newSegmentEditText)
+                val saveButton: Button = holder.constraintLayout.findViewById(R.id.newSegmentSaveButton)
                 saveButton.setOnClickListener { onNewSegmentSaveButtonClick(editText.text.toString()) }
+                if (!newNote) {
+                    editText.requestFocus()
+                }
             }
         }
 
@@ -189,21 +213,29 @@ class CreateNoteActivity : AppCompatActivity() {
         override fun getItemCount() = segments.size + 1
 
         private fun onNewSegmentSaveButtonClick(text: String) {
+            if (text.isEmpty()) return
+
             segments.add(text)
             newSegmentEditText.text.clear()
             this.notifyItemInserted(segments.size)
-            Log.i("ljw", segments.toString())
+
+            // flip newNote so the cursor focus will go to the new segment EditText
+            newNote = false
         }
 
         private fun deleteSegment(position: Int) {
             Log.i("ljw", "segments is $segments, position is $position")
+
+            deletedSegments.push(DeletedSegment(position, segments[position]))
             segments.removeAt(position)
+
+            //todo: un-hide or re-color the undo button
+
 
             // notifyItemRemoved() is unreliable here because position here was set when the view was bound, so
             // if new views/segments were created after this was bound then the position will be out of date
             // which could lead to an outOfBounds exception. so notifyDataSetChanged() is used.
             this.notifyDataSetChanged()
-            
         }
     }
 }

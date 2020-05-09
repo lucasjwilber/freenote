@@ -24,11 +24,11 @@
 
     <Button
         android:id="@+id/newSegmentSaveButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:paddingTop="5dp"
-        android:drawableTop="@drawable/check"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="?android:attr/selectableItemBackground"
+        android:drawableTop="@drawable/check"
+        android:paddingTop="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

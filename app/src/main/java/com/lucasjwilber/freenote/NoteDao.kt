@@ -10,11 +10,8 @@ interface NoteDao {
     @Query("SELECT id, title FROM notes")
     suspend fun getAllDescriptors(): List<NoteDescriptor>
 
-//    @Query("SELECT * FROM note WHERE uid IN (:noteIds)")
-//    fun loadAllByIds(noteIds: IntArray): List<Note>
-
     @Query("SELECT * FROM notes WHERE id = :id")
-    fun getNoteById(id: Int): Note
+    suspend fun getNoteById(id: Int): Note
 
     @Insert
     suspend fun insert(vararg note: Note)
@@ -24,4 +21,7 @@ interface NoteDao {
 
     @Delete
     suspend fun delete(note: Note)
+
+    @Query("DELETE FROM notes WHERE id = :id")
+    suspend fun deleteNoteById(id: Int)
 }

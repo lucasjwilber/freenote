@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_undo"
+        android:icon="@drawable/undo"
+        android:orderInCategory="0"
+        android:title="UNDO"
+        app:showAsAction="ifRoom"/>
+
     <item
         android:id="@+id/action_save"
         android:icon="@drawable/save"
+        android:orderInCategory="1"
         android:title="SAVE"
         app:showAsAction="ifRoom"/>
 
-    <!-- Settings, should always be in the overflow -->
-<!--    <item android:id="@+id/action_settings"-->
-<!--        android:title="SETTINGS"-->
-<!--        app:showAsAction="never"/>-->
+     Settings, should always be in the overflow
+    <item android:id="@+id/action_settings"
+        android:title="SETTINGS"
+        app:showAsAction="never"/>
 
 </menu>
