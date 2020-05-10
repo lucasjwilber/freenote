@@ -53,8 +53,6 @@ class AllNotesActivity : AppCompatActivity() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 swipedNotePosition = viewHolder.adapterPosition
 
-//                binding.createNoteButton.visibility = View.GONE
-//                binding.toolbar.visibility = View.GONE
                 binding.deleteModalLayout.visibility = View.VISIBLE
 
                 val selectedNoteTitle = notesFromDb[swipedNotePosition].title
@@ -95,8 +93,6 @@ class AllNotesActivity : AppCompatActivity() {
     }
 
     private fun cancelDelete(position: Int) {
-//        binding.createNoteButton.visibility = View.VISIBLE
-//        binding.toolbar.visibility = View.VISIBLE
         binding.deleteModalLayout.visibility = View.GONE
 
         viewAdapter.notifyDataSetChanged()

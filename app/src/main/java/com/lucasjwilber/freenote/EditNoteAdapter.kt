@@ -7,12 +7,21 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import java.util.*
 import kotlin.collections.ArrayList
 
-class EditNoteAdapter(private val segments: ArrayList<String>, var newNote: Boolean, var deletedSegments: Stack<EditNoteActivity.DeletedSegment>) :
+class EditNoteAdapter(private val segments: ArrayList<String>,
+                      var newNote: Boolean,
+                      var deletedSegments: Stack<EditNoteActivity.DeletedSegment>) :
     RecyclerView.Adapter<EditNoteAdapter.MyViewHolder>() {
+
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        setUpSwipeListener(recyclerView)
+    }
 
     private val SEGMENT: Int = 0
     private val NEW_SEGMENT: Int = 1
@@ -89,6 +98,24 @@ class EditNoteAdapter(private val segments: ArrayList<String>, var newNote: Bool
         // notifyItemRemoved() is unreliable here because position here was set when the view was bound, so
         // if new views/segments were created after this was bound then the position will be out of date
         // which could lead to an outOfBounds exception. so notifyDataSetChanged() is used.
-        this.notifyDataSetChanged()
+//        this.notifyDataSetChanged()
+    }
+
+
+    private fun setUpSwipeListener(recyclerView: RecyclerView) {
+
+        Log.i("ljw", "set up swipe listener")
+        val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, viewHolder1: RecyclerView.ViewHolder): Boolean {
+                return false
+            }
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                deleteSegment(viewHolder.adapterPosition)
+                notifyItemRemoved(viewHolder.adapterPosition)
+            }
+        }
+
+        val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 }

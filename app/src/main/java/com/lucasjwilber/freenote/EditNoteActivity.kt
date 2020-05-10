@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lucasjwilber.freenote.databinding.ActivityEditNoteBinding
@@ -94,6 +95,12 @@ class EditNoteActivity : AppCompatActivity() {
 
     }
 
+    override fun onPause() {
+        super.onPause()
+        saveNote()
+    }
+
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.action_bar_menu, menu)
         return super.onCreateOptionsMenu(menu)
@@ -116,15 +123,8 @@ class EditNoteActivity : AppCompatActivity() {
 
     private fun undoSegmentDelete() {
         val delseg: DeletedSegment = deletedSegments.pop()
-        Log.i("ljw", delseg.text)
         segments.add(delseg.position, delseg.text)
-
-        viewAdapter = EditNoteAdapter(segments, newNote, deletedSegments)
-        binding.noteSegmentsRV.apply {
-            setHasFixedSize(true)
-            layoutManager = viewManager
-            adapter = viewAdapter
-        }
+        viewAdapter.notifyItemInserted(delseg.position)
     }
 
 
@@ -135,6 +135,8 @@ class EditNoteActivity : AppCompatActivity() {
             //todo: toast
             return
         }
+
+        //todo: get the new-segment-edittext text and append to segments
 
         val db = AppDatabase.getDatabase(this, CoroutineScope(Dispatchers.IO))
         val serializedSegments = segments.joinToString(segmentDelimiter)

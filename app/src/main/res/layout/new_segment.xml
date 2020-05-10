@@ -17,7 +17,9 @@
         android:ems="10"
         android:textSize="20sp"
         android:hint="Enter text..."
+        android:gravity="bottom|left"
         android:inputType="textMultiLine"
+        android:lines="2"
         app:layout_constraintEnd_toStartOf="@+id/newSegmentSaveButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,6 +31,6 @@
         android:background="?android:attr/selectableItemBackground"
         android:drawableTop="@drawable/check"
         android:paddingTop="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/newSegmentEditText"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
