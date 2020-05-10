@@ -24,11 +24,7 @@ class EditNoteActivity : AppCompatActivity() {
     private lateinit var viewManager: RecyclerView.LayoutManager
     private var newNote = true
     private var noteId: Int? = null
-    private var segments = ArrayList<String>()
-    private var originalSegments = ArrayList<String>()
     private val segmentDelimiter = "|{]"
-    class DeletedSegment(val position: Int, val text: String)
-    private var deletedSegments: Stack<DeletedSegment> = Stack()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,12 +37,12 @@ class EditNoteActivity : AppCompatActivity() {
         binding.toolbar.inflateMenu(R.menu.action_bar_menu)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        currentNoteSegments = ArrayList<String>()
+        currentNoteDeletedSegments = Stack()
+        currentNoteHasBeenChanged = false
+
         val bundle: Bundle ?= intent.extras
         val message = bundle?.getInt("noteId")
-
-
-        testString += "oncreate"
-
 
 
         val context = this
@@ -65,22 +61,19 @@ class EditNoteActivity : AppCompatActivity() {
                     return@async notesDao.getNoteById(message)
                 }.await()
 
-                Log.i("ljw", note.segments.toString())
-
                 binding.noteTitleTV.setText(note.title)
                 binding.noteTitleEditText.setText(note.title)
 
                 if (note.segments!!.isNotEmpty()) {
                     // if there was only one segment the delimiter won't be there
                     if (!note.segments!!.contains(segmentDelimiter)) {
-                        segments.add(note.segments.toString())
+                        currentNoteSegments.add(note.segments.toString())
                     } else {
-                        segments = note.segments?.split(segmentDelimiter) as ArrayList<String>
+                        currentNoteSegments = note.segments?.split(segmentDelimiter) as ArrayList<String>
                     }
-                    originalSegments = segments
                 }
 
-                viewAdapter = EditNoteAdapter(segments, newNote, deletedSegments)
+                viewAdapter = EditNoteAdapter(newNote)
                 binding.noteSegmentsRV.apply {
                     setHasFixedSize(true)
                     layoutManager = viewManager
@@ -94,7 +87,7 @@ class EditNoteActivity : AppCompatActivity() {
             binding.noteTitleEditText.visibility = View.VISIBLE
             binding.noteTitleEditText.requestFocus()
 
-            viewAdapter = EditNoteAdapter(segments, newNote, deletedSegments)
+            viewAdapter = EditNoteAdapter(newNote)
             binding.noteSegmentsRV.apply {
                 setHasFixedSize(true)
                 layoutManager = viewManager
@@ -104,8 +97,8 @@ class EditNoteActivity : AppCompatActivity() {
 
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
+        super.onStop()
         saveNote()
     }
 
@@ -119,11 +112,11 @@ class EditNoteActivity : AppCompatActivity() {
         if (item.itemId == R.id.action_save) {
             saveNote()
         } else if (item.itemId == R.id.action_undo) {
-            if (deletedSegments.isEmpty()) return false
+            if (currentNoteDeletedSegments.isEmpty()) return false
 
             undoSegmentDelete()
 
-            if (deletedSegments.isEmpty()) {
+            if (currentNoteDeletedSegments.isEmpty()) {
                 //todo: hide button or discolor it
             }
         }
@@ -131,8 +124,8 @@ class EditNoteActivity : AppCompatActivity() {
     }
 
     private fun undoSegmentDelete() {
-        val delseg: DeletedSegment = deletedSegments.pop()
-        segments.add(delseg.position, delseg.text)
+        val delseg: DeletedSegment = currentNoteDeletedSegments.pop()
+        currentNoteSegments.add(delseg.position, delseg.text)
         viewAdapter.notifyItemInserted(delseg.position)
     }
 
@@ -145,14 +138,23 @@ class EditNoteActivity : AppCompatActivity() {
             return
         }
 
+        if (title != binding.noteTitleTV.text.toString() ||
+                currentNoteDeletedSegments.size > 0) {
+            currentNoteHasBeenChanged = true
+        }
 
-        Log.i("ljw", testString)
+        Log.i("ljw", currentNoteHasBeenChanged.toString())
+
+        if (!currentNoteHasBeenChanged) {
+            Log.i("ljw", "no changes to save")
+            return
+        }
 
 
         //todo: get the new-segment-edittext text and append to segments
 
         val db = AppDatabase.getDatabase(this, CoroutineScope(Dispatchers.IO))
-        val serializedSegments = segments.joinToString(segmentDelimiter)
+        val serializedSegments = currentNoteSegments.joinToString(segmentDelimiter)
         val note = Note(noteId, title, serializedSegments)
 
         GlobalScope.launch(Dispatchers.IO) {

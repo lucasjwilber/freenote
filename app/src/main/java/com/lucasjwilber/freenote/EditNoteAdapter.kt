@@ -12,9 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import java.util.*
 import kotlin.collections.ArrayList
 
-class EditNoteAdapter(private val segments: ArrayList<String>,
-                      var newNote: Boolean,
-                      var deletedSegments: Stack<EditNoteActivity.DeletedSegment>) :
+class EditNoteAdapter(var newNote: Boolean) :
     RecyclerView.Adapter<EditNoteAdapter.MyViewHolder>() {
 
 
@@ -30,7 +28,7 @@ class EditNoteAdapter(private val segments: ArrayList<String>,
     class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout) { }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == segments.size)
+        return if (position == currentNoteSegments.size)
             NEW_SEGMENT
         else
             SEGMENT
@@ -58,7 +56,7 @@ class EditNoteAdapter(private val segments: ArrayList<String>,
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         if (getItemViewType(position) == SEGMENT) {
             val textView: TextView = holder.constraintLayout.findViewById(R.id.segmentTextView)
-            textView.text = segments[position]
+            textView.text = currentNoteSegments[position]
 
         } else { //(getItemViewType(position) == NEW_SEGMENT)
             val editText: EditText = holder.constraintLayout.findViewById(R.id.newSegmentEditText)
@@ -71,26 +69,24 @@ class EditNoteAdapter(private val segments: ArrayList<String>,
     }
 
     // Return the size of your dataset (invoked by the layout manager)
-    override fun getItemCount() = segments.size + 1
+    override fun getItemCount() = currentNoteSegments.size + 1
 
     private fun onNewSegmentSaveButtonClick(text: String) {
         if (text.isEmpty()) return
 
-        segments.add(text)
+        currentNoteSegments.add(text)
         newSegmentEditText.text.clear()
-        this.notifyItemInserted(segments.size)
+        this.notifyItemInserted(currentNoteSegments.size)
 
         // flip newNote so the cursor focus will go to the new segment EditText
         newNote = false
-
-        testString += "newsegmentsaved"
+        currentNoteHasBeenChanged = true
     }
 
     private fun deleteSegment(position: Int) {
-        Log.i("ljw", "segments is $segments, position is $position")
 
-        deletedSegments.push(EditNoteActivity.DeletedSegment(position, segments[position]))
-        segments.removeAt(position)
+        currentNoteDeletedSegments.push(DeletedSegment(position, currentNoteSegments[position]))
+        currentNoteSegments.removeAt(position)
 
         //todo: un-hide or re-color the undo button
     }

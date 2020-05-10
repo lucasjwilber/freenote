@@ -6,17 +6,23 @@ import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import java.util.*
+import kotlin.collections.ArrayList
 
-var testString: String = "abc"
+var currentNoteTitle: String = ""
+var currentNoteSegments: ArrayList<String> = ArrayList<String>()
+class DeletedSegment(val position: Int, val text: String)
+var currentNoteDeletedSegments: Stack<DeletedSegment> = Stack()
+var currentNoteHasBeenChanged: Boolean = false
 
 
 fun showToast(context: Context, message: String) {
-    var toast: Toast = Toast.makeText(
+    val toast: Toast = Toast.makeText(
         context,
         message,
         Toast.LENGTH_SHORT
     )
-    var toastView = toast.view
+    val toastView = toast.view
     toastView.setBackground(context.getResources().getDrawable(R.drawable.toast_background))
     toast.show()
 }
