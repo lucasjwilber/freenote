@@ -59,8 +59,6 @@ class EditNoteAdapter(private val segments: ArrayList<String>,
         if (getItemViewType(position) == SEGMENT) {
             val textView: TextView = holder.constraintLayout.findViewById(R.id.segmentTextView)
             textView.text = segments[position]
-            val deleteButton: Button = holder.constraintLayout.findViewById(R.id.segmentDeleteButton)
-            deleteButton.setOnClickListener { deleteSegment(position)}
 
         } else { //(getItemViewType(position) == NEW_SEGMENT)
             val editText: EditText = holder.constraintLayout.findViewById(R.id.newSegmentEditText)

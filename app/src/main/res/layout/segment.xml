@@ -18,17 +18,8 @@
         android:background="@drawable/border_bottom_segment"
         android:textSize="20sp"
         android:textColor="#000000"
-        app:layout_constraintEnd_toStartOf="@+id/segmentDeleteButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/segmentDeleteButton"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:drawableTop="@drawable/delete"
-        android:background="?android:attr/selectableItemBackground"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

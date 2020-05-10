@@ -63,7 +63,7 @@ class EditNoteActivity : AppCompatActivity() {
 
                 Log.i("ljw", note.segments.toString())
 
-                binding.noteTitleEditText.setText(note.title)
+                binding.noteTitleTV.setText(note.title)
 
                 if (note.segments!!.isNotEmpty()) {
                     if (!note.segments!!.contains(segmentDelimiter)) {
@@ -83,6 +83,8 @@ class EditNoteActivity : AppCompatActivity() {
                 noteId = note.id
             }
         } else { //if we got here from clicking the 'new note' button
+            binding.noteTitleTV.visibility = View.GONE
+            binding.noteTitleEditText.visibility = View.VISIBLE
             binding.noteTitleEditText.requestFocus()
 
             viewAdapter = EditNoteAdapter(segments, newNote, deletedSegments)
@@ -133,6 +135,7 @@ class EditNoteActivity : AppCompatActivity() {
 
         if (title.isEmpty()) {
             //todo: toast
+            showToast(this, "Saved")
             return
         }
 
@@ -148,7 +151,11 @@ class EditNoteActivity : AppCompatActivity() {
             else
                 db.noteDao().update(note)
         }
+    }
 
-        finish()
+    public fun changeTitle(view: View) {
+        binding.noteTitleEditText.setText(binding.noteTitleTV.text)
+        binding.noteTitleTV.visibility = View.GONE
+        binding.noteTitleEditText.visibility = View.VISIBLE
     }
 }

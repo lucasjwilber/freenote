@@ -57,9 +57,9 @@
         tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="216dp"
-            android:layout_height="174dp"
-            android:background="@color/coffeeLightest"
+            android:layout_width="240dp"
+            android:layout_height="180dp"
+            android:background="@drawable/rounded_square_coffeedark_border"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -74,9 +74,9 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
-                android:textSize="18sp"
-                android:textAlignment="center"
                 android:gravity="center_horizontal"
+                android:textAlignment="center"
+                android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -89,7 +89,10 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginBottom="16dp"
+                android:background="?android:attr/selectableItemBackground"
                 android:text="@android:string/cancel"
+                android:textColor="@color/coffeeDark"
+                android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -99,10 +102,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
-                android:layout_marginBottom="16dp"
+                android:background="@drawable/rounded_square_coffeedark"
+                android:padding="4dp"
                 android:text="Delete"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                android:textColor="@color/coffeeLightest"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/cancelDeleteButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/cancelDeleteButton" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
