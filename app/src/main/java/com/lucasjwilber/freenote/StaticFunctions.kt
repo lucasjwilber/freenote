@@ -7,6 +7,8 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 
+var testString: String = "abc"
+
 
 fun showToast(context: Context, message: String) {
     var toast: Toast = Toast.makeText(

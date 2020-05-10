@@ -61,7 +61,7 @@
         android:id="@+id/noteSegmentsRV"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="49dp"
+        android:layout_marginTop="45dp"
         android:background="@color/coffeeLightest"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

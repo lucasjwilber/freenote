@@ -25,6 +25,7 @@ class EditNoteActivity : AppCompatActivity() {
     private var newNote = true
     private var noteId: Int? = null
     private var segments = ArrayList<String>()
+    private var originalSegments = ArrayList<String>()
     private val segmentDelimiter = "|{]"
     class DeletedSegment(val position: Int, val text: String)
     private var deletedSegments: Stack<DeletedSegment> = Stack()
@@ -36,13 +37,17 @@ class EditNoteActivity : AppCompatActivity() {
         setContentView(view)
 
         setSupportActionBar(binding.toolbar)
-        val pageTitle = "Create Note"
-        supportActionBar?.title = pageTitle
+        supportActionBar?.title = "Create Note"
         binding.toolbar.inflateMenu(R.menu.action_bar_menu)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val bundle: Bundle ?= intent.extras
         val message = bundle?.getInt("noteId")
+
+
+        testString += "oncreate"
+
+
 
         val context = this
         viewManager = LinearLayoutManager(context)
@@ -50,8 +55,7 @@ class EditNoteActivity : AppCompatActivity() {
         if (message != null) { // if we got here from clicking on an existing note
             newNote = false
 
-            val pageTitle = "Edit Note"
-            supportActionBar?.title = pageTitle
+            supportActionBar?.title = "Edit Note"
 
 
             GlobalScope.launch(Dispatchers.Main) {
@@ -64,13 +68,16 @@ class EditNoteActivity : AppCompatActivity() {
                 Log.i("ljw", note.segments.toString())
 
                 binding.noteTitleTV.setText(note.title)
+                binding.noteTitleEditText.setText(note.title)
 
                 if (note.segments!!.isNotEmpty()) {
+                    // if there was only one segment the delimiter won't be there
                     if (!note.segments!!.contains(segmentDelimiter)) {
                         segments.add(note.segments.toString())
                     } else {
                         segments = note.segments?.split(segmentDelimiter) as ArrayList<String>
                     }
+                    originalSegments = segments
                 }
 
                 viewAdapter = EditNoteAdapter(segments, newNote, deletedSegments)
@@ -134,10 +141,13 @@ class EditNoteActivity : AppCompatActivity() {
         val title: String = binding.noteTitleEditText.text.toString()
 
         if (title.isEmpty()) {
-            //todo: toast
-            showToast(this, "Saved")
+            showToast(this, "Please add a title")
             return
         }
+
+
+        Log.i("ljw", testString)
+
 
         //todo: get the new-segment-edittext text and append to segments
 
@@ -151,6 +161,7 @@ class EditNoteActivity : AppCompatActivity() {
             else
                 db.noteDao().update(note)
         }
+        showToast(this, "Saved")
     }
 
     public fun changeTitle(view: View) {

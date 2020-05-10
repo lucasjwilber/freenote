@@ -82,6 +82,8 @@ class EditNoteAdapter(private val segments: ArrayList<String>,
 
         // flip newNote so the cursor focus will go to the new segment EditText
         newNote = false
+
+        testString += "newsegmentsaved"
     }
 
     private fun deleteSegment(position: Int) {
@@ -91,12 +93,6 @@ class EditNoteAdapter(private val segments: ArrayList<String>,
         segments.removeAt(position)
 
         //todo: un-hide or re-color the undo button
-
-
-        // notifyItemRemoved() is unreliable here because position here was set when the view was bound, so
-        // if new views/segments were created after this was bound then the position will be out of date
-        // which could lead to an outOfBounds exception. so notifyDataSetChanged() is used.
-//        this.notifyDataSetChanged()
     }
 
 
@@ -107,6 +103,23 @@ class EditNoteAdapter(private val segments: ArrayList<String>,
             override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, viewHolder1: RecyclerView.ViewHolder): Boolean {
                 return false
             }
+
+            override fun getSwipeDirs(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                return createSwipeFlags(viewHolder.adapterPosition, viewHolder)
+            }
+
+            private fun createSwipeFlags(position: Int, viewHolder: RecyclerView.ViewHolder): Int {
+                return if (position == itemCount - 1) {
+                    //make the new segment EditText un-swipable
+                    0
+                } else {
+                    super.getSwipeDirs(recyclerView, viewHolder)
+                }
+            }
+
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 deleteSegment(viewHolder.adapterPosition)
                 notifyItemRemoved(viewHolder.adapterPosition)
