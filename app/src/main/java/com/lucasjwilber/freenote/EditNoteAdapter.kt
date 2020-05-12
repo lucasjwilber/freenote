@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
 
-class EditNoteAdapter(var newNote: Boolean, val context: Context) :
+class EditNoteAdapter(var newNote: Boolean, val context: Context, val noteType: Int) :
     RecyclerView.Adapter<EditNoteAdapter.MyViewHolder>() {
 
 
@@ -29,18 +29,23 @@ class EditNoteAdapter(var newNote: Boolean, val context: Context) :
 
     private val SEGMENT: Int = 0
     private val NEW_SEGMENT: Int = 1
+    private val NOTE_BODY: Int = 2
     private lateinit var newSegmentEditText: EditText
     private var currentlyEditedSegmentPosition: Int? = null
     private class LastEditedSegment(var editText: EditText, var textView: TextView, var button: Button)
     private var lastEditedSegment: LastEditedSegment? = null
 
-    class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout) { }
+    class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout) {}
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == currentNoteSegments.size)
-            NEW_SEGMENT
-        else
-            SEGMENT
+        return if (noteType == LIST) {
+            if (position == currentNoteSegments.size)
+                NEW_SEGMENT
+            else
+                SEGMENT
+        } else {
+            NOTE_BODY
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup,
@@ -52,14 +57,17 @@ class EditNoteAdapter(var newNote: Boolean, val context: Context) :
 
             return MyViewHolder(constraintLayout)
         }
-        else { //(viewType == NEW_SEGMENT)
+        else if (viewType == NEW_SEGMENT) {
             val constraintLayout = LayoutInflater.from(parent.context)
                 .inflate(R.layout.new_segment, parent, false) as ConstraintLayout
 
             newSegmentEditText = constraintLayout.findViewById(R.id.newSegmentEditText)
-
             newSegmentEditText.addTextChangedListener(newSegmentEditTextWatcher())
 
+            return MyViewHolder(constraintLayout)
+        } else { // if (viewType == NOTE_BODY) {
+            val constraintLayout = LayoutInflater.from(parent.context)
+                .inflate(R.layout.note_body, parent, false) as ConstraintLayout
             return MyViewHolder(constraintLayout)
         }
     }
@@ -74,7 +82,7 @@ class EditNoteAdapter(var newNote: Boolean, val context: Context) :
 
             textView.setOnClickListener {updateSegment(textView, editText, position, updateSegmentButton) }
 
-        } else { //(getItemViewType(position) == NEW_SEGMENT)
+        } else if (getItemViewType(position) == NEW_SEGMENT) {
             val editText: EditText = holder.constraintLayout.findViewById(R.id.newSegmentEditText)
 
             val saveButton: Button = holder.constraintLayout.findViewById(R.id.newSegmentSaveButton)
@@ -87,6 +95,10 @@ class EditNoteAdapter(var newNote: Boolean, val context: Context) :
             editText.onFocusChangeListener = OnFocusChangeListener { view, hasFocus ->
                     if (hasFocus) hideLastEditedSegment()
             }
+        } else { //if (getItemViewType(position) == NOTE_BODY) {
+            val editText: EditText = holder.constraintLayout.findViewById(R.id.noteBodyEditText)
+            editText.setText(currentNoteBody)
+            editText.addTextChangedListener(noteBodyEditTextWatcher())
         }
     }
 
@@ -216,6 +228,16 @@ class EditNoteAdapter(var newNote: Boolean, val context: Context) :
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 currentNoteSegments[currentlyEditedSegmentPosition!!] = s.toString()
                 currentNoteHasBeenChanged = true
+            }
+            override fun afterTextChanged(s: Editable) { }
+        }
+    }
+    private fun noteBodyEditTextWatcher(): TextWatcher? {
+        return object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) { }
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                currentNoteHasBeenChanged = true
+                currentNoteBody = s.toString()
             }
             override fun afterTextChanged(s: Editable) { }
         }

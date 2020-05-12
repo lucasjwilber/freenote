@@ -15,25 +15,32 @@
         android:id="@+id/segmentTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginLeft="6dp"
         android:background="@drawable/border_bottom_segment"
-        android:textSize="20sp"
+        android:paddingBottom="10dp"
         android:textColor="#000000"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/segmentEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginLeft="6dp"
         android:ems="10"
         android:inputType="textMultiLine"
+        android:paddingLeft="1sp"
+        android:paddingTop="2sp"
+        android:textSize="20sp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/updateSegmentButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/imageView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
     <Button
         android:id="@+id/updateSegmentButton"
@@ -47,5 +54,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="6dp"
+        android:layout_height="6dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/bullet_point" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -27,12 +27,13 @@ class AllNotesAdapter(private var myDataset: List<NoteDescriptor>, private var c
         val titleTextView: TextView = holder.constraintLayout.findViewById(R.id.noteTitleTextView)
         val title = myDataset[position].title
         titleTextView.text = title
-        holder.constraintLayout.setOnClickListener { goToNoteDetails(myDataset[position].id)}
+        holder.constraintLayout.setOnClickListener { goToNoteDetails(myDataset[position].type, myDataset[position].id)}
     }
 
-    private fun goToNoteDetails(noteId: Int) {
+    private fun goToNoteDetails(type: Int, noteId: Int) {
         val intent = Intent(context, EditNoteActivity::class.java)
         intent.putExtra("noteId", noteId)
+        intent.putExtra("type", type)
         context.startActivity(intent)
     }
 

@@ -23,7 +23,7 @@ class EditNoteActivity : AppCompatActivity() {
     private var noteId: Int? = null
     private val segmentDelimiter = "|{]"
     private val context: Context = this
-    private var noteType = 2
+    private var noteType: Int = NOTE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,14 +41,17 @@ class EditNoteActivity : AppCompatActivity() {
         currentNoteHasBeenChanged = false
 
         val bundle: Bundle ?= intent.extras
-        val message = bundle?.getInt("noteId")
+        noteId = bundle?.getInt("noteId")
+        newNote = bundle?.getBoolean("isNew") == true
+        if (bundle?.getInt("type") == LIST) noteType = LIST
 
+        Log.i("ljw", "noteId is $noteId")
 
         val context = this
         viewManager = LinearLayoutManager(context)
 
-        if (message != null) { // if we got here from clicking on an existing note
-            newNote = false
+//        if (noteId != null) { // if we got here from clicking on an existing note
+        if (!newNote) { // if we got here from clicking on an existing note
 
             supportActionBar?.title = "Edit Note"
 
@@ -57,37 +60,41 @@ class EditNoteActivity : AppCompatActivity() {
                 val notesDao = AppDatabase.getDatabase(application, CoroutineScope(Dispatchers.IO)).noteDao()
 
                 val note: Note = async(Dispatchers.IO) {
-                    return@async notesDao.getNoteById(message)
+                    return@async notesDao.getNoteById(noteId!!)
                 }.await()
 
                 binding.noteTitleTV.setText(note.title)
                 binding.noteTitleTV.setOnClickListener { changeTitle() }
                 binding.noteTitleEditText.setText(note.title)
 
-                if (note.segments!!.isNotEmpty()) {
-                    // if there was only one segment the delimiter won't be there
-                    if (!note.segments!!.contains(segmentDelimiter)) {
-                        currentNoteSegments.add(note.segments.toString())
-                    } else {
-                        currentNoteSegments = note.segments?.split(segmentDelimiter) as ArrayList<String>
+                if (noteType == LIST) {
+                    if (note.segments!!.isNotEmpty()) {
+                        // if there was only one segment the delimiter won't be there
+                        if (!note.segments!!.contains(segmentDelimiter)) {
+                            currentNoteSegments.add(note.segments.toString())
+                        } else {
+                            currentNoteSegments =
+                                note.segments?.split(segmentDelimiter) as ArrayList<String>
+                        }
                     }
+                } else {
+                    currentNoteBody = note.segments.toString()
                 }
 
-                viewAdapter = EditNoteAdapter(newNote, context)
+                viewAdapter = EditNoteAdapter(newNote, context, noteType)
                 binding.noteSegmentsRV.apply {
                     setHasFixedSize(true)
                     layoutManager = viewManager
                     adapter = viewAdapter
                 }
 
-                noteId = note.id
             }
         } else { //if we got here from clicking the 'new note' button
             binding.noteTitleTV.visibility = View.GONE
             binding.noteTitleEditText.visibility = View.VISIBLE
             binding.noteTitleEditText.requestFocus()
 
-            viewAdapter = EditNoteAdapter(newNote, context)
+            viewAdapter = EditNoteAdapter(newNote, context, noteType)
             binding.noteSegmentsRV.apply {
                 setHasFixedSize(true)
                 layoutManager = viewManager
@@ -156,7 +163,9 @@ class EditNoteActivity : AppCompatActivity() {
 
         val db = AppDatabase.getDatabase(this, CoroutineScope(Dispatchers.IO))
         val serializedSegments = currentNoteSegments.joinToString(segmentDelimiter)
-        val note = Note(noteId, noteType, title, serializedSegments)
+        val id = if (newNote) null else noteId
+        val text = if (noteType == NOTE) currentNoteBody else serializedSegments
+        val note = Note(id, noteType, title, text)
 
         GlobalScope.launch(Dispatchers.IO) {
            if (newNote) {

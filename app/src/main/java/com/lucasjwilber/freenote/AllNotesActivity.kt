@@ -56,8 +56,8 @@ class AllNotesActivity : AppCompatActivity() {
         binding.confirmDeleteButton.setOnClickListener { deleteNote(swipedNotePosition) }
         binding.createNoteButton.setOnClickListener { binding.selectTypeBackground.visibility = View.VISIBLE }
         binding.selectTypeBackground.setOnClickListener { binding.selectTypeBackground.visibility = View.GONE }
-        binding.selectNoteButton.setOnClickListener { goToCreateNoteActivity() }
-        binding.selectListButton.setOnClickListener { goToCreateNoteActivity() }
+        binding.selectNoteButton.setOnClickListener { goToEditNoteActivity(NOTE) }
+        binding.selectListButton.setOnClickListener { goToEditNoteActivity(LIST) }
 
         // swipe listener
         val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -106,9 +106,11 @@ class AllNotesActivity : AppCompatActivity() {
     }
 
 
-    private fun goToCreateNoteActivity() {
+    private fun goToEditNoteActivity(type: Int) {
         //make intent, go to CreateNote.kt
         intent = Intent(applicationContext, EditNoteActivity::class.java)
+        intent.putExtra("type", type)
+        intent.putExtra("isNew", true)
         startActivity(intent)
     }
 }
