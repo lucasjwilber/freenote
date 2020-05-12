@@ -1,21 +1,18 @@
 package com.lucasjwilber.freenote
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.*
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.recyclerview.widget.ItemTouchHelper
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lucasjwilber.freenote.databinding.ActivityEditNoteBinding
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class EditNoteActivity : AppCompatActivity() {
 
@@ -62,6 +59,7 @@ class EditNoteActivity : AppCompatActivity() {
                 }.await()
 
                 binding.noteTitleTV.setText(note.title)
+                binding.noteTitleTV.setOnClickListener { changeTitle() }
                 binding.noteTitleEditText.setText(note.title)
 
                 if (note.segments!!.isNotEmpty()) {
@@ -100,6 +98,7 @@ class EditNoteActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         saveNote()
+        currentNewSegmentText = ""
     }
 
 
@@ -131,44 +130,47 @@ class EditNoteActivity : AppCompatActivity() {
 
 
     private fun saveNote() {
-        val title: String = binding.noteTitleEditText.text.toString()
-
-        if (title.isEmpty()) {
-            showToast(this, "Please add a title")
-            return
-        }
+        val title: String =
+            if (binding.noteTitleEditText.text.toString().isEmpty())
+                "Untitled"
+            else
+                binding.noteTitleEditText.text.toString()
 
         if (title != binding.noteTitleTV.text.toString() ||
-                currentNoteDeletedSegments.size > 0) {
+            currentNoteDeletedSegments.size > 0 ||
+            currentNewSegmentText.isNotEmpty()
+        ) {
             currentNoteHasBeenChanged = true
         }
-
-        Log.i("ljw", currentNoteHasBeenChanged.toString())
 
         if (!currentNoteHasBeenChanged) {
             Log.i("ljw", "no changes to save")
             return
         }
 
-
-        //todo: get the new-segment-edittext text and append to segments
+        if (currentNewSegmentText.isNotEmpty()) {
+            currentNoteSegments.add(currentNewSegmentText)
+        }
 
         val db = AppDatabase.getDatabase(this, CoroutineScope(Dispatchers.IO))
         val serializedSegments = currentNoteSegments.joinToString(segmentDelimiter)
         val note = Note(noteId, title, serializedSegments)
-
+        
         GlobalScope.launch(Dispatchers.IO) {
-            if (newNote)
-                db.noteDao().insert(note)
-            else
-                db.noteDao().update(note)
+           if (newNote) {
+               db.noteDao().insert(note)
+           } else {
+               db.noteDao().update(note)
+           }
         }
+
         showToast(this, "Saved")
     }
 
-    public fun changeTitle(view: View) {
+    fun changeTitle() {
         binding.noteTitleEditText.setText(binding.noteTitleTV.text)
-        binding.noteTitleTV.visibility = View.GONE
+        binding.noteTitleTV.visibility = View.INVISIBLE
         binding.noteTitleEditText.visibility = View.VISIBLE
+        binding.noteTitleEditText.requestFocus()
     }
 }

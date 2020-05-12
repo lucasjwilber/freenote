@@ -1,14 +1,16 @@
 package com.lucasjwilber.freenote
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 
 @Dao
-interface NoteDao {
+interface NotesDao {
     @Query("SELECT * FROM notes")
     suspend fun getAll(): List<Note>
 
-    @Query("SELECT id, title FROM notes")
-    suspend fun getAllDescriptors(): List<NoteDescriptor>
+    @Query("SELECT id, title FROM notes ORDER BY id DESC")
+    fun getAllDescriptors(): LiveData<List<NoteDescriptor>>
 
     @Query("SELECT * FROM notes WHERE id = :id")
     suspend fun getNoteById(id: Int): Note

@@ -10,10 +10,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
-class AllNotesAdapter(private var myDataset: List<NoteDescriptor>, context: Context) :
+class AllNotesAdapter(private var myDataset: List<NoteDescriptor>, private var context: Context) :
     RecyclerView.Adapter<AllNotesAdapter.MyViewHolder>() {
-
-    private var context = context
 
     class MyViewHolder(val constraintLayout: CardView) : RecyclerView.ViewHolder(constraintLayout)
 

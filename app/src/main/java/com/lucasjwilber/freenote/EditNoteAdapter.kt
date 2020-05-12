@@ -1,7 +1,10 @@
 package com.lucasjwilber.freenote
 
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
@@ -24,6 +27,7 @@ class EditNoteAdapter(var newNote: Boolean) :
     private val SEGMENT: Int = 0
     private val NEW_SEGMENT: Int = 1
     private lateinit var newSegmentEditText: EditText
+    private var textWatcher: TextWatcher? = null
 
     class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout) { }
 
@@ -46,8 +50,11 @@ class EditNoteAdapter(var newNote: Boolean) :
         else { //(viewType == NEW_SEGMENT)
             val constraintLayout = LayoutInflater.from(parent.context)
                 .inflate(R.layout.new_segment, parent, false) as ConstraintLayout
-            // set the view's size, margins, paddings and layout parameters
+
             newSegmentEditText = constraintLayout.findViewById(R.id.newSegmentEditText)
+
+            newSegmentEditText.addTextChangedListener(newSegmentEditTextWatcher(newSegmentEditText))
+
             return MyViewHolder(constraintLayout)
         }
     }
@@ -57,9 +64,14 @@ class EditNoteAdapter(var newNote: Boolean) :
         if (getItemViewType(position) == SEGMENT) {
             val textView: TextView = holder.constraintLayout.findViewById(R.id.segmentTextView)
             textView.text = currentNoteSegments[position]
+            val editText: EditText = holder.constraintLayout.findViewById(R.id.segmentEditText)
+            val updateSegmentButton: Button = holder.constraintLayout.findViewById(R.id.updateSegmentButton)
+
+            textView.setOnClickListener {updateSegment(textView, editText, position, updateSegmentButton) }
 
         } else { //(getItemViewType(position) == NEW_SEGMENT)
             val editText: EditText = holder.constraintLayout.findViewById(R.id.newSegmentEditText)
+
             val saveButton: Button = holder.constraintLayout.findViewById(R.id.newSegmentSaveButton)
             saveButton.setOnClickListener { onNewSegmentSaveButtonClick(editText.text.toString()) }
             if (!newNote) {
@@ -81,6 +93,7 @@ class EditNoteAdapter(var newNote: Boolean) :
         // flip newNote so the cursor focus will go to the new segment EditText
         newNote = false
         currentNoteHasBeenChanged = true
+        currentNewSegmentText = ""
     }
 
     private fun deleteSegment(position: Int) {
@@ -91,10 +104,28 @@ class EditNoteAdapter(var newNote: Boolean) :
         //todo: un-hide or re-color the undo button
     }
 
+    private fun updateSegment(textView: TextView, editText: EditText, position: Int, updateSegmentButton: Button) {
+        editText.setText(textView.text.toString())
+        editText.visibility = View.VISIBLE
+        editText.requestFocus()
+        updateSegmentButton.visibility = View.VISIBLE
+        textView.visibility = View.GONE
+
+        updateSegmentButton.setOnClickListener {
+            if (textView.text.toString() != editText.text.toString()) {
+                currentNoteHasBeenChanged = true
+                currentNoteSegments[position] = editText.text.toString()
+                textView.text = editText.text.toString()
+            }
+            textView.visibility = View.VISIBLE
+            editText.visibility = View.GONE
+            updateSegmentButton.visibility = View.GONE
+        }
+    }
+
+
 
     private fun setUpSwipeListener(recyclerView: RecyclerView) {
-
-        Log.i("ljw", "set up swipe listener")
         val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, viewHolder1: RecyclerView.ViewHolder): Boolean {
                 return false
@@ -124,5 +155,17 @@ class EditNoteAdapter(var newNote: Boolean) :
 
         val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
+    }
+
+    private fun newSegmentEditTextWatcher(editText: EditText): TextWatcher? {
+        return object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) { }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                currentNewSegmentText = s.toString()
+            }
+
+            override fun afterTextChanged(s: Editable) { }
+        }
     }
 }

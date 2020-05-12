@@ -1,10 +1,14 @@
 package com.lucasjwilber.freenote
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,8 +22,9 @@ class AllNotesActivity : AppCompatActivity() {
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
     private var allNotes: List<NoteDescriptor> = listOf()
-    private var notesFromDb: List<NoteDescriptor> = listOf()
     private var swipedNotePosition: Int = 0
+    private var allNotesActivityContext: Context = this
+    private var viewModel: NoteDescriptorsViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,72 +34,49 @@ class AllNotesActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
         setSupportActionBar(binding.toolbar)
-        val pageTitle = "My Notes"
-        supportActionBar?.setTitle(pageTitle)
+        supportActionBar?.title = "My Notes"
 
-        //init RecyclerView with empty list first. the list is populated in onResume
+        // init recyclerview and add a LiveData observer
         viewManager = LinearLayoutManager(this)
-        viewAdapter = AllNotesAdapter(allNotes, applicationContext)
-        binding.allNotesReyclerView.apply {
-            setHasFixedSize(true)
-            layoutManager = viewManager
-            adapter = viewAdapter
-        }
+        viewModel = ViewModelProviders.of(this).get(NoteDescriptorsViewModel::class.java)
+        viewModel?.allNoteDescriptors?.observe(this, object : Observer<List<NoteDescriptor>> {
+            override fun onChanged(data: List<NoteDescriptor>?) {
+                allNotes = data!!
+                viewAdapter = AllNotesAdapter(allNotes, allNotesActivityContext)
+                binding.allNotesReyclerView.apply {
+                    setHasFixedSize(true)
+                    layoutManager = viewManager
+                    adapter = viewAdapter
+                }
+            }
+        })
 
-        binding.deleteModalLayout.setOnClickListener { cancelDelete(swipedNotePosition) }
-        binding.cancelDeleteButton.setOnClickListener { cancelDelete(swipedNotePosition) }
+        binding.deleteModalLayout.setOnClickListener { cancelDelete() }
+        binding.cancelDeleteButton.setOnClickListener { cancelDelete() }
         binding.confirmDeleteButton.setOnClickListener { deleteNote(swipedNotePosition) }
+        binding.createNoteButton.setOnClickListener { goToCreateNoteActivity() }
 
+        // swipe listener
         val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, viewHolder1: RecyclerView.ViewHolder): Boolean {
                 return false
             }
-
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 swipedNotePosition = viewHolder.adapterPosition
 
                 binding.deleteModalLayout.visibility = View.VISIBLE
 
-                val selectedNoteTitle = notesFromDb[swipedNotePosition].title
-                val prompt = "Delete \"$selectedNoteTitle\"?"
+                val selectedNoteTitle = allNotes[swipedNotePosition].title
+                val prompt = "Permanently delete \"$selectedNoteTitle\"?"
                 binding.deleteModalTextView.text = prompt
             }
         }
-
         val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
         itemTouchHelper.attachToRecyclerView(binding.allNotesReyclerView)
-
-
-        binding.createNoteButton.setOnClickListener { goToCreateNoteActivity() }
     }
 
-
-
-    override fun onResume() {
-        super.onResume()
-        val notesDao = AppDatabase.getDatabase(application, CoroutineScope(Dispatchers.IO)).noteDao()
-        // cache the context so that we can pass it into the RecyclerView adapter
-        val context = this
-
-        GlobalScope.launch(Dispatchers.Main) {
-            val allNotes: List<NoteDescriptor> = async(Dispatchers.IO) {
-                return@async notesDao.getAllDescriptors()
-            }.await()
-
-            notesFromDb = allNotes
-
-            viewAdapter = AllNotesAdapter(notesFromDb, context)
-            binding.allNotesReyclerView.apply {
-                setHasFixedSize(true)
-                layoutManager = viewManager
-                adapter = viewAdapter
-            }
-        }
-    }
-
-    private fun cancelDelete(position: Int) {
+    private fun cancelDelete() {
         binding.deleteModalLayout.visibility = View.GONE
-
         viewAdapter.notifyDataSetChanged()
     }
 
@@ -102,16 +84,16 @@ class AllNotesActivity : AppCompatActivity() {
         val notesDao = AppDatabase.getDatabase(application, CoroutineScope(Dispatchers.IO)).noteDao()
 
         // cache id before mutating the list
-        val noteId = notesFromDb[position].id
+        val noteId = allNotes[position].id
 
         GlobalScope.launch(Dispatchers.IO) {
             notesDao.deleteNoteById(noteId)
         }
 
-        val updatedNotesList = notesFromDb.toMutableList()
+        val updatedNotesList = allNotes.toMutableList()
         updatedNotesList.removeAt(position)
-        notesFromDb = updatedNotesList
-        viewAdapter = AllNotesAdapter(notesFromDb, this)
+        allNotes = updatedNotesList
+        viewAdapter = AllNotesAdapter(allNotes, this)
         binding.allNotesReyclerView.apply {
             setHasFixedSize(true)
             layoutManager = viewManager
