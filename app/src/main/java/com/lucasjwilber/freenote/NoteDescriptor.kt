@@ -1,3 +1,3 @@
 package com.lucasjwilber.freenote
 
-class NoteDescriptor(var id: Int, var title: String) { }
+class NoteDescriptor(var id: Int, var title: String, var type: Int) { }

@@ -9,7 +9,7 @@ interface NotesDao {
     @Query("SELECT * FROM notes")
     suspend fun getAll(): List<Note>
 
-    @Query("SELECT id, title FROM notes ORDER BY id DESC")
+    @Query("SELECT id, title, type FROM notes ORDER BY id DESC")
     fun getAllDescriptors(): LiveData<List<NoteDescriptor>>
 
     @Query("SELECT * FROM notes WHERE id = :id")

@@ -22,6 +22,8 @@ class EditNoteActivity : AppCompatActivity() {
     private var newNote = true
     private var noteId: Int? = null
     private val segmentDelimiter = "|{]"
+    private val context: Context = this
+    private var noteType = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,7 +73,7 @@ class EditNoteActivity : AppCompatActivity() {
                     }
                 }
 
-                viewAdapter = EditNoteAdapter(newNote)
+                viewAdapter = EditNoteAdapter(newNote, context)
                 binding.noteSegmentsRV.apply {
                     setHasFixedSize(true)
                     layoutManager = viewManager
@@ -85,7 +87,7 @@ class EditNoteActivity : AppCompatActivity() {
             binding.noteTitleEditText.visibility = View.VISIBLE
             binding.noteTitleEditText.requestFocus()
 
-            viewAdapter = EditNoteAdapter(newNote)
+            viewAdapter = EditNoteAdapter(newNote, context)
             binding.noteSegmentsRV.apply {
                 setHasFixedSize(true)
                 layoutManager = viewManager
@@ -154,8 +156,8 @@ class EditNoteActivity : AppCompatActivity() {
 
         val db = AppDatabase.getDatabase(this, CoroutineScope(Dispatchers.IO))
         val serializedSegments = currentNoteSegments.joinToString(segmentDelimiter)
-        val note = Note(noteId, title, serializedSegments)
-        
+        val note = Note(noteId, noteType, title, serializedSegments)
+
         GlobalScope.launch(Dispatchers.IO) {
            if (newNote) {
                db.noteDao().insert(note)

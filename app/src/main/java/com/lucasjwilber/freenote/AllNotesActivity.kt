@@ -54,7 +54,10 @@ class AllNotesActivity : AppCompatActivity() {
         binding.deleteModalLayout.setOnClickListener { cancelDelete() }
         binding.cancelDeleteButton.setOnClickListener { cancelDelete() }
         binding.confirmDeleteButton.setOnClickListener { deleteNote(swipedNotePosition) }
-        binding.createNoteButton.setOnClickListener { goToCreateNoteActivity() }
+        binding.createNoteButton.setOnClickListener { binding.selectTypeBackground.visibility = View.VISIBLE }
+        binding.selectTypeBackground.setOnClickListener { binding.selectTypeBackground.visibility = View.GONE }
+        binding.selectNoteButton.setOnClickListener { goToCreateNoteActivity() }
+        binding.selectListButton.setOnClickListener { goToCreateNoteActivity() }
 
         // swipe listener
         val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {

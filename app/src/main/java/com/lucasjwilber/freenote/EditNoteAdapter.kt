@@ -1,21 +1,24 @@
 package com.lucasjwilber.freenote
 
+import android.app.Activity
+import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import java.util.*
-import kotlin.collections.ArrayList
 
-class EditNoteAdapter(var newNote: Boolean) :
+
+class EditNoteAdapter(var newNote: Boolean, val context: Context) :
     RecyclerView.Adapter<EditNoteAdapter.MyViewHolder>() {
 
 
@@ -27,7 +30,9 @@ class EditNoteAdapter(var newNote: Boolean) :
     private val SEGMENT: Int = 0
     private val NEW_SEGMENT: Int = 1
     private lateinit var newSegmentEditText: EditText
-    private var textWatcher: TextWatcher? = null
+    private var currentlyEditedSegmentPosition: Int? = null
+    private class LastEditedSegment(var editText: EditText, var textView: TextView, var button: Button)
+    private var lastEditedSegment: LastEditedSegment? = null
 
     class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout) { }
 
@@ -53,7 +58,7 @@ class EditNoteAdapter(var newNote: Boolean) :
 
             newSegmentEditText = constraintLayout.findViewById(R.id.newSegmentEditText)
 
-            newSegmentEditText.addTextChangedListener(newSegmentEditTextWatcher(newSegmentEditText))
+            newSegmentEditText.addTextChangedListener(newSegmentEditTextWatcher())
 
             return MyViewHolder(constraintLayout)
         }
@@ -77,6 +82,11 @@ class EditNoteAdapter(var newNote: Boolean) :
             if (!newNote) {
                 editText.requestFocus()
             }
+
+            currentlyEditedSegmentPosition = position
+            editText.onFocusChangeListener = OnFocusChangeListener { view, hasFocus ->
+                    if (hasFocus) hideLastEditedSegment()
+            }
         }
     }
 
@@ -94,6 +104,11 @@ class EditNoteAdapter(var newNote: Boolean) :
         newNote = false
         currentNoteHasBeenChanged = true
         currentNewSegmentText = ""
+        newSegmentEditText.requestFocus()
+
+        val imm: InputMethodManager =
+            context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
     }
 
     private fun deleteSegment(position: Int) {
@@ -104,14 +119,41 @@ class EditNoteAdapter(var newNote: Boolean) :
         //todo: un-hide or re-color the undo button
     }
 
+    private fun hideLastEditedSegment() {
+        Log.i("ljw", "click")
+        if (lastEditedSegment != null) {
+            lastEditedSegment!!.textView.visibility = View.VISIBLE
+            if (lastEditedSegment!!.editText.text.toString() != lastEditedSegment!!.textView.text.toString()) {
+                lastEditedSegment!!.textView.text = lastEditedSegment!!.editText.text.toString()
+                currentNoteSegments[currentlyEditedSegmentPosition!!] = lastEditedSegment!!.editText.text.toString()
+            }
+            lastEditedSegment!!.editText.visibility = View.GONE
+            lastEditedSegment!!.button.visibility = View.GONE
+            lastEditedSegment!!.editText.removeTextChangedListener(updatedSegmentEditTextWatcher())
+        }
+        currentlyEditedSegmentPosition = null
+    }
+
     private fun updateSegment(textView: TextView, editText: EditText, position: Int, updateSegmentButton: Button) {
+
+        hideLastEditedSegment()
+
+        currentlyEditedSegmentPosition = position
+        editText.addTextChangedListener(updatedSegmentEditTextWatcher())
+
+        lastEditedSegment = LastEditedSegment(editText, textView, updateSegmentButton)
+
         editText.setText(textView.text.toString())
         editText.visibility = View.VISIBLE
         editText.requestFocus()
+        editText.setSelection(editText.text.length)
         updateSegmentButton.visibility = View.VISIBLE
         textView.visibility = View.GONE
 
+
         updateSegmentButton.setOnClickListener {
+            lastEditedSegment = null
+
             if (textView.text.toString() != editText.text.toString()) {
                 currentNoteHasBeenChanged = true
                 currentNoteSegments[position] = editText.text.toString()
@@ -120,6 +162,7 @@ class EditNoteAdapter(var newNote: Boolean) :
             textView.visibility = View.VISIBLE
             editText.visibility = View.GONE
             updateSegmentButton.visibility = View.GONE
+            currentlyEditedSegmentPosition = null
         }
     }
 
@@ -139,7 +182,7 @@ class EditNoteAdapter(var newNote: Boolean) :
             }
 
             private fun createSwipeFlags(position: Int, viewHolder: RecyclerView.ViewHolder): Int {
-                return if (position == itemCount - 1) {
+                return if (position == itemCount - 1 || position == currentlyEditedSegmentPosition) {
                     //make the new segment EditText un-swipable
                     0
                 } else {
@@ -157,14 +200,23 @@ class EditNoteAdapter(var newNote: Boolean) :
         itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 
-    private fun newSegmentEditTextWatcher(editText: EditText): TextWatcher? {
+    private fun newSegmentEditTextWatcher(): TextWatcher? {
         return object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) { }
-
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 currentNewSegmentText = s.toString()
             }
+            override fun afterTextChanged(s: Editable) { }
+        }
+    }
 
+    private fun updatedSegmentEditTextWatcher(): TextWatcher? {
+        return object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) { }
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                currentNoteSegments[currentlyEditedSegmentPosition!!] = s.toString()
+                currentNoteHasBeenChanged = true
+            }
             override fun afterTextChanged(s: Editable) { }
         }
     }

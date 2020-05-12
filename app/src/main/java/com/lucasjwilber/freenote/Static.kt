@@ -17,6 +17,10 @@ var currentNewSegmentText: String = ""
 class DeletedSegment(val position: Int, val text: String)
 var currentNoteDeletedSegments: Stack<DeletedSegment> = Stack()
 var currentNoteHasBeenChanged: Boolean = false
+var currentSelectedSegmentPosition: Int? = null
+
+val NOTE = 1
+val LIST = 2
 
 
 fun showToast(context: Context, message: String) {
