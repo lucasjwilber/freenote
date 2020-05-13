@@ -6,6 +6,7 @@
         android:id="@+id/action_undo"
         android:icon="@drawable/undo"
         android:orderInCategory="0"
+        android:visible="false"
         android:title="UNDO"
         app:showAsAction="ifRoom"/>
 

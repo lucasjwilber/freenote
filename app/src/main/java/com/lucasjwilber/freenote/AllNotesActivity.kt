@@ -4,9 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -34,13 +32,12 @@ class AllNotesActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = "My Notes"
+        supportActionBar?.title = getString(R.string.my_notes)
 
-        // init recyclerview and add a LiveData observer
+        // init recyclerview and add a LiveData observer to the dataset
         viewManager = LinearLayoutManager(this)
         viewModel = ViewModelProviders.of(this).get(NoteDescriptorsViewModel::class.java)
-        viewModel?.allNoteDescriptors?.observe(this, object : Observer<List<NoteDescriptor>> {
-            override fun onChanged(data: List<NoteDescriptor>?) {
+        viewModel?.allNoteDescriptors?.observe(this, Observer { data ->
                 allNotes = data!!
                 viewAdapter = AllNotesAdapter(allNotes, allNotesActivityContext)
                 binding.allNotesReyclerView.apply {
@@ -48,16 +45,16 @@ class AllNotesActivity : AppCompatActivity() {
                     layoutManager = viewManager
                     adapter = viewAdapter
                 }
-            }
-        })
+            })
 
-        binding.deleteModalLayout.setOnClickListener { cancelDelete() }
-        binding.cancelDeleteButton.setOnClickListener { cancelDelete() }
-        binding.confirmDeleteButton.setOnClickListener { deleteNote(swipedNotePosition) }
         binding.createNoteButton.setOnClickListener { binding.selectTypeBackground.visibility = View.VISIBLE }
         binding.selectTypeBackground.setOnClickListener { binding.selectTypeBackground.visibility = View.GONE }
         binding.selectNoteButton.setOnClickListener { goToEditNoteActivity(NOTE) }
         binding.selectListButton.setOnClickListener { goToEditNoteActivity(LIST) }
+
+        binding.deleteModalLayout.setOnClickListener { cancelDelete() }
+        binding.cancelDeleteButton.setOnClickListener { cancelDelete() }
+        binding.confirmDeleteButton.setOnClickListener { deleteNote(swipedNotePosition) }
 
         // swipe listener
         val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -65,10 +62,9 @@ class AllNotesActivity : AppCompatActivity() {
                 return false
             }
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                swipedNotePosition = viewHolder.adapterPosition
-
                 binding.deleteModalLayout.visibility = View.VISIBLE
 
+                swipedNotePosition = viewHolder.adapterPosition
                 val selectedNoteTitle = allNotes[swipedNotePosition].title
                 val prompt = "Permanently delete \"$selectedNoteTitle\"?"
                 binding.deleteModalTextView.text = prompt
@@ -79,7 +75,6 @@ class AllNotesActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-//        super.onBackPressed()
         if (binding.selectTypeBackground.visibility == View.VISIBLE) {
             binding.selectTypeBackground.visibility = View.GONE
             return
@@ -94,33 +89,25 @@ class AllNotesActivity : AppCompatActivity() {
     }
 
     private fun deleteNote(position: Int) {
-        val notesDao = AppDatabase.getDatabase(application, CoroutineScope(Dispatchers.IO)).noteDao()
-
         // cache id before mutating the list
         val noteId = allNotes[position].id
 
         GlobalScope.launch(Dispatchers.IO) {
-            notesDao.deleteNoteById(noteId)
+            AppDatabase.getDatabase(application).noteDao().deleteNoteById(noteId)
         }
 
         val updatedNotesList = allNotes.toMutableList()
         updatedNotesList.removeAt(position)
         allNotes = updatedNotesList
-        viewAdapter = AllNotesAdapter(allNotes, this)
-        binding.allNotesReyclerView.apply {
-            setHasFixedSize(true)
-            layoutManager = viewManager
-            adapter = viewAdapter
-        }
+        viewAdapter.notifyItemRemoved(position)
         binding.deleteModalLayout.visibility = View.GONE
     }
 
 
     private fun goToEditNoteActivity(type: Int) {
-        //make intent, go to CreateNote.kt
         intent = Intent(applicationContext, EditNoteActivity::class.java)
-        intent.putExtra("type", type)
-        intent.putExtra("isNew", true)
+        currentNote.type = type
+        currentNote.isNew = true
         startActivity(intent)
     }
 }

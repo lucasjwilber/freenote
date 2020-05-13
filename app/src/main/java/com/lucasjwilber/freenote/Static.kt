@@ -1,30 +1,30 @@
 package com.lucasjwilber.freenote
 
 import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
-import android.widget.EditText
-import android.widget.TextView
+import android.view.MenuItem
 import android.widget.Toast
-import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-var currentNoteTitle: String = ""
-var currentNoteSegments: ArrayList<String> = ArrayList<String>()
-var currentNewSegmentText: String = ""
+const val SEGMENT_DELIMITER = "|{]"
+const val STRIKE_THROUGH_INDICATOR = "[}|"
+const val LIST = 0
+const val NOTE = 1
+var undoButton: MenuItem? = null
+
 class DeletedSegment(val position: Int, val text: String)
-var currentNoteDeletedSegments: Stack<DeletedSegment> = Stack()
-var currentNoteHasBeenChanged: Boolean = false
-var currentSelectedSegmentPosition: Int? = null
-var currentNoteBody: String = ""
-val segmentDelimiter = "|{]"
-val strikeThroughIndicator = "[}|"
-
-val LIST = 0
-val NOTE = 1
-
+class CurrentNote(
+    var id: Int? = null,
+    var type: Int = NOTE,
+    var isNew: Boolean = false,
+    var title: String = "",
+    var body: String = "",
+    var segments: ArrayList<String> = ArrayList(),
+    var deletedSegments: Stack<DeletedSegment> = Stack(),
+    var newSegmentText: String = "",
+    var hasBeenChanged: Boolean = false
+)
+var currentNote: CurrentNote = CurrentNote()
 
 fun showToast(context: Context, message: String) {
     val toast: Toast = Toast.makeText(

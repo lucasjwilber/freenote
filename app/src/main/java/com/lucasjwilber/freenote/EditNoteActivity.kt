@@ -1,6 +1,5 @@
 package com.lucasjwilber.freenote
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -11,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lucasjwilber.freenote.databinding.ActivityEditNoteBinding
 import kotlinx.coroutines.*
-import java.util.*
 import kotlin.collections.ArrayList
 
 class EditNoteActivity : AppCompatActivity() {
@@ -19,10 +17,6 @@ class EditNoteActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditNoteBinding
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
-    private var newNote = true
-    private var noteId: Int? = null
-    private val context: Context = this
-    private var noteType: Int = NOTE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,66 +32,41 @@ class EditNoteActivity : AppCompatActivity() {
         binding.cancelDeleteButton.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
         binding.confirmDeleteButton.setOnClickListener { deleteNote() }
 
-        currentNoteSegments = ArrayList<String>()
-        currentNoteDeletedSegments = Stack()
-        currentNoteHasBeenChanged = false
-
-        val bundle: Bundle ?= intent.extras
-        noteId = bundle?.getInt("noteId")
-        newNote = bundle?.getBoolean("isNew") == true
-        if (bundle?.getInt("type") == LIST) {
-            noteType = LIST
-            supportActionBar?.title = "Create List"
-        } else {
-            supportActionBar?.title = "Create Note"
-        }
+        supportActionBar?.title = "Create " + if (currentNote.type == NOTE) "Note" else "List"
 
         val context = this
         viewManager = LinearLayoutManager(context)
 
-//        if (noteId != null) { // if we got here from clicking on an existing note
-        if (!newNote) { // if we got here from clicking on an existing note
+        if (!currentNote.isNew) { // if we got here from clicking on an existing note
 
-            supportActionBar?.title = if (noteType == NOTE) "Edit Note" else "Edit List"
+            supportActionBar?.title = if (currentNote.type == NOTE) "Edit Note" else "Edit List"
 
 
             GlobalScope.launch(Dispatchers.Main) {
-                val notesDao = AppDatabase.getDatabase(application, CoroutineScope(Dispatchers.IO)).noteDao()
+                val notesDao = AppDatabase.getDatabase(application).noteDao()
 
                 val note: Note = async(Dispatchers.IO) {
-                    return@async notesDao.getNoteById(noteId!!)
+                    return@async notesDao.getNoteById(currentNote.id!!)
                 }.await()
 
                 binding.noteTitleTV.setText(note.title)
                 binding.noteTitleTV.setOnClickListener { changeTitle() }
                 binding.noteTitleEditText.setText(note.title)
 
-                if (noteType == LIST) {
+                if (currentNote.type == LIST) {
                     if (note.segments!!.isNotEmpty()) {
                         // if there was only one segment the delimiter won't be there
-                        if (!note.segments!!.contains(segmentDelimiter)) {
-                            currentNoteSegments.add(note.segments.toString())
+                        if (!note.segments!!.contains(SEGMENT_DELIMITER)) {
+                            currentNote.segments.add(note.segments.toString())
                         } else {
-                            currentNoteSegments = note.segments?.split(segmentDelimiter) as ArrayList<String>
-
-                            //find elements that should be strike-through'd
-//                            for (segment: IndexedValue<String> in currentNoteSegments.withIndex()) {
-//                                if (segment.toString().contains(strikeThroughIndicator)) {
-//                                    currentNoteStrikeThroughIndicies.add(segment.index)
-//                                    currentNoteSegments[segment.index] = currentNoteSegments[segment.index].substring(3)
-//                                }
-//                            }
-//                            Log.i("ljw", currentNoteStrikeThroughIndicies.toString())
+                            currentNote.segments = note.segments?.split(SEGMENT_DELIMITER) as ArrayList<String>
                         }
-
-                        //strike through the lines that start with the indicator
-
                     }
                 } else {
-                    currentNoteBody = note.segments.toString()
+                    currentNote.body = note.segments.toString()
                 }
 
-                viewAdapter = EditNoteAdapter(newNote, context, noteType)
+                viewAdapter = EditNoteAdapter(context)
                 binding.noteSegmentsRV.apply {
                     setHasFixedSize(true)
                     layoutManager = viewManager
@@ -105,12 +74,12 @@ class EditNoteActivity : AppCompatActivity() {
                 }
 
             }
-        } else { //if we got here from clicking the 'new note' button
+        } else { //if we got here from clicking the 'new note' button:
             binding.noteTitleTV.visibility = View.GONE
             binding.noteTitleEditText.visibility = View.VISIBLE
             binding.noteTitleEditText.requestFocus()
 
-            viewAdapter = EditNoteAdapter(newNote, context, noteType)
+            viewAdapter = EditNoteAdapter(context)
             binding.noteSegmentsRV.apply {
                 setHasFixedSize(true)
                 layoutManager = viewManager
@@ -123,14 +92,14 @@ class EditNoteActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         saveNote()
-        currentNewSegmentText = ""
-        currentNoteBody = ""
+        currentNote = CurrentNote()
     }
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.action_bar_menu, menu)
-        if (newNote) {
+        undoButton = menu?.findItem(R.id.action_undo)
+        if (currentNote.isNew) {
             menu?.getItem(1)?.isVisible = false
         }
         return super.onCreateOptionsMenu(menu)
@@ -141,7 +110,7 @@ class EditNoteActivity : AppCompatActivity() {
 //            saveNote()
 //        } else
         if (item.itemId == R.id.action_undo) {
-            if (currentNoteDeletedSegments.isNotEmpty()) undoSegmentDelete()
+            if (currentNote.deletedSegments.isNotEmpty()) undoSegmentDelete()
         } else if (item.itemId == R.id.action_delete) {
             binding.deleteModalLayout.visibility = View.VISIBLE
         }
@@ -149,9 +118,13 @@ class EditNoteActivity : AppCompatActivity() {
     }
 
     private fun undoSegmentDelete() {
-        val delseg: DeletedSegment = currentNoteDeletedSegments.pop()
-        currentNoteSegments.add(delseg.position, delseg.text)
+        val delseg: DeletedSegment = currentNote.deletedSegments.pop()
+        currentNote.segments.add(delseg.position, delseg.text)
         viewAdapter.notifyItemInserted(delseg.position)
+
+        if (currentNote.deletedSegments.isEmpty()) {
+            undoButton?.isVisible = false
+        }
     }
 
 
@@ -163,38 +136,29 @@ class EditNoteActivity : AppCompatActivity() {
                 binding.noteTitleEditText.text.toString()
 
         if (title != binding.noteTitleTV.text.toString() ||
-            currentNoteDeletedSegments.size > 0 ||
-            currentNewSegmentText.isNotEmpty()
+            currentNote.deletedSegments.size > 0 ||
+            currentNote.newSegmentText.isNotEmpty()
         ) {
-            currentNoteHasBeenChanged = true
+            currentNote.hasBeenChanged = true
         }
 
-        if (!currentNoteHasBeenChanged) {
+        if (!currentNote.hasBeenChanged) {
             Log.i("ljw", "no changes to save")
             return
         }
 
-        if (currentNewSegmentText.isNotEmpty()) {
-            currentNoteSegments.add(currentNewSegmentText)
+        if (currentNote.newSegmentText.isNotEmpty()) {
+            currentNote.segments.add(currentNote.newSegmentText)
         }
 
-        //for each index in strikethroughindicies prepend the strikethrough indicator
-//        for (segment in currentNoteSegments.withIndex()) {
-//            if (currentNoteStrikeThroughIndicies.contains(segment.index)) {
-//                currentNoteSegments[segment.index] = strikeThroughIndicator + currentNoteSegments[segment.index]
-//            }
-//        }
-
-        val db = AppDatabase.getDatabase(this, CoroutineScope(Dispatchers.IO))
-        val serializedSegments = currentNoteSegments.joinToString(segmentDelimiter)
-        val id = if (newNote) null else noteId
-        val text = if (noteType == NOTE) currentNoteBody else serializedSegments
-        val note = Note(id, noteType, title, text)
+        val db = AppDatabase.getDatabase(this)
+        val serializedSegments = currentNote.segments.joinToString(SEGMENT_DELIMITER)
+        val text = if (currentNote.type == NOTE) currentNote.body else serializedSegments
+        val note = Note(currentNote.id, currentNote.type, title, text)
 
         GlobalScope.launch(Dispatchers.IO) {
-           if (newNote) {
+           if (currentNote.isNew) {
                db.noteDao().insert(note)
-               newNote = false
            } else {
                db.noteDao().update(note)
            }
@@ -205,8 +169,8 @@ class EditNoteActivity : AppCompatActivity() {
 
     private fun deleteNote() {
         GlobalScope.launch {
-            val notesDao = AppDatabase.getDatabase(application, CoroutineScope(Dispatchers.IO)).noteDao()
-            notesDao.deleteNoteById(noteId!!)
+            val notesDao = AppDatabase.getDatabase(application).noteDao()
+            notesDao.deleteNoteById(currentNote.id!!)
         }
         finish()
     }
