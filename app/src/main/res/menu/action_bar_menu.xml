@@ -9,16 +9,21 @@
         android:title="UNDO"
         app:showAsAction="ifRoom"/>
 
-    <item
-        android:id="@+id/action_save"
-        android:icon="@drawable/save"
-        android:orderInCategory="1"
-        android:title="SAVE"
-        app:showAsAction="ifRoom"/>
+<!--    <item-->
+<!--        android:id="@+id/action_save"-->
+<!--        android:icon="@drawable/save"-->
+<!--        android:orderInCategory="1"-->
+<!--        android:title="SAVE"-->
+<!--        app:showAsAction="ifRoom"/>-->
 
-     Settings, should always be in the overflow
-    <item android:id="@+id/action_settings"
-        android:title="SETTINGS"
+<!--     Settings, should always be in the overflow-->
+<!--    <item android:id="@+id/action_settings"-->
+<!--        android:orderInCategory="2"-->
+<!--        android:title="SETTINGS"-->
+<!--        app:showAsAction="never" />-->
+
+    <item android:id="@+id/action_delete"
+        android:title="Delete this note"
         app:showAsAction="never"/>
 
 </menu>

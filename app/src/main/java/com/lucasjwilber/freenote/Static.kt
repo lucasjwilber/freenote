@@ -19,6 +19,8 @@ var currentNoteDeletedSegments: Stack<DeletedSegment> = Stack()
 var currentNoteHasBeenChanged: Boolean = false
 var currentSelectedSegmentPosition: Int? = null
 var currentNoteBody: String = ""
+val segmentDelimiter = "|{]"
+val strikeThroughIndicator = "[}|"
 
 val LIST = 0
 val NOTE = 1
@@ -31,7 +33,7 @@ fun showToast(context: Context, message: String) {
         Toast.LENGTH_SHORT
     )
     val toastView = toast.view
-    toastView.setBackground(context.getResources().getDrawable(R.drawable.toast_background))
+    toastView.background = context.resources.getDrawable(R.drawable.toast_background)
     toast.show()
 }
 

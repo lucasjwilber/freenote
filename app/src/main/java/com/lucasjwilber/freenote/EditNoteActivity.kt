@@ -21,7 +21,6 @@ class EditNoteActivity : AppCompatActivity() {
     private lateinit var viewManager: RecyclerView.LayoutManager
     private var newNote = true
     private var noteId: Int? = null
-    private val segmentDelimiter = "|{]"
     private val context: Context = this
     private var noteType: Int = NOTE
 
@@ -36,6 +35,10 @@ class EditNoteActivity : AppCompatActivity() {
         binding.toolbar.inflateMenu(R.menu.action_bar_menu)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        binding.deleteModalLayout.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
+        binding.cancelDeleteButton.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
+        binding.confirmDeleteButton.setOnClickListener { deleteNote() }
+
         currentNoteSegments = ArrayList<String>()
         currentNoteDeletedSegments = Stack()
         currentNoteHasBeenChanged = false
@@ -44,8 +47,6 @@ class EditNoteActivity : AppCompatActivity() {
         noteId = bundle?.getInt("noteId")
         newNote = bundle?.getBoolean("isNew") == true
         if (bundle?.getInt("type") == LIST) noteType = LIST
-
-        Log.i("ljw", "noteId is $noteId")
 
         val context = this
         viewManager = LinearLayoutManager(context)
@@ -73,9 +74,20 @@ class EditNoteActivity : AppCompatActivity() {
                         if (!note.segments!!.contains(segmentDelimiter)) {
                             currentNoteSegments.add(note.segments.toString())
                         } else {
-                            currentNoteSegments =
-                                note.segments?.split(segmentDelimiter) as ArrayList<String>
+                            currentNoteSegments = note.segments?.split(segmentDelimiter) as ArrayList<String>
+
+                            //find elements that should be strike-through'd
+//                            for (segment: IndexedValue<String> in currentNoteSegments.withIndex()) {
+//                                if (segment.toString().contains(strikeThroughIndicator)) {
+//                                    currentNoteStrikeThroughIndicies.add(segment.index)
+//                                    currentNoteSegments[segment.index] = currentNoteSegments[segment.index].substring(3)
+//                                }
+//                            }
+//                            Log.i("ljw", currentNoteStrikeThroughIndicies.toString())
                         }
+
+                        //strike through the lines that start with the indicator
+
                     }
                 } else {
                     currentNoteBody = note.segments.toString()
@@ -108,25 +120,26 @@ class EditNoteActivity : AppCompatActivity() {
         super.onStop()
         saveNote()
         currentNewSegmentText = ""
+        currentNoteBody = ""
     }
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.action_bar_menu, menu)
+        if (newNote) {
+            menu?.getItem(1)?.isVisible = false
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.action_save) {
-            saveNote()
-        } else if (item.itemId == R.id.action_undo) {
-            if (currentNoteDeletedSegments.isEmpty()) return false
-
-            undoSegmentDelete()
-
-            if (currentNoteDeletedSegments.isEmpty()) {
-                //todo: hide button or discolor it
-            }
+//        if (item.itemId == R.id.action_save) {
+//            saveNote()
+//        } else
+        if (item.itemId == R.id.action_undo) {
+            if (currentNoteDeletedSegments.isNotEmpty()) undoSegmentDelete()
+        } else if (item.itemId == R.id.action_delete) {
+            binding.deleteModalLayout.visibility = View.VISIBLE
         }
         return super.onOptionsItemSelected(item)
     }
@@ -161,6 +174,13 @@ class EditNoteActivity : AppCompatActivity() {
             currentNoteSegments.add(currentNewSegmentText)
         }
 
+        //for each index in strikethroughindicies prepend the strikethrough indicator
+//        for (segment in currentNoteSegments.withIndex()) {
+//            if (currentNoteStrikeThroughIndicies.contains(segment.index)) {
+//                currentNoteSegments[segment.index] = strikeThroughIndicator + currentNoteSegments[segment.index]
+//            }
+//        }
+
         val db = AppDatabase.getDatabase(this, CoroutineScope(Dispatchers.IO))
         val serializedSegments = currentNoteSegments.joinToString(segmentDelimiter)
         val id = if (newNote) null else noteId
@@ -170,12 +190,21 @@ class EditNoteActivity : AppCompatActivity() {
         GlobalScope.launch(Dispatchers.IO) {
            if (newNote) {
                db.noteDao().insert(note)
+               newNote = false
            } else {
                db.noteDao().update(note)
            }
         }
 
         showToast(this, "Saved")
+    }
+
+    private fun deleteNote() {
+        GlobalScope.launch {
+            val notesDao = AppDatabase.getDatabase(application, CoroutineScope(Dispatchers.IO)).noteDao()
+            notesDao.deleteNoteById(noteId!!)
+        }
+        finish()
     }
 
     fun changeTitle() {

@@ -31,7 +31,6 @@
         android:layout_marginBottom="6dp"
         android:background="?android:attr/selectableItemBackground"
         android:drawableTop="@drawable/check"
-        android:paddingTop="5dp"
         app:layout_constraintBottom_toBottomOf="@+id/newSegmentEditText"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

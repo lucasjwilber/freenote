@@ -78,6 +78,16 @@ class AllNotesActivity : AppCompatActivity() {
         itemTouchHelper.attachToRecyclerView(binding.allNotesReyclerView)
     }
 
+    override fun onBackPressed() {
+//        super.onBackPressed()
+        if (binding.selectTypeBackground.visibility == View.VISIBLE) {
+            binding.selectTypeBackground.visibility = View.GONE
+            return
+        } else {
+            finish()
+        }
+    }
+
     private fun cancelDelete() {
         binding.deleteModalLayout.visibility = View.GONE
         viewAdapter.notifyDataSetChanged()
