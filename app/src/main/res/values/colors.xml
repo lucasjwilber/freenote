@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--    Cafe palette    -->
+    <color name="coffeeLighterest">#FFE4C6</color>
     <color name="coffeeLightest">#FFDFC1</color>
     <color name="coffeeLight">#FBB675</color>
-    <color name="coffeeMedium">#DB893A</color>
+    <color name="coffeeMedium">#CB792A</color>
     <color name="coffeeDark">#B36112</color>
     <color name="coffeeDarkest">#844000</color>
 
-    <color name="colorPrimary">#DB893A</color>
-    <color name="colorPrimaryDark">#844000</color>
-    <color name="colorAccent">#DB893A</color>
+    <color name="colorPrimary">@color/coffeeMedium</color>
+    <color name="colorPrimaryDark">@color/coffeeDarkest</color>
+    <color name="colorAccent">@color/coffeeMedium</color>
 </resources>

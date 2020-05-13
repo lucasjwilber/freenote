@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:background="@color/coffeeLightest"
+    android:background="@color/coffeeLighterest"
     tools:context=".EditNoteActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -30,8 +30,10 @@
         android:layout_marginRight="12dp"
         android:paddingStart="2sp"
         android:paddingLeft="2sp"
-        android:paddingTop="3sp"
+        android:paddingTop="8dp"
         android:text="TextView"
+        android:textColor="@android:color/black"
+        android:fontFamily="sans-serif-smallcaps"
         android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,7 +51,6 @@
         android:ems="10"
         android:hint="Title"
         android:inputType="textPersonName"
-        android:maxLength="36"
         android:textSize="22sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
@@ -62,7 +63,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="55dp"
-        android:background="@color/coffeeLightest"
+        android:background="@color/coffeeLighterest"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -31,7 +31,6 @@ class EditNoteActivity : AppCompatActivity() {
         setContentView(view)
 
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = "Create Note"
         binding.toolbar.inflateMenu(R.menu.action_bar_menu)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -46,7 +45,12 @@ class EditNoteActivity : AppCompatActivity() {
         val bundle: Bundle ?= intent.extras
         noteId = bundle?.getInt("noteId")
         newNote = bundle?.getBoolean("isNew") == true
-        if (bundle?.getInt("type") == LIST) noteType = LIST
+        if (bundle?.getInt("type") == LIST) {
+            noteType = LIST
+            supportActionBar?.title = "Create List"
+        } else {
+            supportActionBar?.title = "Create Note"
+        }
 
         val context = this
         viewManager = LinearLayoutManager(context)
@@ -54,7 +58,7 @@ class EditNoteActivity : AppCompatActivity() {
 //        if (noteId != null) { // if we got here from clicking on an existing note
         if (!newNote) { // if we got here from clicking on an existing note
 
-            supportActionBar?.title = "Edit Note"
+            supportActionBar?.title = if (noteType == NOTE) "Edit Note" else "Edit List"
 
 
             GlobalScope.launch(Dispatchers.Main) {
