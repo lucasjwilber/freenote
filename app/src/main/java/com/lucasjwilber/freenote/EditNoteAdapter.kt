@@ -24,7 +24,7 @@ class EditNoteAdapter(val context: Context) :
     private val SEGMENT: Int = 0
     private val NEW_SEGMENT: Int = 1
     private val NOTE_BODY: Int = 2
-    private lateinit var newSegmentEditText: EditText
+//    private lateinit var newSegmentEditText: EditText
     private class CurrentEditedSegment(var editText: EditText, var textView: TextView, var button: Button, var position: Int, var isStruckThrough: Boolean)
     private var currentEditedSegment: CurrentEditedSegment? = null
 
@@ -54,7 +54,7 @@ class EditNoteAdapter(val context: Context) :
                 .inflate(R.layout.new_segment, parent, false) as ConstraintLayout
 
             newSegmentEditText = constraintLayout.findViewById(R.id.newSegmentEditText)
-            newSegmentEditText.addTextChangedListener(makeTextWatcher(TW_NEW_SEGMENT))
+            newSegmentEditText!!.addTextChangedListener(makeTextWatcher(TW_NEW_SEGMENT))
 
             return MyViewHolder(constraintLayout)
         } else { // if (viewType == NOTE_BODY) {
@@ -108,7 +108,7 @@ class EditNoteAdapter(val context: Context) :
         if (text.isEmpty()) return
 
         currentNote.segments.add(text)
-        newSegmentEditText.text.clear()
+        newSegmentEditText!!.text.clear()
 
         // don't use notifyItemInserted() here, in order to keep the keyboard open and the edit text focused
         notifyDataSetChanged()

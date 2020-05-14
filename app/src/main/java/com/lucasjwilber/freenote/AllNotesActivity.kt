@@ -74,6 +74,14 @@ class AllNotesActivity : AppCompatActivity() {
         itemTouchHelper.attachToRecyclerView(binding.allNotesReyclerView)
     }
 
+    override fun onResume() {
+        super.onResume()
+        // clearing currentNote here affects the onStop saveNote() function because of asynchronous saving.
+        // so currentNote is cleared before navigating to EditNoteActivity instead
+        //currentNote = CurrentNote()
+        newSegmentEditText = null
+    }
+
     override fun onBackPressed() {
         if (binding.selectTypeBackground.visibility == View.VISIBLE) {
             binding.selectTypeBackground.visibility = View.GONE
@@ -106,6 +114,7 @@ class AllNotesActivity : AppCompatActivity() {
 
     private fun goToEditNoteActivity(type: Int) {
         intent = Intent(applicationContext, EditNoteActivity::class.java)
+        currentNote = CurrentNote()
         currentNote.type = type
         currentNote.isNew = true
         startActivity(intent)

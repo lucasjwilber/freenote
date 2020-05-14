@@ -39,6 +39,8 @@ class EditNoteActivity : AppCompatActivity() {
 
         if (!currentNote.isNew) { // if we got here from clicking on an existing note
 
+            Log.i("ljw", "oncreate")
+
             supportActionBar?.title = if (currentNote.type == NOTE) "Edit Note" else "Edit List"
 
 
@@ -86,20 +88,23 @@ class EditNoteActivity : AppCompatActivity() {
                 adapter = viewAdapter
             }
         }
+    }
 
+    override fun onResume() {
+        super.onResume()
+        currentNote.newSegmentText = ""
     }
 
     override fun onStop() {
         super.onStop()
         saveNote()
-        currentNote = CurrentNote()
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.action_bar_menu, menu)
         undoButton = menu?.findItem(R.id.action_undo)
         if (currentNote.isNew) {
+            //hide the delete option
             menu?.getItem(1)?.isVisible = false
         }
         return super.onCreateOptionsMenu(menu)
@@ -149,6 +154,8 @@ class EditNoteActivity : AppCompatActivity() {
 
         if (currentNote.newSegmentText.isNotEmpty()) {
             currentNote.segments.add(currentNote.newSegmentText)
+            currentNote.newSegmentText = ""
+            if (newSegmentEditText != null) newSegmentEditText!!.text.clear()
         }
 
         val db = AppDatabase.getDatabase(this)
@@ -159,6 +166,7 @@ class EditNoteActivity : AppCompatActivity() {
         GlobalScope.launch(Dispatchers.IO) {
            if (currentNote.isNew) {
                db.noteDao().insert(note)
+               currentNote.isNew = false
            } else {
                db.noteDao().update(note)
            }

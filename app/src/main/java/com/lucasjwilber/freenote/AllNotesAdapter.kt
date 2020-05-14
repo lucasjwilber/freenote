@@ -30,6 +30,7 @@ class AllNotesAdapter(private var allNoteDescriptors: List<NoteDescriptor>, priv
 
     private fun goToNoteDetails(type: Int, noteId: Int) {
         val intent = Intent(context, EditNoteActivity::class.java)
+        currentNote = CurrentNote()
         currentNote.id = noteId
         currentNote.type = type
         context.startActivity(intent)
