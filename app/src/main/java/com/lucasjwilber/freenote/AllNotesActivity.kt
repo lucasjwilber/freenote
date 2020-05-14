@@ -85,7 +85,7 @@ class AllNotesActivity : AppCompatActivity() {
 
     private fun cancelDelete() {
         binding.deleteModalLayout.visibility = View.GONE
-        viewAdapter.notifyDataSetChanged()
+        viewAdapter.notifyItemChanged(swipedNotePosition)
     }
 
     private fun deleteNote(position: Int) {

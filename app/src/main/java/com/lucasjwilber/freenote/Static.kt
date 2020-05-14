@@ -1,6 +1,8 @@
 package com.lucasjwilber.freenote
 
 import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.MenuItem
 import android.widget.Toast
 import java.util.*
@@ -10,6 +12,9 @@ const val SEGMENT_DELIMITER = "|{]"
 const val STRIKE_THROUGH_INDICATOR = "[}|"
 const val LIST = 0
 const val NOTE = 1
+const val TW_NEW_SEGMENT = 2
+const val TW_UPDATED_SEGMENT = 3
+const val TW_NOTE_BODY = 4
 var undoButton: MenuItem? = null
 
 class DeletedSegment(val position: Int, val text: String)
@@ -22,6 +27,7 @@ class CurrentNote(
     var segments: ArrayList<String> = ArrayList(),
     var deletedSegments: Stack<DeletedSegment> = Stack(),
     var newSegmentText: String = "",
+    var currentlyEditedSegmentPosition: Int? = null,
     var hasBeenChanged: Boolean = false
 )
 var currentNote: CurrentNote = CurrentNote()
@@ -37,44 +43,33 @@ fun showToast(context: Context, message: String) {
     toast.show()
 }
 
-//fun makeTextWatcher(
-//    editText: EditText,
-//    counter: TextView,
-//    maxLength: Int
-//): TextWatcher? {
-//    return object : TextWatcher {
-//        var currentText: String? = null
-//        var cursorPosition = 0
-//        override fun beforeTextChanged(
-//            s: CharSequence,
-//            start: Int,
-//            count: Int,
-//            after: Int
-//        ) {
-//            currentText = editText.text.toString()
-//            cursorPosition = editText.selectionStart - 1
-//        }
-//
-//        override fun onTextChanged(
-//            s: CharSequence,
-//            start: Int,
-//            before: Int,
-//            count: Int
-//        ) {
-//        }
-//
-//        override fun afterTextChanged(s: Editable) {
-//            if (editText.lineCount > editText.maxLines ||
-//                editText.length() - 1 >= maxLength
-//            ) {
-//                editText.setText(currentText)
-//                editText.setSelection(cursorPosition)
-//            } else {
-//                val counterText = editText.length().toString() + "/" + maxLength
-//                counter.text = counterText
-//            }
-//            val alpha = editText.length().toFloat() / maxLength
-//            counter.alpha = alpha
-//        }
-//    }
-//}
+fun makeTextWatcher(type: Int): TextWatcher? {
+    if (type == TW_NEW_SEGMENT) {
+        return object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                currentNote.newSegmentText = s.toString()
+            }
+            override fun afterTextChanged(s: Editable) {}
+        }
+    } else if (type == TW_UPDATED_SEGMENT) {
+        return object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                currentNote.segments[currentNote.currentlyEditedSegmentPosition!!] = s.toString()
+                currentNote.hasBeenChanged = true
+            }
+            override fun afterTextChanged(s: Editable) {}
+        }
+    } else {//if (type == TW_NOTE_BODY) {
+        return object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                currentNote.hasBeenChanged = true
+                currentNote.body = s.toString()
+            }
+            override fun afterTextChanged(s: Editable) {}
+        }
+    }
+}
+

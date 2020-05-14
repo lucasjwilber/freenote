@@ -2,8 +2,6 @@ package com.lucasjwilber.freenote
 
 import android.content.Context
 import android.graphics.Paint
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
@@ -27,9 +25,8 @@ class EditNoteAdapter(val context: Context) :
     private val NEW_SEGMENT: Int = 1
     private val NOTE_BODY: Int = 2
     private lateinit var newSegmentEditText: EditText
-    private var currentlyEditedSegmentPosition: Int? = null
-    private class LastEditedSegment(var editText: EditText, var textView: TextView, var button: Button, var position: Int)
-    private var lastEditedSegment: LastEditedSegment? = null
+    private class CurrentEditedSegment(var editText: EditText, var textView: TextView, var button: Button, var position: Int, var isStruckThrough: Boolean)
+    private var currentEditedSegment: CurrentEditedSegment? = null
 
     class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout) {}
 
@@ -57,7 +54,7 @@ class EditNoteAdapter(val context: Context) :
                 .inflate(R.layout.new_segment, parent, false) as ConstraintLayout
 
             newSegmentEditText = constraintLayout.findViewById(R.id.newSegmentEditText)
-            newSegmentEditText.addTextChangedListener(newSegmentEditTextWatcher())
+            newSegmentEditText.addTextChangedListener(makeTextWatcher(TW_NEW_SEGMENT))
 
             return MyViewHolder(constraintLayout)
         } else { // if (viewType == NOTE_BODY) {
@@ -90,38 +87,35 @@ class EditNoteAdapter(val context: Context) :
             val editText: EditText = holder.constraintLayout.findViewById(R.id.newSegmentEditText)
 
             val saveButton: Button = holder.constraintLayout.findViewById(R.id.newSegmentSaveButton)
-            saveButton.setOnClickListener { onNewSegmentSaveButtonClick(editText.text.toString()) }
-            if (!currentNote.isNew) {
-                editText.requestFocus()
-            }
+            saveButton.setOnClickListener { createNewSegment(editText.text.toString()) }
 
-            currentlyEditedSegmentPosition = position
+            newSegmentEditText = editText
+            editText.requestFocus()
+            currentNote.currentlyEditedSegmentPosition = position
             editText.onFocusChangeListener = OnFocusChangeListener { view, hasFocus ->
-                    if (hasFocus) hideLastEditedSegment()
+                if (hasFocus) hideLastEditedSegment()
             }
         } else { //if (getItemViewType(position) == NOTE_BODY) {
             val editText: EditText = holder.constraintLayout.findViewById(R.id.noteBodyEditText)
             editText.setText(currentNote.body)
-            editText.addTextChangedListener(noteBodyEditTextWatcher())
+            editText.addTextChangedListener(makeTextWatcher(TW_NOTE_BODY))
         }
     }
 
     override fun getItemCount() = currentNote.segments.size + 1
 
-    private fun onNewSegmentSaveButtonClick(text: String) {
+    private fun createNewSegment(text: String) {
         if (text.isEmpty()) return
 
         currentNote.segments.add(text)
         newSegmentEditText.text.clear()
+
+        // don't use notifyItemInserted() here, in order to keep the keyboard open and the edit text focused
         notifyDataSetChanged()
 
         currentNote.hasBeenChanged = true
         currentNote.newSegmentText = ""
-        newSegmentEditText.requestFocus()
 
-//        val imm: InputMethodManager =
-//            context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-//        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
     }
 
     private fun deleteSegment(position: Int) {
@@ -132,30 +126,35 @@ class EditNoteAdapter(val context: Context) :
     }
 
     private fun hideLastEditedSegment() {
-        if (lastEditedSegment != null) {
-            lastEditedSegment!!.textView.visibility = View.VISIBLE
-            if (lastEditedSegment!!.editText.text.toString() != lastEditedSegment!!.textView.text.toString()) {
-                lastEditedSegment!!.textView.text = lastEditedSegment!!.editText.text.toString()
-                if (currentlyEditedSegmentPosition != null) {
-                    currentNote.segments[lastEditedSegment!!.position] = lastEditedSegment!!.editText.text.toString()
-                }
+        if (currentEditedSegment != null) {
+            val ces: CurrentEditedSegment = currentEditedSegment!!
+
+            ces.textView.visibility = View.VISIBLE
+            val updatedText: String = ces.editText.text.toString()
+            if (updatedText != ces.textView.text.toString()) {
+                ces.textView.text = updatedText
+                currentNote.segments[ces.position] = updatedText
             }
-            lastEditedSegment!!.editText.visibility = View.GONE
-            lastEditedSegment!!.button.visibility = View.GONE
-            lastEditedSegment!!.editText.removeTextChangedListener(updatedSegmentEditTextWatcher())
+            ces.editText.visibility = View.GONE
+            ces.button.visibility = View.GONE
+            ces.editText.removeTextChangedListener(makeTextWatcher(TW_UPDATED_SEGMENT))
         }
-        currentlyEditedSegmentPosition = null
     }
 
     private fun updateSegment(textView: TextView, editText: EditText, position: Int, updateSegmentButton: Button) {
-        val isStruckThrough = currentNote.segments[position].contains(STRIKE_THROUGH_INDICATOR)
+        //if the last edited segment wasn't 'saved', save the changes and update the textview
         hideLastEditedSegment()
 
-        currentlyEditedSegmentPosition = position
-        editText.addTextChangedListener(updatedSegmentEditTextWatcher())
+        currentEditedSegment = CurrentEditedSegment(
+            editText,
+            textView,
+            updateSegmentButton,
+            position,
+            currentNote.segments[position].contains(STRIKE_THROUGH_INDICATOR))
 
-        lastEditedSegment = LastEditedSegment(editText, textView, updateSegmentButton, position)
-
+        val ces = currentEditedSegment
+        currentNote.currentlyEditedSegmentPosition = position
+        ces!!.editText.addTextChangedListener(makeTextWatcher(TW_UPDATED_SEGMENT))
         editText.setText(textView.text.toString())
         editText.visibility = View.VISIBLE
         editText.requestFocus()
@@ -164,24 +163,29 @@ class EditNoteAdapter(val context: Context) :
         textView.visibility = View.GONE
 
         updateSegmentButton.setOnClickListener {
-            lastEditedSegment = null
-
-            if (textView.text.toString() != editText.text.toString()) {
-                currentNote.hasBeenChanged = true
-                    currentNote.segments[position] = editText.text.toString()
-                textView.text = editText.text.toString()
-            }
-
-            //reapply the strike-through indicator
-            if (isStruckThrough) {
-                currentNote.segments[position] = STRIKE_THROUGH_INDICATOR + editText.text.toString()
-            }
-
-            textView.visibility = View.VISIBLE
-            editText.visibility = View.GONE
-            updateSegmentButton.visibility = View.GONE
-            currentlyEditedSegmentPosition = null
+            saveSegmentEdits()
         }
+    }
+
+    private fun saveSegmentEdits() {
+        val ces: CurrentEditedSegment = currentEditedSegment!!
+        if (ces.textView.text.toString() != ces.editText.text.toString()) {
+            currentNote.hasBeenChanged = true
+            currentNote.segments[ces.position] = ces.editText.text.toString()
+            ces.textView.text = ces.editText.text.toString()
+        }
+
+        //reapply the strike-through indicator
+        if (ces.isStruckThrough) {
+            currentNote.segments[ces.position] = STRIKE_THROUGH_INDICATOR + ces.editText.text.toString()
+        }
+
+        ces.textView.visibility = View.VISIBLE
+        ces.editText.visibility = View.GONE
+        ces.button.visibility = View.GONE
+
+        currentEditedSegment = null
+        currentNote.currentlyEditedSegmentPosition = null
     }
 
     private fun strikeThroughSegment(position: Int, text: String, textView: TextView): Boolean {
@@ -192,14 +196,11 @@ class EditNoteAdapter(val context: Context) :
             currentNote.segments[position] = STRIKE_THROUGH_INDICATOR + currentNote.segments[position]
             textView.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
         }
-//        notifyItemChanged(position)
-        notifyDataSetChanged()
+        notifyItemChanged(position)
         currentNote.hasBeenChanged = true
 
         return true
     }
-
-
 
     private fun setUpSwipeListener(recyclerView: RecyclerView) {
         val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -215,7 +216,7 @@ class EditNoteAdapter(val context: Context) :
             }
 
             private fun createSwipeFlags(position: Int, viewHolder: RecyclerView.ViewHolder): Int {
-                return if (position == itemCount - 1 || position == currentlyEditedSegmentPosition) {
+                return if (position == itemCount - 1 || position == currentNote.currentlyEditedSegmentPosition) {
                     //make the new segment EditText un-swipable
                     0
                 } else {
@@ -225,43 +226,11 @@ class EditNoteAdapter(val context: Context) :
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 deleteSegment(viewHolder.adapterPosition)
-//                notifyItemRemoved(viewHolder.adapterPosition)
-                notifyDataSetChanged()
+                notifyItemRemoved(viewHolder.adapterPosition)
             }
         }
 
         val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
-    }
-
-    private fun newSegmentEditTextWatcher(): TextWatcher? {
-        return object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) { }
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                currentNote.newSegmentText = s.toString()
-            }
-            override fun afterTextChanged(s: Editable) { }
-        }
-    }
-
-    private fun updatedSegmentEditTextWatcher(): TextWatcher? {
-        return object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) { }
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                currentNote.segments[currentlyEditedSegmentPosition!!] = s.toString()
-                currentNote.hasBeenChanged = true
-            }
-            override fun afterTextChanged(s: Editable) { }
-        }
-    }
-    private fun noteBodyEditTextWatcher(): TextWatcher? {
-        return object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) { }
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                currentNote.hasBeenChanged = true
-                currentNote.body = s.toString()
-            }
-            override fun afterTextChanged(s: Editable) { }
-        }
     }
 }
