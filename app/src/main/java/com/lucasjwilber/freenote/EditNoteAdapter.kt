@@ -24,7 +24,6 @@ class EditNoteAdapter(val context: Context) :
     private val SEGMENT: Int = 0
     private val NEW_SEGMENT: Int = 1
     private val NOTE_BODY: Int = 2
-//    private lateinit var newSegmentEditText: EditText
     private class CurrentEditedSegment(var editText: EditText, var textView: TextView, var button: Button, var position: Int, var isStruckThrough: Boolean)
     private var currentEditedSegment: CurrentEditedSegment? = null
 
@@ -92,7 +91,7 @@ class EditNoteAdapter(val context: Context) :
             newSegmentEditText = editText
             editText.requestFocus()
             currentNote.currentlyEditedSegmentPosition = position
-            editText.onFocusChangeListener = OnFocusChangeListener { view, hasFocus ->
+            editText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) hideLastEditedSegment()
             }
         } else { //if (getItemViewType(position) == NOTE_BODY) {

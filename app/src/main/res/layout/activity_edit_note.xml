@@ -85,7 +85,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="240dp"
             android:layout_height="180dp"
-            android:background="@drawable/rounded_square_coffeedark_border"
+            android:background="@drawable/rounded_square_dark_border"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

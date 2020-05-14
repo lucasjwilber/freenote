@@ -39,10 +39,7 @@ class EditNoteActivity : AppCompatActivity() {
 
         if (!currentNote.isNew) { // if we got here from clicking on an existing note
 
-            Log.i("ljw", "oncreate")
-
             supportActionBar?.title = if (currentNote.type == NOTE) "Edit Note" else "Edit List"
-
 
             GlobalScope.launch(Dispatchers.Main) {
                 val notesDao = AppDatabase.getDatabase(application).noteDao()
@@ -51,7 +48,7 @@ class EditNoteActivity : AppCompatActivity() {
                     return@async notesDao.getNoteById(currentNote.id!!)
                 }.await()
 
-                binding.noteTitleTV.setText(note.title)
+                binding.noteTitleTV.text = if (note.title.isEmpty()) "Untitled" else note.title
                 binding.noteTitleTV.setOnClickListener { changeTitle() }
                 binding.noteTitleEditText.setText(note.title)
 
