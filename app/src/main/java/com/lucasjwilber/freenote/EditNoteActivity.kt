@@ -128,6 +128,16 @@ class EditNoteActivity : AppCompatActivity() {
         if (currentNote.deletedSegments.isEmpty()) {
             undoButton?.isVisible = false
         }
+
+        if (currentNote.currentlyEditedSegmentPosition != null) {
+            if (currentNote.currentlyEditedSegmentPosition!! > delseg.position) {
+                currentNote.currentlyEditedSegmentPosition =
+                    currentNote.currentlyEditedSegmentPosition!! + 1
+            } else {
+                currentNote.currentlyEditedSegmentPosition =
+                    currentNote.currentlyEditedSegmentPosition!! - 1
+            }
+        }
     }
 
 
@@ -182,7 +192,7 @@ class EditNoteActivity : AppCompatActivity() {
         finish()
     }
 
-    fun changeTitle() {
+    private fun changeTitle() {
         binding.noteTitleEditText.setText(binding.noteTitleTV.text)
         binding.noteTitleTV.visibility = View.INVISIBLE
         binding.noteTitleEditText.visibility = View.VISIBLE

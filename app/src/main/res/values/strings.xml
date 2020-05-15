@@ -13,7 +13,7 @@
     <string name="new_note">New Note</string>
     <string name="new_list">New List</string>
     <string name="title">Title</string>
-    <string name="delete_this_note_question">Delete this note?</string>
+    <string name="delete_this_note_question">Permanently delete this note?</string>
     <string name="delete_this_note">Delete this note</string>
     <string name="enter_text">Enter text…</string>
     <string name="undo">UNDO</string>

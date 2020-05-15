@@ -2,6 +2,7 @@ package com.lucasjwilber.freenote
 
 import android.content.Context
 import android.graphics.Paint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
@@ -79,8 +80,8 @@ class EditNoteAdapter(val context: Context) :
             val editText: EditText = holder.constraintLayout.findViewById(R.id.segmentEditText)
             val updateSegmentButton: Button = holder.constraintLayout.findViewById(R.id.updateSegmentButton)
 
-            textView.setOnClickListener {updateSegment(textView, editText, position, updateSegmentButton) }
-            textView.setOnLongClickListener { strikeThroughSegment(position, currentNote.segments[position], textView) }
+            textView.setOnClickListener {updateSegment(textView, editText, holder, updateSegmentButton) }
+            textView.setOnLongClickListener { strikeThroughSegment(holder, textView) }
 
         } else if (getItemViewType(position) == NEW_SEGMENT) {
             val editText: EditText = holder.constraintLayout.findViewById(R.id.newSegmentEditText)
@@ -90,7 +91,6 @@ class EditNoteAdapter(val context: Context) :
 
             newSegmentEditText = editText
             editText.requestFocus()
-            currentNote.currentlyEditedSegmentPosition = position
             editText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) hideLastEditedSegment()
             }
@@ -120,7 +120,20 @@ class EditNoteAdapter(val context: Context) :
     private fun deleteSegment(position: Int) {
         currentNote.deletedSegments.push(DeletedSegment(position, currentNote.segments[position]))
         undoButton?.isVisible = true
+
         currentNote.segments.removeAt(position)
+
+        // update currentlyEditedSegmentPosition accordingly.
+        // can't use simple ++ or -- operators for some reason
+        if (currentNote.currentlyEditedSegmentPosition != null) {
+            if (currentNote.currentlyEditedSegmentPosition!! > position) {
+                currentNote.currentlyEditedSegmentPosition =
+                    currentNote.currentlyEditedSegmentPosition!! - 1
+            } else {
+                currentNote.currentlyEditedSegmentPosition =
+                    currentNote.currentlyEditedSegmentPosition!! + 1
+            }
+        }
         notifyItemRemoved(position)
     }
 
@@ -140,7 +153,7 @@ class EditNoteAdapter(val context: Context) :
         }
     }
 
-    private fun updateSegment(textView: TextView, editText: EditText, position: Int, updateSegmentButton: Button) {
+    private fun updateSegment(textView: TextView, editText: EditText, holder: MyViewHolder, updateSegmentButton: Button) {
         //if the last edited segment wasn't 'saved', save the changes and update the textview
         hideLastEditedSegment()
 
@@ -148,11 +161,11 @@ class EditNoteAdapter(val context: Context) :
             editText,
             textView,
             updateSegmentButton,
-            position,
-            currentNote.segments[position].contains(STRIKE_THROUGH_INDICATOR))
+            holder.adapterPosition,
+            currentNote.segments[holder.adapterPosition].contains(STRIKE_THROUGH_INDICATOR))
 
         val ces = currentEditedSegment
-        currentNote.currentlyEditedSegmentPosition = position
+        currentNote.currentlyEditedSegmentPosition = holder.adapterPosition
         ces!!.editText.addTextChangedListener(makeTextWatcher(TW_UPDATED_SEGMENT))
         editText.setText(textView.text.toString())
         editText.visibility = View.VISIBLE
@@ -187,15 +200,15 @@ class EditNoteAdapter(val context: Context) :
         currentNote.currentlyEditedSegmentPosition = null
     }
 
-    private fun strikeThroughSegment(position: Int, text: String, textView: TextView): Boolean {
-        if (text.contains(STRIKE_THROUGH_INDICATOR)) {
-            currentNote.segments[position] = currentNote.segments[position].substring(3)
+    private fun strikeThroughSegment(holder: MyViewHolder, textView: TextView): Boolean {
+        if (currentNote.segments[holder.adapterPosition].contains(STRIKE_THROUGH_INDICATOR)) {
+            currentNote.segments[holder.adapterPosition] = currentNote.segments[holder.adapterPosition].substring(3)
             textView.paintFlags = 0
         } else {
-            currentNote.segments[position] = STRIKE_THROUGH_INDICATOR + currentNote.segments[position]
+            currentNote.segments[holder.adapterPosition] = STRIKE_THROUGH_INDICATOR + currentNote.segments[holder.adapterPosition]
             textView.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
         }
-        notifyItemChanged(position)
+        notifyItemChanged(holder.adapterPosition)
         currentNote.hasBeenChanged = true
 
         return true

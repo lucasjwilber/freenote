@@ -22,7 +22,7 @@ class AllNotesActivity : AppCompatActivity() {
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
     private var allNotes: List<NoteDescriptor> = listOf()
-    private var swipedNotePosition: Int = 0
+    private var swipedNotePosition: Int? = null
     private var allNotesActivityContext: Context = this
     private var viewModel: NoteDescriptorsViewModel? = null
 
@@ -56,7 +56,7 @@ class AllNotesActivity : AppCompatActivity() {
 
         binding.deleteModalLayout.setOnClickListener { cancelDelete() }
         binding.cancelDeleteButton.setOnClickListener { cancelDelete() }
-        binding.confirmDeleteButton.setOnClickListener { deleteNote(swipedNotePosition) }
+        binding.confirmDeleteButton.setOnClickListener { deleteNote(swipedNotePosition!!) }
 
         // swipe listener
         val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -67,7 +67,7 @@ class AllNotesActivity : AppCompatActivity() {
                 binding.deleteModalLayout.visibility = View.VISIBLE
 
                 swipedNotePosition = viewHolder.adapterPosition
-                val selectedNoteTitle = allNotes[swipedNotePosition].title
+                val selectedNoteTitle = allNotes[swipedNotePosition!!].title
                 val prompt = "Permanently delete \"$selectedNoteTitle\"?"
                 binding.deleteModalTextView.text = prompt
             }
@@ -105,7 +105,7 @@ class AllNotesActivity : AppCompatActivity() {
 
     private fun cancelDelete() {
         binding.deleteModalLayout.visibility = View.GONE
-        viewAdapter.notifyItemChanged(swipedNotePosition)
+        viewAdapter.notifyItemChanged(swipedNotePosition!!)
     }
 
     private fun deleteNote(position: Int) {

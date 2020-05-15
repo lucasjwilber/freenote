@@ -25,14 +25,14 @@ class AllNotesAdapter(private var allNoteDescriptors: List<NoteDescriptor>, priv
         val titleTextView: TextView = holder.cardView.findViewById(R.id.noteTitleTextView)
         val title = allNoteDescriptors[position].title
         titleTextView.text = title
-        holder.cardView.setOnClickListener { goToNoteDetails(allNoteDescriptors[position].type, allNoteDescriptors[position].id)}
+        holder.cardView.setOnClickListener { goToNoteDetails(holder)}
     }
 
-    private fun goToNoteDetails(type: Int, noteId: Int) {
+    private fun goToNoteDetails(holder: NoteDescriptorViewHolder) {
         val intent = Intent(context, EditNoteActivity::class.java)
         currentNote = CurrentNote()
-        currentNote.id = noteId
-        currentNote.type = type
+        currentNote.id = allNoteDescriptors[holder.adapterPosition].id
+        currentNote.type = allNoteDescriptors[holder.adapterPosition].type
         context.startActivity(intent)
     }
 
