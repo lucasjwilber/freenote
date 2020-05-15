@@ -2,9 +2,11 @@ package com.lucasjwilber.freenote
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.LinearLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -82,6 +84,16 @@ class AllNotesActivity : AppCompatActivity() {
         newSegmentEditText = null
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // Checks the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            binding.selectTypeOptionsContainer.orientation = LinearLayout.HORIZONTAL
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            binding.selectTypeOptionsContainer.orientation = LinearLayout.VERTICAL
+        }
+    }
+
     override fun onBackPressed() {
         if (binding.selectTypeBackground.visibility == View.VISIBLE) {
             binding.selectTypeBackground.visibility = View.GONE
@@ -110,7 +122,6 @@ class AllNotesActivity : AppCompatActivity() {
         viewAdapter.notifyItemRemoved(position)
         binding.deleteModalLayout.visibility = View.GONE
     }
-
 
     private fun goToEditNoteActivity(type: Int) {
         intent = Intent(applicationContext, EditNoteActivity::class.java)
