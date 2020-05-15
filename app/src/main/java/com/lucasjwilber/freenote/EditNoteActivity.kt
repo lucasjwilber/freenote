@@ -32,14 +32,15 @@ class EditNoteActivity : AppCompatActivity() {
         binding.cancelDeleteButton.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
         binding.confirmDeleteButton.setOnClickListener { deleteNote() }
 
-        supportActionBar?.title = "Create " + if (currentNote.type == NOTE) "Note" else "List"
+        supportActionBar?.title = getString(R.string.create_) +
+                if (currentNote.type == NOTE) getString(R.string.note) else getString(R.string.list)
 
         val context = this
         viewManager = LinearLayoutManager(context)
 
         if (!currentNote.isNew) { // if we got here from clicking on an existing note
 
-            supportActionBar?.title = if (currentNote.type == NOTE) "Edit Note" else "Edit List"
+            supportActionBar?.title = if (currentNote.type == NOTE) getString(R.string.edit_note) else getString(R.string.edit_list)
 
             GlobalScope.launch(Dispatchers.Main) {
                 val notesDao = AppDatabase.getDatabase(application).noteDao()
@@ -48,7 +49,7 @@ class EditNoteActivity : AppCompatActivity() {
                     return@async notesDao.getNoteById(currentNote.id!!)
                 }.await()
 
-                binding.noteTitleTV.text = if (note.title.isEmpty()) "Untitled" else note.title
+                binding.noteTitleTV.text = if (note.title.isEmpty()) getString(R.string.untitled) else note.title
                 binding.noteTitleTV.setOnClickListener { changeTitle() }
                 binding.noteTitleEditText.setText(note.title)
 
@@ -133,7 +134,7 @@ class EditNoteActivity : AppCompatActivity() {
     private fun saveNote() {
         val title: String =
             if (binding.noteTitleEditText.text.toString().isEmpty())
-                "Untitled"
+                getString(R.string.untitled)
             else
                 binding.noteTitleEditText.text.toString()
 
@@ -169,7 +170,7 @@ class EditNoteActivity : AppCompatActivity() {
            }
         }
 
-        showToast(this, "Saved")
+        showToast(this, getString(R.string.saved))
     }
 
     private fun deleteNote() {
@@ -177,6 +178,7 @@ class EditNoteActivity : AppCompatActivity() {
             val notesDao = AppDatabase.getDatabase(application).noteDao()
             notesDao.deleteNoteById(currentNote.id!!)
         }
+        showToast(this, getString(R.string.note_deleted))
         finish()
     }
 

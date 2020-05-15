@@ -1,4 +1,20 @@
 <resources>
     <string name="app_name">FreeNote</string>
     <string name="my_notes">My Notes</string>
+    <string name="create_">Create </string>
+    <string name="note">Note</string>
+    <string name="list">List</string>
+    <string name="edit_list">Edit List</string>
+    <string name="edit_note">Edit Note</string>
+    <string name="untitled">Untitled</string>
+    <string name="saved">Saved</string>
+    <string name="delete">Delete</string>
+    <string name="note_deleted">Note deleted</string>
+    <string name="new_note">New Note</string>
+    <string name="new_list">New List</string>
+    <string name="title">Title</string>
+    <string name="delete_this_note_question">Delete this note?</string>
+    <string name="delete_this_note">Delete this note</string>
+    <string name="enter_text">Enter text…</string>
+    <string name="undo">UNDO</string>
 </resources>

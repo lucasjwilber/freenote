@@ -7,7 +7,7 @@
         android:icon="@drawable/undo"
         android:orderInCategory="0"
         android:visible="false"
-        android:title="UNDO"
+        android:title="@string/undo"
         app:showAsAction="ifRoom"/>
 
 <!--    <item-->
@@ -24,7 +24,7 @@
 <!--        app:showAsAction="never" />-->
 
     <item android:id="@+id/action_delete"
-        android:title="Delete this note"
+        android:title="@string/delete_this_note"
         app:showAsAction="never"/>
 
 </menu>

@@ -34,6 +34,7 @@
         android:ems="10"
         android:inputType="textMultiLine"
         android:paddingLeft="1sp"
+        android:paddingStart="1sp"
         android:paddingTop="2sp"
         android:textSize="20sp"
         android:visibility="gone"

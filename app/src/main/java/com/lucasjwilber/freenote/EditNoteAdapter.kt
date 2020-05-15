@@ -119,9 +119,9 @@ class EditNoteAdapter(val context: Context) :
 
     private fun deleteSegment(position: Int) {
         currentNote.deletedSegments.push(DeletedSegment(position, currentNote.segments[position]))
-        currentNote.segments.removeAt(position)
         undoButton?.isVisible = true
-        notifyDataSetChanged()
+        currentNote.segments.removeAt(position)
+        notifyItemRemoved(position)
     }
 
     private fun hideLastEditedSegment() {
@@ -216,7 +216,7 @@ class EditNoteAdapter(val context: Context) :
 
             private fun createSwipeFlags(position: Int, viewHolder: RecyclerView.ViewHolder): Int {
                 return if (position == itemCount - 1 || position == currentNote.currentlyEditedSegmentPosition) {
-                    //make the new segment EditText un-swipable
+                    //make the new segment EditText and any segments that are being edited un-swipable
                     0
                 } else {
                     super.getSwipeDirs(recyclerView, viewHolder)
@@ -225,7 +225,6 @@ class EditNoteAdapter(val context: Context) :
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 deleteSegment(viewHolder.adapterPosition)
-                notifyItemRemoved(viewHolder.adapterPosition)
             }
         }
 

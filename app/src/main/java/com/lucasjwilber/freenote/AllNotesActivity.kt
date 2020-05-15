@@ -40,7 +40,7 @@ class AllNotesActivity : AppCompatActivity() {
         viewModel?.allNoteDescriptors?.observe(this, Observer { data ->
                 allNotes = data!!
                 viewAdapter = AllNotesAdapter(allNotes, allNotesActivityContext)
-                binding.allNotesReyclerView.apply {
+                binding.allNotesRecyclerView.apply {
                     setHasFixedSize(true)
                     layoutManager = viewManager
                     adapter = viewAdapter
@@ -71,7 +71,7 @@ class AllNotesActivity : AppCompatActivity() {
             }
         }
         val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
-        itemTouchHelper.attachToRecyclerView(binding.allNotesReyclerView)
+        itemTouchHelper.attachToRecyclerView(binding.allNotesRecyclerView)
     }
 
     override fun onResume() {
