@@ -25,7 +25,7 @@ class EditNoteActivity : AppCompatActivity() {
         setContentView(view)
 
         setSupportActionBar(binding.toolbar)
-        binding.toolbar.inflateMenu(R.menu.action_bar_menu)
+        binding.toolbar.inflateMenu(R.menu.edit_note_menu)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.deleteModalLayout.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
@@ -90,7 +90,8 @@ class EditNoteActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        currentNote.newSegmentText = ""
+//        currentNote.newSegmentText = ""
+        currentNote.hasBeenChanged = true
     }
 
     override fun onStop() {
@@ -99,7 +100,7 @@ class EditNoteActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.action_bar_menu, menu)
+        menuInflater.inflate(R.menu.edit_note_menu, menu)
         undoButton = menu?.findItem(R.id.action_undo)
         if (currentNote.isNew) {
             //hide the delete option

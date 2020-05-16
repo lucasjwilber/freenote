@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
 import androidx.lifecycle.Observer
@@ -33,8 +35,10 @@ class AllNotesActivity : AppCompatActivity() {
         setContentView(view)
 
         setSupportActionBar(binding.toolbar)
-        setSupportActionBar(binding.toolbar)
         supportActionBar?.title = getString(R.string.my_notes)
+
+        //TODO: sorting
+        //binding.toolbar.inflateMenu(R.menu.all_notes_menu)
 
         // init recyclerview and add a LiveData observer to the dataset
         viewManager = LinearLayoutManager(this)
@@ -58,29 +62,11 @@ class AllNotesActivity : AppCompatActivity() {
         binding.cancelDeleteButton.setOnClickListener { cancelDelete() }
         binding.confirmDeleteButton.setOnClickListener { deleteNote(swipedNotePosition!!) }
 
-        // swipe listener
-        val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, viewHolder1: RecyclerView.ViewHolder): Boolean {
-                return false
-            }
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                binding.deleteModalLayout.visibility = View.VISIBLE
-
-                swipedNotePosition = viewHolder.adapterPosition
-                val selectedNoteTitle = allNotes[swipedNotePosition!!].title
-                val prompt = "Permanently delete \"$selectedNoteTitle\"?"
-                binding.deleteModalTextView.text = prompt
-            }
-        }
-        val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
-        itemTouchHelper.attachToRecyclerView(binding.allNotesRecyclerView)
+        initSwipeListener()
     }
 
     override fun onResume() {
         super.onResume()
-        // clearing currentNote here affects the onStop saveNote() function because of asynchronous saving.
-        // so currentNote is cleared before navigating to EditNoteActivity instead
-        //currentNote = CurrentNote()
         newSegmentEditText = null
     }
 
@@ -93,6 +79,15 @@ class AllNotesActivity : AppCompatActivity() {
             binding.selectTypeOptionsContainer.orientation = LinearLayout.VERTICAL
         }
     }
+
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        menuInflater.inflate(R.menu.all_notes_menu, menu)
+//        return super.onCreateOptionsMenu(menu)
+//    }
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        //
+//        return super.onOptionsItemSelected(item)
+//    }
 
     override fun onBackPressed() {
         if (binding.selectTypeBackground.visibility == View.VISIBLE) {
@@ -129,5 +124,23 @@ class AllNotesActivity : AppCompatActivity() {
         currentNote.type = type
         currentNote.isNew = true
         startActivity(intent)
+    }
+
+    private fun initSwipeListener() {
+        val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, viewHolder1: RecyclerView.ViewHolder): Boolean {
+                return false
+            }
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                binding.deleteModalLayout.visibility = View.VISIBLE
+
+                swipedNotePosition = viewHolder.adapterPosition
+                val selectedNoteTitle = allNotes[swipedNotePosition!!].title
+                val prompt = "Permanently delete \"$selectedNoteTitle\"?"
+                binding.deleteModalTextView.text = prompt
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
+        itemTouchHelper.attachToRecyclerView(binding.allNotesRecyclerView)
     }
 }

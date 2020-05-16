@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/menu_sort_options"
+        android:title="Sort Options"
+        app:showAsAction="never" >
+
+        <menu>
+            <item android:id="@+id/menu_sort_oldest_first"
+                android:title="Oldest first" />
+            <item android:id="@+id/menu_sort_newest_first"
+                android:title="Newest first" />
+            <item android:id="@+id/menu_sort_last_updated_first"
+                android:title="Last updated first" />
+            <item android:id="@+id/menu_sort_lists_first"
+                android:title="Lists first" />
+            <item android:id="@+id/menu_sort_notes_first"
+                android:title="Notes first" />
+        </menu>
+
+    </item>
+
+</menu>
