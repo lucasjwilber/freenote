@@ -2,7 +2,6 @@ package com.lucasjwilber.freenote
 
 import android.content.Context
 import android.graphics.Paint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
@@ -77,10 +76,7 @@ class EditNoteAdapter(val context: Context) :
                 textView.paintFlags = 0
             }
 
-            val editText: EditText = holder.constraintLayout.findViewById(R.id.segmentEditText)
-            val updateSegmentButton: Button = holder.constraintLayout.findViewById(R.id.updateSegmentButton)
-
-            textView.setOnClickListener {updateSegment(textView, editText, holder, updateSegmentButton) }
+            textView.setOnClickListener {updateSegment(holder, textView) }
             textView.setOnLongClickListener { strikeThroughSegment(holder, textView) }
 
         } else if (getItemViewType(position) == NEW_SEGMENT) {
@@ -142,20 +138,27 @@ class EditNoteAdapter(val context: Context) :
             val ces: CurrentEditedSegment = currentEditedSegment!!
 
             ces.textView.visibility = View.VISIBLE
+
             val updatedText: String = ces.editText.text.toString()
-            if (updatedText != ces.textView.text.toString()) {
-                ces.textView.text = updatedText
+            ces.textView.text = updatedText
+            if (currentNote.segments[ces.position].contains(STRIKE_THROUGH_INDICATOR)) {
+                currentNote.segments[ces.position] = STRIKE_THROUGH_INDICATOR + updatedText
+            } else {
                 currentNote.segments[ces.position] = updatedText
             }
+
             ces.editText.visibility = View.GONE
             ces.button.visibility = View.GONE
             ces.editText.removeTextChangedListener(makeTextWatcher(TW_UPDATED_SEGMENT))
         }
     }
 
-    private fun updateSegment(textView: TextView, editText: EditText, holder: MyViewHolder, updateSegmentButton: Button) {
+    private fun updateSegment(holder: MyViewHolder, textView: TextView) {
         //if the last edited segment wasn't 'saved', save the changes and update the textview
         hideLastEditedSegment()
+
+        val editText: EditText = holder.constraintLayout.findViewById(R.id.segmentEditText)
+        val updateSegmentButton: Button = holder.constraintLayout.findViewById(R.id.updateSegmentButton)
 
         currentEditedSegment = CurrentEditedSegment(
             editText,
@@ -183,13 +186,13 @@ class EditNoteAdapter(val context: Context) :
         val ces: CurrentEditedSegment = currentEditedSegment!!
         if (ces.textView.text.toString() != ces.editText.text.toString()) {
             currentNote.hasBeenChanged = true
-            currentNote.segments[ces.position] = ces.editText.text.toString()
+            //reapply the strike-through indicator
+            if (ces.isStruckThrough) {
+                currentNote.segments[ces.position] = STRIKE_THROUGH_INDICATOR + ces.editText.text.toString()
+            } else {
+                currentNote.segments[ces.position] = ces.editText.text.toString()
+            }
             ces.textView.text = ces.editText.text.toString()
-        }
-
-        //reapply the strike-through indicator
-        if (ces.isStruckThrough) {
-            currentNote.segments[ces.position] = STRIKE_THROUGH_INDICATOR + ces.editText.text.toString()
         }
 
         ces.textView.visibility = View.VISIBLE
