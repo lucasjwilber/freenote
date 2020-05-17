@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">FreeNote</string>
     <string name="my_notes">My Notes</string>
-    <string name="create_">Create </string>
+    <string name="create_note">Create Note</string>
+    <string name="create_list">Create List</string>
     <string name="note">Note</string>
     <string name="list">List</string>
     <string name="edit_list">Edit List</string>

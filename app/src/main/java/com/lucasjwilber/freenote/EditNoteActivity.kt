@@ -31,9 +31,9 @@ class EditNoteActivity : AppCompatActivity() {
         binding.deleteModalLayout.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
         binding.cancelDeleteButton.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
         binding.confirmDeleteButton.setOnClickListener { deleteNote() }
-
-        supportActionBar?.title = getString(R.string.create_) +
-                if (currentNote.type == NOTE) getString(R.string.note) else getString(R.string.list)
+        
+        supportActionBar?.title =
+            if (currentNote.type == NOTE) getString(R.string.create_note) else getString(R.string.create_list)
 
         val context = this
         viewManager = LinearLayoutManager(context)
