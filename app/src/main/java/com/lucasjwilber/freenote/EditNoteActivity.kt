@@ -202,5 +202,6 @@ class EditNoteActivity : AppCompatActivity() {
         binding.noteTitleTV.visibility = View.INVISIBLE
         binding.noteTitleEditText.visibility = View.VISIBLE
         binding.noteTitleEditText.requestFocus()
+        binding.noteTitleEditText.setSelection(binding.noteTitleEditText.text.length)
     }
 }
