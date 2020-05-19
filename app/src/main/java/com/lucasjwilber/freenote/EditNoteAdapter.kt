@@ -27,7 +27,7 @@ class EditNoteAdapter(val context: Context) :
     private class CurrentEditedSegment(var editText: EditText, var textView: TextView, var button: Button, var position: Int, var isStruckThrough: Boolean)
     private var currentEditedSegment: CurrentEditedSegment? = null
 
-    class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout) {}
+    class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout)
 
     override fun getItemViewType(position: Int): Int {
         return if (currentNote.type == LIST) {
@@ -108,7 +108,6 @@ class EditNoteAdapter(val context: Context) :
         // don't use notifyItemInserted() here, in order to keep the keyboard open and the edit text focused
         notifyDataSetChanged()
 
-        currentNote.hasBeenChanged = true
         currentNote.newSegmentText = ""
 
     }
@@ -185,7 +184,6 @@ class EditNoteAdapter(val context: Context) :
     private fun saveSegmentEdits() {
         val ces: CurrentEditedSegment = currentEditedSegment!!
         if (ces.textView.text.toString() != ces.editText.text.toString()) {
-            currentNote.hasBeenChanged = true
             //reapply the strike-through indicator
             if (ces.isStruckThrough) {
                 currentNote.segments[ces.position] = STRIKE_THROUGH_INDICATOR + ces.editText.text.toString()
@@ -212,7 +210,6 @@ class EditNoteAdapter(val context: Context) :
             textView.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
         }
         notifyItemChanged(holder.adapterPosition)
-        currentNote.hasBeenChanged = true
 
         return true
     }

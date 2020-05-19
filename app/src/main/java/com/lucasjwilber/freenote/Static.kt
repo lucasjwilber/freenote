@@ -69,7 +69,6 @@ fun makeTextWatcher(type: Int): TextWatcher? {
                 } else {
                     currentNote.segments[currentNote.currentlyEditedSegmentPosition!!] = s.toString()
                 }
-                currentNote.hasBeenChanged = true
             }
             override fun afterTextChanged(s: Editable) {}
         }

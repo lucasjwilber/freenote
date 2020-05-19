@@ -19,6 +19,7 @@ class EditNoteActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditNoteBinding
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
+    private var segmentsOnOpen = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,21 +52,24 @@ class EditNoteActivity : AppCompatActivity() {
                     return@async notesDao.getNoteById(currentNote.id!!)
                 }.await()
 
-                binding.noteTitleTV.text = if (note.title.isEmpty()) getString(R.string.untitled) else note.title
+                val titleText = if (note.title.isEmpty()) getString(R.string.untitled) else note.title
+                binding.noteTitleTV.text = titleText
                 binding.noteTitleTV.setOnClickListener { changeTitle() }
-                binding.noteTitleEditText.setText(note.title)
+                binding.noteTitleEditText.setText(titleText)
+
+                segmentsOnOpen = note.segments
 
                 if (currentNote.type == LIST) {
-                    if (note.segments!!.isNotEmpty()) {
+                    if (note.segments.isNotEmpty()) {
                         // if there was only one segment the delimiter won't be there
-                        if (!note.segments!!.contains(SEGMENT_DELIMITER)) {
-                            currentNote.segments.add(note.segments.toString())
+                        if (!note.segments.contains(SEGMENT_DELIMITER)) {
+                            currentNote.segments.add(note.segments)
                         } else {
-                            currentNote.segments = note.segments?.split(SEGMENT_DELIMITER) as ArrayList<String>
+                            currentNote.segments = note.segments.split(SEGMENT_DELIMITER) as ArrayList<String>
                         }
                     }
                 } else {
-                    currentNote.body = note.segments.toString()
+                    currentNote.body = note.segments
                 }
 
                 viewAdapter = EditNoteAdapter(context)
@@ -88,12 +92,6 @@ class EditNoteActivity : AppCompatActivity() {
                 adapter = viewAdapter
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-//        currentNote.newSegmentText = ""
-        currentNote.hasBeenChanged = true
     }
 
     override fun onStop() {
@@ -145,15 +143,13 @@ class EditNoteActivity : AppCompatActivity() {
 
 
     private fun saveNote() {
-        val title: String =
-            if (binding.noteTitleEditText.text.toString().isEmpty())
-                getString(R.string.untitled)
-            else
-                binding.noteTitleEditText.text.toString()
+        var title: String = binding.noteTitleEditText.text.toString()
 
         if (title != binding.noteTitleTV.text.toString() ||
-            currentNote.deletedSegments.size > 0 ||
-            currentNote.newSegmentText.isNotEmpty()
+                currentNote.deletedSegments.size > 0 ||
+                currentNote.newSegmentText.isNotEmpty() ||
+                (currentNote.type == NOTE && currentNote.body != segmentsOnOpen) ||
+                (currentNote.type == LIST && currentNote.segments.joinToString(SEGMENT_DELIMITER) != segmentsOnOpen)
         ) {
             currentNote.hasBeenChanged = true
         }
@@ -177,8 +173,8 @@ class EditNoteActivity : AppCompatActivity() {
         }
 
         val db = AppDatabase.getDatabase(this)
-        val serializedSegments = currentNote.segments.joinToString(SEGMENT_DELIMITER)
-        val text = if (currentNote.type == NOTE) currentNote.body else serializedSegments
+        if (title.isEmpty()) title = "Untitled"
+        val text = if (currentNote.type == NOTE) currentNote.body else currentNote.segments.joinToString(SEGMENT_DELIMITER)
         val note = Note(currentNote.id, currentNote.type, title, text, Date().time)
 
         GlobalScope.launch(Dispatchers.IO) {
@@ -203,7 +199,6 @@ class EditNoteActivity : AppCompatActivity() {
     }
 
     private fun changeTitle() {
-        binding.noteTitleEditText.setText(binding.noteTitleTV.text)
         binding.noteTitleTV.visibility = View.INVISIBLE
         binding.noteTitleEditText.visibility = View.VISIBLE
         binding.noteTitleEditText.requestFocus()
