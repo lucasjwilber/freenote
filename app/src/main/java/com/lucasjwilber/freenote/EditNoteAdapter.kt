@@ -86,9 +86,16 @@ class EditNoteAdapter(val context: Context) :
             saveButton.setOnClickListener { createNewSegment(editText.text.toString()) }
 
             newSegmentEditText = editText
-            editText.requestFocus()
+
+            if (currentNote.titleWasSet) {
+                editText.requestFocus()
+            }
+
             editText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
-                if (hasFocus) hideLastEditedSegment()
+                if (hasFocus) {
+                    currentNote.titleWasSet = true
+                    hideLastEditedSegment()
+                }
             }
         } else { //if (getItemViewType(position) == NOTE_BODY) {
             val editText: EditText = holder.constraintLayout.findViewById(R.id.noteBodyEditText)

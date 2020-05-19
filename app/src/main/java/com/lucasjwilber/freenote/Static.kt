@@ -35,7 +35,8 @@ class CurrentNote(
     var deletedSegments: Stack<DeletedSegment> = Stack(),
     var newSegmentText: String = "",
     var currentlyEditedSegmentPosition: Int? = null,
-    var hasBeenChanged: Boolean = false
+    var hasBeenChanged: Boolean = false,
+    var titleWasSet: Boolean = false //this is used to focus the title ET on new Lists, but only one time, so new segment auto focus still works
 )
 var currentNote: CurrentNote = CurrentNote()
 

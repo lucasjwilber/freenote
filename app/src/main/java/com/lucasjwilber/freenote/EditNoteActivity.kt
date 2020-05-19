@@ -44,6 +44,7 @@ class EditNoteActivity : AppCompatActivity() {
         if (!currentNote.isNew) { // if we got here from clicking on an existing note
 
             supportActionBar?.title = if (currentNote.type == NOTE) getString(R.string.edit_note) else getString(R.string.edit_list)
+            currentNote.titleWasSet = true
 
             GlobalScope.launch(Dispatchers.Main) {
                 val notesDao = AppDatabase.getDatabase(application).noteDao()
