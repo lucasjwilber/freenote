@@ -1,8 +1,8 @@
-![banner logo](/images/freenote-banner.png)
+![banner logo](/images/banner.png)
 
 A simple, free, lightweight notepad & list making app. Made to practice Kotlin, Room, and coroutines. Currently pending Google Play publication.
 
-![screenshot images](/images/freenote-screenshots.png)
+![screenshot images](/images/screenshots.png)
 
 # Built With
 * Android Studio
