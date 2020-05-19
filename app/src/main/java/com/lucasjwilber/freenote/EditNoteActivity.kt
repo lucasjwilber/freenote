@@ -9,7 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lucasjwilber.freenote.databinding.ActivityEditNoteBinding
+import kotlinx.android.synthetic.main.activity_edit_note.*
 import kotlinx.coroutines.*
+import java.util.*
 import kotlin.collections.ArrayList
 
 class EditNoteActivity : AppCompatActivity() {
@@ -31,7 +33,7 @@ class EditNoteActivity : AppCompatActivity() {
         binding.deleteModalLayout.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
         binding.cancelDeleteButton.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
         binding.confirmDeleteButton.setOnClickListener { deleteNote() }
-        
+
         supportActionBar?.title =
             if (currentNote.type == NOTE) getString(R.string.create_note) else getString(R.string.create_list)
 
@@ -159,6 +161,13 @@ class EditNoteActivity : AppCompatActivity() {
         if (!currentNote.hasBeenChanged) {
             Log.i("ljw", "no changes to save")
             return
+        } else if (currentNote.title.isEmpty() &&
+            noteTitleEditText.text.isEmpty() &&
+            currentNote.body.isEmpty() &&
+            currentNote.segments.size == 0 &&
+            currentNote.newSegmentText.isEmpty()) {
+            Log.i("ljw","no use saving an empty note")
+            return
         }
 
         if (currentNote.newSegmentText.isNotEmpty()) {
@@ -170,7 +179,7 @@ class EditNoteActivity : AppCompatActivity() {
         val db = AppDatabase.getDatabase(this)
         val serializedSegments = currentNote.segments.joinToString(SEGMENT_DELIMITER)
         val text = if (currentNote.type == NOTE) currentNote.body else serializedSegments
-        val note = Note(currentNote.id, currentNote.type, title, text)
+        val note = Note(currentNote.id, currentNote.type, title, text, Date().time)
 
         GlobalScope.launch(Dispatchers.IO) {
            if (currentNote.isNew) {
@@ -181,7 +190,7 @@ class EditNoteActivity : AppCompatActivity() {
            }
         }
 
-        showToast(this, getString(R.string.saved))
+//        showToast(this, getString(R.string.saved))
     }
 
     private fun deleteNote() {

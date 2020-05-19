@@ -16,3 +16,4 @@ Lucas Wilber
 # Acknowledgements
 * Kevin Moore for [help with the RecyclerView swipe listener](https://www.raywenderlich.com/1560485-android-recyclerview-tutorial-with-kotlin)
 * [remove.bg](https://remove.bg) for help making images/logos
+* Trello for project management

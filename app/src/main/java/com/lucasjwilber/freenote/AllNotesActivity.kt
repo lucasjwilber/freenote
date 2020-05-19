@@ -2,6 +2,7 @@ package com.lucasjwilber.freenote
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -27,6 +28,7 @@ class AllNotesActivity : AppCompatActivity() {
     private var swipedNotePosition: Int? = null
     private var allNotesActivityContext: Context = this
     private var viewModel: NoteDescriptorsViewModel? = null
+    private lateinit var observer: Observer<in List<NoteDescriptor>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,21 +39,21 @@ class AllNotesActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.title = getString(R.string.my_notes)
 
-        //TODO: sorting
-        //binding.toolbar.inflateMenu(R.menu.all_notes_menu)
+        binding.toolbar.inflateMenu(R.menu.all_notes_menu)
 
         // init recyclerview and add a LiveData observer to the dataset
         viewManager = LinearLayoutManager(this)
         viewModel = ViewModelProviders.of(this).get(NoteDescriptorsViewModel::class.java)
-        viewModel?.allNoteDescriptors?.observe(this, Observer { data ->
-                allNotes = data!!
-                viewAdapter = AllNotesAdapter(allNotes, allNotesActivityContext)
-                binding.allNotesRecyclerView.apply {
-                    setHasFixedSize(true)
-                    layoutManager = viewManager
-                    adapter = viewAdapter
-                }
-            })
+        observer = Observer { data ->
+            allNotes = data!!
+            viewAdapter = AllNotesAdapter(allNotes, allNotesActivityContext)
+            binding.allNotesRecyclerView.apply {
+                setHasFixedSize(true)
+                layoutManager = viewManager
+                adapter = viewAdapter
+            }
+        }
+        viewModel?.allNoteDescriptors?.observe(this, observer)
 
         binding.createNoteButton.setOnClickListener { binding.selectTypeBackground.visibility = View.VISIBLE }
         binding.selectTypeBackground.setOnClickListener { binding.selectTypeBackground.visibility = View.GONE }
@@ -80,14 +82,33 @@ class AllNotesActivity : AppCompatActivity() {
         }
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-//        menuInflater.inflate(R.menu.all_notes_menu, menu)
-//        return super.onCreateOptionsMenu(menu)
-//    }
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        //
-//        return super.onOptionsItemSelected(item)
-//    }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.all_notes_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val editor: SharedPreferences.Editor = getSharedPreferences("freenote_prefs", Context.MODE_PRIVATE).edit()
+
+        if (item.itemId == R.id.menu_sort_options) {
+            return false
+        } else {
+            editor.putInt(
+                "sortType", when (item.itemId) {
+                    R.id.menu_sort_newest_first -> SORT_TYPE_NEWEST_FIRST
+                    R.id.menu_sort_oldest_first -> SORT_TYPE_OLDEST_FIRST
+                    R.id.menu_sort_lists_first -> SORT_TYPE_LISTS_FIRST
+                    R.id.menu_sort_notes_first -> SORT_TYPE_NOTES_FIRST
+                    else -> SORT_TYPE_LAST_UPDATED_FIRST
+                }
+            ).apply()
+        }
+
+        //refresh observer
+        viewModel?.refreshSortType()
+        viewModel?.allNoteDescriptors?.observe(this, observer)
+
+        return super.onOptionsItemSelected(item)
+    }
 
     override fun onBackPressed() {
         if (binding.selectTypeBackground.visibility == View.VISIBLE) {
@@ -106,7 +127,6 @@ class AllNotesActivity : AppCompatActivity() {
     private fun deleteNote(position: Int) {
         // cache id before mutating the list
         val noteId = allNotes[position].id
-
         GlobalScope.launch(Dispatchers.IO) {
             AppDatabase.getDatabase(application).noteDao().deleteNoteById(noteId)
         }
@@ -115,7 +135,9 @@ class AllNotesActivity : AppCompatActivity() {
         updatedNotesList.removeAt(position)
         allNotes = updatedNotesList
         viewAdapter.notifyItemRemoved(position)
+
         binding.deleteModalLayout.visibility = View.GONE
+        showToast(this, getString(R.string.note_deleted))
     }
 
     private fun goToEditNoteActivity(type: Int) {
