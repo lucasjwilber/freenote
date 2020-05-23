@@ -1,6 +1,6 @@
 ![banner logo](/images/banner.png)
 
-A simple, free, lightweight notepad & list making app. Made to practice Kotlin, Room, and coroutines. Currently pending Google Play publication.
+A simple, free, lightweight notepad & list making app. Made to practice Kotlin, Room, and coroutines. Find it on Google Play [here](https://play.google.com/store/apps/details?id=com.lucasjwilber.freenote)!
 
 ![screenshot images](/images/screenshots.png)
 
