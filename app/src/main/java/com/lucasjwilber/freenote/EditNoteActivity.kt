@@ -95,6 +95,11 @@ class EditNoteActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+    }
+
     override fun onStop() {
         super.onStop()
         saveNote()
@@ -180,7 +185,7 @@ class EditNoteActivity : AppCompatActivity() {
 
         GlobalScope.launch(Dispatchers.IO) {
            if (currentNote.isNew) {
-               db.noteDao().insert(note)
+               currentNote.id = db.noteDao().insert(note).toInt()
                currentNote.isNew = false
            } else {
                db.noteDao().update(note)

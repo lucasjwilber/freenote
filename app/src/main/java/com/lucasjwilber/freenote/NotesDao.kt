@@ -27,7 +27,7 @@ interface NotesDao {
     suspend fun getNoteById(id: Int): Note
 
     @Insert
-    suspend fun insert(vararg note: Note)
+    suspend fun insert(note: Note): Long
 
     @Update
     suspend fun update(vararg note: Note)
