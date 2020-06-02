@@ -1,4 +1,4 @@
-package com.lucasjwilber.freenote
+package com.lucasjwilber.freenote.views
 
 import android.content.Context
 import android.content.Intent
@@ -9,14 +9,16 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.lucasjwilber.freenote.*
 import com.lucasjwilber.freenote.databinding.ActivityAllNotesBinding
+import com.lucasjwilber.freenote.models.NoteDescriptor
+import com.lucasjwilber.freenote.viewmodels.NoteDescriptorsViewModel
 import kotlinx.coroutines.*
 import kotlin.collections.List
 
@@ -47,7 +49,10 @@ class AllNotesActivity : AppCompatActivity() {
         viewModel = ViewModelProviders.of(this).get(NoteDescriptorsViewModel::class.java)
         observer = Observer { data ->
             allNotes = data!!
-            viewAdapter = AllNotesAdapter(allNotes, allNotesActivityContext)
+            viewAdapter = AllNotesAdapter(
+                allNotes,
+                allNotesActivityContext
+            )
             binding.allNotesRecyclerView.apply {
                 setHasFixedSize(true)
                 layoutManager = viewManager
@@ -105,8 +110,8 @@ class AllNotesActivity : AppCompatActivity() {
         }
 
         //refresh observer
-        viewModel?.refreshSortType()
-        viewModel?.allNoteDescriptors?.observe(this, observer)
+//        viewModel?.refreshSortType()
+//        viewModel?.allNoteDescriptors?.observe(this, observer)
 
         return super.onOptionsItemSelected(item)
     }
@@ -129,7 +134,9 @@ class AllNotesActivity : AppCompatActivity() {
         // cache id before mutating the list
         val noteId = allNotes[position].id
         GlobalScope.launch(Dispatchers.IO) {
-            AppDatabase.getDatabase(application).noteDao().deleteNoteById(noteId)
+            NoteDatabase.getDatabase(
+                application
+            ).noteDao().deleteNoteById(noteId)
         }
 
         val updatedNotesList = allNotes.toMutableList()
@@ -138,12 +145,16 @@ class AllNotesActivity : AppCompatActivity() {
         viewAdapter.notifyItemRemoved(position)
 
         binding.deleteModalLayout.visibility = View.GONE
-        showToast(this, getString(R.string.note_deleted))
+        showToast(
+            this,
+            getString(R.string.note_deleted)
+        )
     }
 
     private fun goToEditNoteActivity(type: Int) {
         intent = Intent(applicationContext, EditNoteActivity::class.java)
-        currentNote = CurrentNote()
+        currentNote =
+            CurrentNote()
         currentNote.type = type
         currentNote.isNew = true
         binding.selectTypeBackground.visibility = View.GONE

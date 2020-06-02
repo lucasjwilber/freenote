@@ -2,11 +2,11 @@ package com.lucasjwilber.freenote
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.lucasjwilber.freenote.models.Note
+import com.lucasjwilber.freenote.models.NoteDescriptor
 
 @Dao
-interface NotesDao {
-    @Query("SELECT * FROM notes")
-    suspend fun getAll(): List<Note>
+interface NoteDao {
 
     @Query("SELECT id, title, type FROM notes ORDER BY id DESC")
     fun getAllDescriptorsNewestFirst(): LiveData<List<NoteDescriptor>>
@@ -24,17 +24,15 @@ interface NotesDao {
     fun getAllDescriptorsListsFirst(): LiveData<List<NoteDescriptor>>
 
     @Query("SELECT * FROM notes WHERE id = :id")
-    suspend fun getNoteById(id: Int): Note
+    suspend fun getNoteById(id: Long): Note
 
+    // insert returns the id of the created Note
     @Insert
     suspend fun insert(note: Note): Long
 
     @Update
-    suspend fun update(vararg note: Note)
-
-    @Delete
-    suspend fun delete(note: Note)
+    suspend fun update(note: Note)
 
     @Query("DELETE FROM notes WHERE id = :id")
-    suspend fun deleteNoteById(id: Int)
+    suspend fun deleteNoteById(id: Long)
 }

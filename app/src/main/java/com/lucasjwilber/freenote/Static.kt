@@ -26,7 +26,7 @@ var undoButton: MenuItem? = null
 
 class DeletedSegment(val position: Int, val text: String)
 class CurrentNote(
-    var id: Int? = null,
+    var id: Long? = null,
     var type: Int = NOTE,
     var isNew: Boolean = false,
     var title: String = "",

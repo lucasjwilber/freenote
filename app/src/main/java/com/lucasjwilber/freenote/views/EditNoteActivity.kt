@@ -1,4 +1,4 @@
-package com.lucasjwilber.freenote
+package com.lucasjwilber.freenote.views
 
 import android.os.Bundle
 import android.util.Log
@@ -8,7 +8,9 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.lucasjwilber.freenote.*
 import com.lucasjwilber.freenote.databinding.ActivityEditNoteBinding
+import com.lucasjwilber.freenote.models.Note
 import kotlinx.android.synthetic.main.activity_edit_note.*
 import kotlinx.coroutines.*
 import java.util.*
@@ -36,18 +38,24 @@ class EditNoteActivity : AppCompatActivity() {
         binding.confirmDeleteButton.setOnClickListener { deleteNote() }
 
         supportActionBar?.title =
-            if (currentNote.type == NOTE) getString(R.string.create_note) else getString(R.string.create_list)
+            if (currentNote.type == NOTE) getString(
+                R.string.create_note
+            ) else getString(R.string.create_list)
 
         val context = this
         viewManager = LinearLayoutManager(context)
 
         if (!currentNote.isNew) { // if we got here from clicking on an existing note
 
-            supportActionBar?.title = if (currentNote.type == NOTE) getString(R.string.edit_note) else getString(R.string.edit_list)
+            supportActionBar?.title = if (currentNote.type == NOTE) getString(
+                R.string.edit_note
+            ) else getString(R.string.edit_list)
             currentNote.titleWasSet = true
 
             GlobalScope.launch(Dispatchers.Main) {
-                val notesDao = AppDatabase.getDatabase(application).noteDao()
+                val notesDao = NoteDatabase.getDatabase(
+                    application
+                ).noteDao()
 
                 val note: Note = async(Dispatchers.IO) {
                     return@async notesDao.getNoteById(currentNote.id!!)
@@ -66,7 +74,9 @@ class EditNoteActivity : AppCompatActivity() {
                         if (!note.segments.contains(SEGMENT_DELIMITER)) {
                             currentNote.segments.add(note.segments)
                         } else {
-                            currentNote.segments = note.segments.split(SEGMENT_DELIMITER) as ArrayList<String>
+                            currentNote.segments = note.segments.split(
+                                SEGMENT_DELIMITER
+                            ) as ArrayList<String>
                         }
                     }
                 } else {
@@ -155,7 +165,9 @@ class EditNoteActivity : AppCompatActivity() {
                 currentNote.deletedSegments.size > 0 ||
                 currentNote.newSegmentText.isNotEmpty() ||
                 (currentNote.type == NOTE && currentNote.body != segmentsOnOpen) ||
-                (currentNote.type == LIST && currentNote.segments.joinToString(SEGMENT_DELIMITER) != segmentsOnOpen)
+                (currentNote.type == LIST && currentNote.segments.joinToString(
+                    SEGMENT_DELIMITER
+                ) != segmentsOnOpen)
         ) {
             currentNote.hasBeenChanged = true
         }
@@ -178,14 +190,23 @@ class EditNoteActivity : AppCompatActivity() {
             if (newSegmentEditText != null) newSegmentEditText!!.text.clear()
         }
 
-        val db = AppDatabase.getDatabase(this)
+        val db =
+            NoteDatabase.getDatabase(this)
         if (title.isEmpty()) title = "Untitled"
-        val text = if (currentNote.type == NOTE) currentNote.body else currentNote.segments.joinToString(SEGMENT_DELIMITER)
-        val note = Note(currentNote.id, currentNote.type, title, text, Date().time)
+        val text = if (currentNote.type == NOTE) currentNote.body else currentNote.segments.joinToString(
+            SEGMENT_DELIMITER
+        )
+        val note = Note(
+            currentNote.id,
+            currentNote.type,
+            title,
+            text,
+            Date().time
+        )
 
         GlobalScope.launch(Dispatchers.IO) {
            if (currentNote.isNew) {
-               currentNote.id = db.noteDao().insert(note).toInt()
+               currentNote.id = db.noteDao().insert(note)
                currentNote.isNew = false
            } else {
                db.noteDao().update(note)
@@ -197,10 +218,15 @@ class EditNoteActivity : AppCompatActivity() {
 
     private fun deleteNote() {
         GlobalScope.launch {
-            val notesDao = AppDatabase.getDatabase(application).noteDao()
+            val notesDao = NoteDatabase.getDatabase(
+                application
+            ).noteDao()
             notesDao.deleteNoteById(currentNote.id!!)
         }
-        showToast(this, getString(R.string.note_deleted))
+        showToast(
+            this,
+            getString(R.string.note_deleted)
+        )
         finish()
     }
 
