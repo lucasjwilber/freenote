@@ -24,6 +24,14 @@ const val SORT_TYPE_NOTES_FIRST = 9
 var newSegmentEditText: EditText? = null
 var undoButton: MenuItem? = null
 
+enum class SortType {
+    NEWEST_FIRST,
+    OLDEST_FIRST,
+    LAST_UPDATED_FIRST,
+    NOTES_FIRST,
+    LISTS_FIRST
+}
+
 class DeletedSegment(val position: Int, val text: String)
 class CurrentNote(
     var id: Long? = null,

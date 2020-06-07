@@ -9,14 +9,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lucasjwilber.freenote.*
+import com.lucasjwilber.freenote.database.NoteDatabase
 import com.lucasjwilber.freenote.databinding.ActivityEditNoteBinding
+import com.lucasjwilber.freenote.models.EditNoteAdapter
 import com.lucasjwilber.freenote.models.Note
 import kotlinx.android.synthetic.main.activity_edit_note.*
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-class EditNoteActivity : AppCompatActivity() {
+class ViewNoteActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEditNoteBinding
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
@@ -83,7 +85,8 @@ class EditNoteActivity : AppCompatActivity() {
                     currentNote.body = note.segments
                 }
 
-                viewAdapter = EditNoteAdapter(context)
+                viewAdapter =
+                    EditNoteAdapter(context)
                 binding.noteSegmentsRV.apply {
                     setHasFixedSize(true)
                     layoutManager = viewManager
@@ -96,7 +99,8 @@ class EditNoteActivity : AppCompatActivity() {
             binding.noteTitleEditText.visibility = View.VISIBLE
             binding.noteTitleEditText.requestFocus()
 
-            viewAdapter = EditNoteAdapter(context)
+            viewAdapter =
+                EditNoteAdapter(context)
             binding.noteSegmentsRV.apply {
                 setHasFixedSize(true)
                 layoutManager = viewManager

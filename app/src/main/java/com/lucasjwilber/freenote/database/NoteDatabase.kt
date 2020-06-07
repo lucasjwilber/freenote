@@ -1,4 +1,4 @@
-package com.lucasjwilber.freenote
+package com.lucasjwilber.freenote.database
 
 import android.content.Context
 import androidx.room.Database
@@ -17,7 +17,8 @@ abstract class NoteDatabase : RoomDatabase() {
         private var INSTANCE: NoteDatabase? = null
 
         fun getDatabase(context: Context): NoteDatabase {
-            val tempInstance = INSTANCE
+            val tempInstance =
+                INSTANCE
             if (tempInstance != null) {
                 return tempInstance
             }

@@ -1,4 +1,4 @@
-package com.lucasjwilber.freenote
+package com.lucasjwilber.freenote.models
 
 import android.content.Context
 import android.graphics.Paint
@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.lucasjwilber.freenote.*
 
 class EditNoteAdapter(val context: Context) :
     RecyclerView.Adapter<EditNoteAdapter.MyViewHolder>() {
@@ -46,20 +47,30 @@ class EditNoteAdapter(val context: Context) :
             val constraintLayout = LayoutInflater.from(parent.context)
                 .inflate(R.layout.segment, parent, false) as ConstraintLayout
 
-            return MyViewHolder(constraintLayout)
+            return MyViewHolder(
+                constraintLayout
+            )
         }
         else if (viewType == NEW_SEGMENT) {
             val constraintLayout = LayoutInflater.from(parent.context)
                 .inflate(R.layout.new_segment, parent, false) as ConstraintLayout
 
-            newSegmentEditText = constraintLayout.findViewById(R.id.newSegmentEditText)
-            newSegmentEditText!!.addTextChangedListener(makeTextWatcher(TW_NEW_SEGMENT))
+            newSegmentEditText = constraintLayout.findViewById(
+                R.id.newSegmentEditText
+            )
+            newSegmentEditText!!.addTextChangedListener(
+                makeTextWatcher(TW_NEW_SEGMENT)
+            )
 
-            return MyViewHolder(constraintLayout)
+            return MyViewHolder(
+                constraintLayout
+            )
         } else { // if (viewType == NOTE_BODY) {
             val constraintLayout = LayoutInflater.from(parent.context)
                 .inflate(R.layout.note_body, parent, false) as ConstraintLayout
-            return MyViewHolder(constraintLayout)
+            return MyViewHolder(
+                constraintLayout
+            )
         }
     }
 
@@ -68,7 +79,9 @@ class EditNoteAdapter(val context: Context) :
         if (getItemViewType(position) == SEGMENT) {
             val textView: TextView = holder.constraintLayout.findViewById(R.id.segmentTextView)
 
-            if (currentNote.segments[position].contains(STRIKE_THROUGH_INDICATOR)) {
+            if (currentNote.segments[position].contains(
+                    STRIKE_THROUGH_INDICATOR
+                )) {
                 textView.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
                 textView.text = currentNote.segments[position].substring(3)
             } else {
@@ -100,7 +113,11 @@ class EditNoteAdapter(val context: Context) :
         } else { //if (getItemViewType(position) == NOTE_BODY) {
             val editText: EditText = holder.constraintLayout.findViewById(R.id.noteBodyEditText)
             editText.setText(currentNote.body)
-            editText.addTextChangedListener(makeTextWatcher(TW_NOTE_BODY))
+            editText.addTextChangedListener(
+                makeTextWatcher(
+                    TW_NOTE_BODY
+                )
+            )
         }
     }
 
@@ -120,7 +137,12 @@ class EditNoteAdapter(val context: Context) :
     }
 
     private fun deleteSegment(position: Int) {
-        currentNote.deletedSegments.push(DeletedSegment(position, currentNote.segments[position]))
+        currentNote.deletedSegments.push(
+            DeletedSegment(
+                position,
+                currentNote.segments[position]
+            )
+        )
         undoButton?.isVisible = true
 
         currentNote.segments.removeAt(position)
@@ -147,7 +169,9 @@ class EditNoteAdapter(val context: Context) :
 
             val updatedText: String = ces.editText.text.toString()
             ces.textView.text = updatedText
-            if (currentNote.segments[ces.position].contains(STRIKE_THROUGH_INDICATOR)) {
+            if (currentNote.segments[ces.position].contains(
+                    STRIKE_THROUGH_INDICATOR
+                )) {
                 currentNote.segments[ces.position] = STRIKE_THROUGH_INDICATOR + updatedText
             } else {
                 currentNote.segments[ces.position] = updatedText
@@ -155,7 +179,11 @@ class EditNoteAdapter(val context: Context) :
 
             ces.editText.visibility = View.GONE
             ces.button.visibility = View.GONE
-            ces.editText.removeTextChangedListener(makeTextWatcher(TW_UPDATED_SEGMENT))
+            ces.editText.removeTextChangedListener(
+                makeTextWatcher(
+                    TW_UPDATED_SEGMENT
+                )
+            )
         }
     }
 
@@ -166,16 +194,24 @@ class EditNoteAdapter(val context: Context) :
         val editText: EditText = holder.constraintLayout.findViewById(R.id.segmentEditText)
         val updateSegmentButton: Button = holder.constraintLayout.findViewById(R.id.updateSegmentButton)
 
-        currentEditedSegment = CurrentEditedSegment(
-            editText,
-            textView,
-            updateSegmentButton,
-            holder.adapterPosition,
-            currentNote.segments[holder.adapterPosition].contains(STRIKE_THROUGH_INDICATOR))
+        currentEditedSegment =
+            CurrentEditedSegment(
+                editText,
+                textView,
+                updateSegmentButton,
+                holder.adapterPosition,
+                currentNote.segments[holder.adapterPosition].contains(
+                    STRIKE_THROUGH_INDICATOR
+                )
+            )
 
         val ces = currentEditedSegment
         currentNote.currentlyEditedSegmentPosition = holder.adapterPosition
-        ces!!.editText.addTextChangedListener(makeTextWatcher(TW_UPDATED_SEGMENT))
+        ces!!.editText.addTextChangedListener(
+            makeTextWatcher(
+                TW_UPDATED_SEGMENT
+            )
+        )
         editText.setText(textView.text.toString())
         editText.visibility = View.VISIBLE
         editText.requestFocus()
@@ -209,7 +245,9 @@ class EditNoteAdapter(val context: Context) :
     }
 
     private fun strikeThroughSegment(holder: MyViewHolder, textView: TextView): Boolean {
-        if (currentNote.segments[holder.adapterPosition].contains(STRIKE_THROUGH_INDICATOR)) {
+        if (currentNote.segments[holder.adapterPosition].contains(
+                STRIKE_THROUGH_INDICATOR
+            )) {
             currentNote.segments[holder.adapterPosition] = currentNote.segments[holder.adapterPosition].substring(3)
             textView.paintFlags = 0
         } else {

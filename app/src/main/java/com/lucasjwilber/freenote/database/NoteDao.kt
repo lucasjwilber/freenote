@@ -1,4 +1,4 @@
-package com.lucasjwilber.freenote
+package com.lucasjwilber.freenote.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*

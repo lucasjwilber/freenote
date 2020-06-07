@@ -10,6 +10,9 @@ android {
     viewBinding {
         enabled = true
     }
+    dataBinding {
+        enabled = true
+    }
 
     defaultConfig {
         applicationId "com.lucasjwilber.freenote"
