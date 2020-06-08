@@ -26,7 +26,6 @@ class AllNotesActivity : AppCompatActivity() {
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
     private var allNotes: List<NoteDescriptor> = listOf()
-    private var swipedNotePosition: Int? = null
     private var viewModel: AllNotesViewModel? = null
     private lateinit var observer: Observer<in List<NoteDescriptor>>
 
@@ -68,10 +67,6 @@ class AllNotesActivity : AppCompatActivity() {
         binding.confirmDeleteButton.setOnClickListener { deleteNote() }
         // swipe-to-delete recyclerview listener
         initSwipeListener()
-
-        // re-apply state of the delete modal in case an orientation change hid it
-        binding.deleteModalLayout.visibility = if (viewModel?.showDeleteNoteModal!!) View.VISIBLE else View.GONE
-
     }
 
 
@@ -101,14 +96,16 @@ class AllNotesActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menu_sort_options) {
             return false
-        } else {
+        } else if (item.itemId == R.id.menu_sort_lists_first ||
+            item.itemId == R.id.menu_sort_notes_first ||
+            item.itemId == R.id.menu_sort_last_updated_first ||
+            item.itemId == R.id.menu_sort_oldest_first ||
+            item.itemId == R.id.menu_sort_newest_first
+        ) {
             viewModel?.updateSortType(item.itemId)
+            // force an observer update to update the recyclerview
+            viewModel?.allNoteDescriptors?.observe(this, observer)
         }
-
-        //refresh observer
-//        viewModel?.refreshSortType()
-//        viewModel?.allNoteDescriptors?.observe(this, observer)
-//        viewAdapter.notifyDataSetChanged()
 
         return super.onOptionsItemSelected(item)
     }
@@ -126,7 +123,6 @@ class AllNotesActivity : AppCompatActivity() {
 
     private fun cancelDeleteNote() {
         binding.deleteModalLayout.visibility = View.GONE
-        viewModel?.showDeleteNoteModal = false
         // re-insert the swiped away view
         viewAdapter.notifyItemChanged(viewModel?.swipedNotePosition!!)
     }
@@ -136,7 +132,6 @@ class AllNotesActivity : AppCompatActivity() {
         viewModel?.deleteSwipedNote()
 
         binding.deleteModalLayout.visibility = View.GONE
-        viewModel?.showDeleteNoteModal = false
 
         showToast(
             this,

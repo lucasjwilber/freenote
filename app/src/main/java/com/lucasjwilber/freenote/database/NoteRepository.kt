@@ -11,7 +11,7 @@ class NoteRepository(private val noteDao: NoteDao, context: Context) {
 
     lateinit var allNoteDescriptors: LiveData<List<NoteDescriptor>>
     private val prefs: SharedPreferences = context.getSharedPreferences("freenote_prefs", Context.MODE_PRIVATE)
-    private var sortType: Int = prefs.getInt("sortType", SORT_TYPE_LAST_UPDATED_FIRST)
+    private var sortType: Int = prefs.getInt("sortType", R.id.menu_sort_last_updated_first)
 
 
     init {
@@ -20,10 +20,10 @@ class NoteRepository(private val noteDao: NoteDao, context: Context) {
 
     fun setSortedNoteDescriptors(sortType: Int) {
         allNoteDescriptors = when (sortType) {
-            SORT_TYPE_NEWEST_FIRST -> noteDao.getAllDescriptorsNewestFirst()
-            SORT_TYPE_OLDEST_FIRST -> noteDao.getAllDescriptorsOldestFirst()
-            SORT_TYPE_NOTES_FIRST -> noteDao.getAllDescriptorsNotesFirst()
-            SORT_TYPE_LISTS_FIRST -> noteDao.getAllDescriptorsListsFirst()
+            R.id.menu_sort_newest_first -> noteDao.getAllDescriptorsNewestFirst()
+            R.id.menu_sort_oldest_first -> noteDao.getAllDescriptorsOldestFirst()
+            R.id.menu_sort_notes_first -> noteDao.getAllDescriptorsNotesFirst()
+            R.id.menu_sort_lists_first -> noteDao.getAllDescriptorsListsFirst()
             else -> noteDao.getAllDescriptorsLastUpdatedFirst()
         }
         prefs.edit().putInt("sortType", sortType).apply()

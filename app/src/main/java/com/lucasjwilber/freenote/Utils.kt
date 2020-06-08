@@ -16,21 +16,9 @@ const val NOTE = 1
 const val TW_NEW_SEGMENT = 2
 const val TW_UPDATED_SEGMENT = 3
 const val TW_NOTE_BODY = 4
-const val SORT_TYPE_OLDEST_FIRST = 5
-const val SORT_TYPE_NEWEST_FIRST = 6
-const val SORT_TYPE_LAST_UPDATED_FIRST = 7
-const val SORT_TYPE_LISTS_FIRST = 8
-const val SORT_TYPE_NOTES_FIRST = 9
 var newSegmentEditText: EditText? = null
 var undoButton: MenuItem? = null
 
-enum class SortType {
-    NEWEST_FIRST,
-    OLDEST_FIRST,
-    LAST_UPDATED_FIRST,
-    NOTES_FIRST,
-    LISTS_FIRST
-}
 
 class DeletedSegment(val position: Int, val text: String)
 class CurrentNote(
