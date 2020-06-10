@@ -1,4 +1,4 @@
-package com.lucasjwilber.freenote.views
+package com.lucasjwilber.freenote.activities
 
 import android.os.Bundle
 import android.util.Log
@@ -6,24 +6,31 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lucasjwilber.freenote.*
 import com.lucasjwilber.freenote.database.NoteDatabase
 import com.lucasjwilber.freenote.databinding.ActivityEditNoteBinding
-import com.lucasjwilber.freenote.models.EditNoteAdapter
+import com.lucasjwilber.freenote.EditNoteAdapter
 import com.lucasjwilber.freenote.models.Note
+import com.lucasjwilber.freenote.models.NoteDescriptor
+import com.lucasjwilber.freenote.viewmodels.AllNotesViewModel
+import com.lucasjwilber.freenote.viewmodels.EditNoteViewModel
 import kotlinx.android.synthetic.main.activity_edit_note.*
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ViewNoteActivity : AppCompatActivity() {
+class EditNoteActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEditNoteBinding
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
     private var segmentsOnOpen = ""
+    private var viewModel: EditNoteViewModel? = null
+    private lateinit var observer: Observer<in Note>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +41,9 @@ class ViewNoteActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
         binding.toolbar.inflateMenu(R.menu.edit_note_menu)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+
+        viewModel = ViewModelProviders.of(this).get(EditNoteViewModel::class.java)
 
         binding.deleteModalLayout.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
         binding.cancelDeleteButton.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
@@ -54,14 +64,9 @@ class ViewNoteActivity : AppCompatActivity() {
             ) else getString(R.string.edit_list)
             currentNote.titleWasSet = true
 
-            GlobalScope.launch(Dispatchers.Main) {
-                val notesDao = NoteDatabase.getDatabase(
-                    application
-                ).noteDao()
+            viewModel?.setNote(currentNote.id!!)
 
-                val note: Note = async(Dispatchers.IO) {
-                    return@async notesDao.getNoteById(currentNote.id!!)
-                }.await()
+            observer = Observer { note ->
 
                 val titleText = if (note.title.isEmpty()) getString(R.string.untitled) else note.title
                 binding.noteTitleTV.text = titleText
@@ -92,8 +97,11 @@ class ViewNoteActivity : AppCompatActivity() {
                     layoutManager = viewManager
                     adapter = viewAdapter
                 }
-
             }
+
+            viewModel?.note?.observe(this, observer)
+
+
         } else { //if we got here from clicking the 'new note' button:
             binding.noteTitleTV.visibility = View.GONE
             binding.noteTitleEditText.visibility = View.VISIBLE

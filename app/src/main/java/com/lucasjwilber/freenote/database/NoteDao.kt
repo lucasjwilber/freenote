@@ -24,7 +24,7 @@ interface NoteDao {
     fun getAllDescriptorsListsFirst(): LiveData<List<NoteDescriptor>>
 
     @Query("SELECT * FROM notes WHERE id = :id")
-    suspend fun getNoteById(id: Long): Note
+    fun getNoteById(id: Long): LiveData<Note>
 
     // insert returns the id of the created Note
     @Insert

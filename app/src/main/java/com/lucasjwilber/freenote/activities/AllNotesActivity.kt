@@ -1,4 +1,4 @@
-package com.lucasjwilber.freenote.views
+package com.lucasjwilber.freenote.activities
 
 import android.content.Intent
 import android.content.res.Configuration
@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lucasjwilber.freenote.*
 import com.lucasjwilber.freenote.databinding.ActivityAllNotesBinding
-import com.lucasjwilber.freenote.models.AllNotesAdapter
+import com.lucasjwilber.freenote.AllNotesAdapter
 import com.lucasjwilber.freenote.models.NoteDescriptor
 import com.lucasjwilber.freenote.viewmodels.AllNotesViewModel
 import kotlin.collections.List
@@ -141,7 +141,7 @@ class AllNotesActivity : AppCompatActivity() {
 
 
     private fun goToEditNoteActivity(type: Int) {
-        intent = Intent(applicationContext, ViewNoteActivity::class.java)
+        intent = Intent(applicationContext, EditNoteActivity::class.java)
         currentNote =
             CurrentNote()
         currentNote.type = type

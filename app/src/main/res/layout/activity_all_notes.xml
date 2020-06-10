@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/coffeeLightest"
     android:animateLayoutChanges="true"
-    tools:context=".views.AllNotesActivity">
+    tools:context=".activities.AllNotesActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

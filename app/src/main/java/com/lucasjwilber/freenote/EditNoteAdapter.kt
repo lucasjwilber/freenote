@@ -1,4 +1,4 @@
-package com.lucasjwilber.freenote.models
+package com.lucasjwilber.freenote
 
 import android.content.Context
 import android.graphics.Paint
@@ -12,7 +12,6 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.lucasjwilber.freenote.*
 
 class EditNoteAdapter(val context: Context) :
     RecyclerView.Adapter<EditNoteAdapter.MyViewHolder>() {

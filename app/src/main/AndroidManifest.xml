@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".views.AllNotesActivity"
+            android:name=".activities.AllNotesActivity"
             android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,8 +18,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".views.ViewNoteActivity"
-            android:parentActivityName=".views.AllNotesActivity" />
+        <activity android:name=".activities.EditNoteActivity"
+            android:parentActivityName=".activities.AllNotesActivity" />
     </application>
 
 </manifest>

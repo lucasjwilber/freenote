@@ -29,6 +29,10 @@ class NoteRepository(private val noteDao: NoteDao, context: Context) {
         prefs.edit().putInt("sortType", sortType).apply()
     }
 
+    fun getNoteById(id: Long): LiveData<Note> {
+        return noteDao.getNoteById(id)
+    }
+
 
     suspend fun insert(note: Note): Long {
         return noteDao.insert(note)
