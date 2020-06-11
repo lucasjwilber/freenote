@@ -79,6 +79,7 @@ class AllNotesActivity : AppCompatActivity() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
+        // change the layout of the note type options to best fit the screen
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             binding.selectTypeOptionsContainer.orientation = LinearLayout.HORIZONTAL
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {

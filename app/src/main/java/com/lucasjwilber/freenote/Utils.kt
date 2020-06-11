@@ -17,7 +17,7 @@ const val TW_NEW_SEGMENT = 2
 const val TW_UPDATED_SEGMENT = 3
 const val TW_NOTE_BODY = 4
 var newSegmentEditText: EditText? = null
-var undoButton: MenuItem? = null
+//var undoButton: MenuItem? = null
 
 
 class DeletedSegment(val position: Int, val text: String)

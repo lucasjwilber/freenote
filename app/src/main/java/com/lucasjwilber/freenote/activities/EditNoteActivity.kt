@@ -15,10 +15,8 @@ import com.lucasjwilber.freenote.database.NoteDatabase
 import com.lucasjwilber.freenote.databinding.ActivityEditNoteBinding
 import com.lucasjwilber.freenote.EditNoteAdapter
 import com.lucasjwilber.freenote.models.Note
-import com.lucasjwilber.freenote.models.NoteDescriptor
-import com.lucasjwilber.freenote.viewmodels.AllNotesViewModel
 import com.lucasjwilber.freenote.viewmodels.EditNoteViewModel
-import kotlinx.android.synthetic.main.activity_edit_note.*
+import kotlinx.android.synthetic.main.segment.*
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -30,7 +28,10 @@ class EditNoteActivity : AppCompatActivity() {
     private lateinit var viewManager: RecyclerView.LayoutManager
     private var segmentsOnOpen = ""
     private var viewModel: EditNoteViewModel? = null
-    private lateinit var observer: Observer<in Note>
+    private lateinit var noteObserver: Observer<in Note>
+    private lateinit var segmentsObserver: Observer<in List<String>>
+    private lateinit var deletedSegmentsObserver: Observer<in Stack<DeletedSegment>>
+    var undoButton: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,9 +67,16 @@ class EditNoteActivity : AppCompatActivity() {
 
             viewModel?.setNote(currentNote.id!!)
 
-            observer = Observer { note ->
+            // observe the note var in the ViewModel in order to update the UI when it is retrieved from the db
+            noteObserver = Observer { note ->
 
                 val titleText = if (note.title.isEmpty()) getString(R.string.untitled) else note.title
+
+                // set segments in the ViewModel
+                viewModel?.segments?.value = note.segments.split(SEGMENT_DELIMITER)
+                viewModel?.deletedSegments?.value = Stack<DeletedSegment>()
+
+
                 binding.noteTitleTV.text = titleText
                 binding.noteTitleTV.setOnClickListener { changeTitle() }
                 binding.noteTitleEditText.setText(titleText)
@@ -90,16 +98,35 @@ class EditNoteActivity : AppCompatActivity() {
                     currentNote.body = note.segments
                 }
 
-                viewAdapter =
-                    EditNoteAdapter(context)
+//                viewAdapter = EditNoteAdapter(viewModel?.segments)
+
                 binding.noteSegmentsRV.apply {
                     setHasFixedSize(true)
                     layoutManager = viewManager
                     adapter = viewAdapter
                 }
             }
+            viewModel?.note?.observe(this, noteObserver)
 
-            viewModel?.note?.observe(this, observer)
+
+            segmentsObserver = Observer { segments ->
+                viewAdapter = EditNoteAdapter(viewModel?.segments, viewModel?.deletedSegments)
+                binding.noteSegmentsRV.apply {
+                    setHasFixedSize(true)
+                    layoutManager = viewManager
+                    adapter = viewAdapter
+                }
+                Log.i("ljw", "segments changed somewhere")
+            }
+            viewModel?.segments?.observe(this, segmentsObserver)
+
+
+            deletedSegmentsObserver = Observer { deletedSegments ->
+                viewModel?.undoButtonIsVisible = (deletedSegments.isNotEmpty())
+                undoButton?.isVisible = (deletedSegments.isNotEmpty())
+                Log.i("ljw", "deleted segments changed somewhere")
+            }
+            viewModel?.deletedSegments?.observe(this, deletedSegmentsObserver)
 
 
         } else { //if we got here from clicking the 'new note' button:
@@ -107,8 +134,8 @@ class EditNoteActivity : AppCompatActivity() {
             binding.noteTitleEditText.visibility = View.VISIBLE
             binding.noteTitleEditText.requestFocus()
 
-            viewAdapter =
-                EditNoteAdapter(context)
+            viewAdapter = EditNoteAdapter(viewModel?.segments, viewModel?.deletedSegments)
+
             binding.noteSegmentsRV.apply {
                 setHasFixedSize(true)
                 layoutManager = viewManager
@@ -117,23 +144,20 @@ class EditNoteActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-    }
-
     override fun onStop() {
         super.onStop()
-        saveNote()
+//        saveNote()
+        viewModel?.saveNote(binding.noteTitleEditText.text.toString())
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.edit_note_menu, menu)
         undoButton = menu?.findItem(R.id.action_undo)
-        if (currentNote.isNew) {
-            //hide the delete option
-            menu?.getItem(1)?.isVisible = false
-        }
+//        if (currentNote.isNew) {
+//            //hide the delete option
+//            menu?.getItem(1)?.isVisible = false
+//        }
+        menu?.getItem(1)?.isVisible = viewModel?.undoButtonIsVisible!!
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -142,7 +166,8 @@ class EditNoteActivity : AppCompatActivity() {
 //            saveNote()
 //        } else
         if (item.itemId == R.id.action_undo) {
-            if (currentNote.deletedSegments.isNotEmpty()) undoSegmentDelete()
+//            if (currentNote.deletedSegments.isNotEmpty()) undoSegmentDelete()
+            undoSegmentDelete()
         } else if (item.itemId == R.id.action_delete) {
             binding.deleteModalLayout.visibility = View.VISIBLE
         }
@@ -150,13 +175,20 @@ class EditNoteActivity : AppCompatActivity() {
     }
 
     private fun undoSegmentDelete() {
-        val delseg: DeletedSegment = currentNote.deletedSegments.pop()
-        currentNote.segments.add(delseg.position, delseg.text)
-        viewAdapter.notifyItemInserted(delseg.position)
+        Log.i("ljw", "undo clicked")
+        val deletedSegments = viewModel?.deletedSegments?.value
+        val delseg: DeletedSegment = deletedSegments!!.pop()
+        viewModel?.deletedSegments?.value = deletedSegments
 
-        if (currentNote.deletedSegments.isEmpty()) {
-            undoButton?.isVisible = false
-        }
+        val segments = viewModel?.segments?.value as ArrayList<String>
+        segments.add(delseg.position, delseg.text)
+        viewModel?.segments?.value = segments
+//        currentNote.segments.add(delseg.position, delseg.text)
+//        viewAdapter.notifyItemInserted(delseg.position)
+
+//        if (currentNote.deletedSegments.isEmpty()) {
+//            undoButton?.isVisible = false
+//        }
 
         if (currentNote.currentlyEditedSegmentPosition != null) {
             if (currentNote.currentlyEditedSegmentPosition!! > delseg.position) {
@@ -170,63 +202,63 @@ class EditNoteActivity : AppCompatActivity() {
     }
 
 
-    private fun saveNote() {
-        var title: String = binding.noteTitleEditText.text.toString()
-
-        if (title != binding.noteTitleTV.text.toString() ||
-                currentNote.deletedSegments.size > 0 ||
-                currentNote.newSegmentText.isNotEmpty() ||
-                (currentNote.type == NOTE && currentNote.body != segmentsOnOpen) ||
-                (currentNote.type == LIST && currentNote.segments.joinToString(
-                    SEGMENT_DELIMITER
-                ) != segmentsOnOpen)
-        ) {
-            currentNote.hasBeenChanged = true
-        }
-
-        if (!currentNote.hasBeenChanged) {
-            Log.i("ljw", "no changes to save")
-            return
-        } else if (currentNote.title.isEmpty() &&
-            noteTitleEditText.text.isEmpty() &&
-            currentNote.body.isEmpty() &&
-            currentNote.segments.size == 0 &&
-            currentNote.newSegmentText.isEmpty()) {
-            Log.i("ljw","no use saving an empty note")
-            return
-        }
-
-        if (currentNote.newSegmentText.isNotEmpty()) {
-            currentNote.segments.add(currentNote.newSegmentText)
-            currentNote.newSegmentText = ""
-            if (newSegmentEditText != null) newSegmentEditText!!.text.clear()
-        }
-
-        val db =
-            NoteDatabase.getDatabase(this)
-        if (title.isEmpty()) title = "Untitled"
-        val text = if (currentNote.type == NOTE) currentNote.body else currentNote.segments.joinToString(
-            SEGMENT_DELIMITER
-        )
-        val note = Note(
-            currentNote.id,
-            currentNote.type,
-            title,
-            text,
-            Date().time
-        )
-
-        GlobalScope.launch(Dispatchers.IO) {
-           if (currentNote.isNew) {
-               currentNote.id = db.noteDao().insert(note)
-               currentNote.isNew = false
-           } else {
-               db.noteDao().update(note)
-           }
-        }
-
-//        showToast(this, getString(R.string.saved))
-    }
+//    private fun saveNote() {
+//        var title: String = binding.noteTitleEditText.text.toString()
+//
+//        if (title != binding.noteTitleTV.text.toString() ||
+//                currentNote.deletedSegments.size > 0 ||
+//                currentNote.newSegmentText.isNotEmpty() ||
+//                (currentNote.type == NOTE && currentNote.body != segmentsOnOpen) ||
+//                (currentNote.type == LIST && currentNote.segments.joinToString(
+//                    SEGMENT_DELIMITER
+//                ) != segmentsOnOpen)
+//        ) {
+//            currentNote.hasBeenChanged = true
+//        }
+//
+//        if (!currentNote.hasBeenChanged) {
+//            Log.i("ljw", "no changes to save")
+//            return
+//        } else if (currentNote.title.isEmpty() &&
+//            noteTitleEditText.text.isEmpty() &&
+//            currentNote.body.isEmpty() &&
+//            currentNote.segments.size == 0 &&
+//            currentNote.newSegmentText.isEmpty()) {
+//            Log.i("ljw","no use saving an empty note")
+//            return
+//        }
+//
+//        if (currentNote.newSegmentText.isNotEmpty()) {
+//            currentNote.segments.add(currentNote.newSegmentText)
+//            currentNote.newSegmentText = ""
+//            if (newSegmentEditText != null) newSegmentEditText!!.text.clear()
+//        }
+//
+//        val db =
+//            NoteDatabase.getDatabase(this)
+//        if (title.isEmpty()) title = "Untitled"
+//        val text = if (currentNote.type == NOTE) currentNote.body else currentNote.segments.joinToString(
+//            SEGMENT_DELIMITER
+//        )
+//        val note = Note(
+//            currentNote.id,
+//            currentNote.type,
+//            title,
+//            text,
+//            Date().time
+//        )
+//
+//        GlobalScope.launch(Dispatchers.IO) {
+//           if (currentNote.isNew) {
+//               currentNote.id = db.noteDao().insert(note)
+//               currentNote.isNew = false
+//           } else {
+//               db.noteDao().update(note)
+//           }
+//        }
+//
+////        showToast(this, getString(R.string.saved))
+//    }
 
     private fun deleteNote() {
         GlobalScope.launch {
@@ -248,4 +280,6 @@ class EditNoteActivity : AppCompatActivity() {
         binding.noteTitleEditText.requestFocus()
         binding.noteTitleEditText.setSelection(binding.noteTitleEditText.text.length)
     }
+
+
 }

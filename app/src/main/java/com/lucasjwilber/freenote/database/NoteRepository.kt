@@ -6,6 +6,9 @@ import androidx.lifecycle.LiveData
 import com.lucasjwilber.freenote.*
 import com.lucasjwilber.freenote.models.Note
 import com.lucasjwilber.freenote.models.NoteDescriptor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class NoteRepository(private val noteDao: NoteDao, context: Context) {
 
@@ -35,12 +38,19 @@ class NoteRepository(private val noteDao: NoteDao, context: Context) {
 
 
     suspend fun insert(note: Note): Long {
+//        var id: Long? = null
+//        GlobalScope.launch(Dispatchers.IO) {
+//            id = noteDao.insert(note)
+//        }
+//        return id!!
         return noteDao.insert(note)
     }
 
 
     suspend fun update(note: Note) {
-        noteDao.update(note)
+//        GlobalScope.launch(Dispatchers.IO) {
+            noteDao.update(note)
+//        }
     }
 
 
