@@ -8,7 +8,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/freenote_logo_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
+        <activity android:name=".activities.EditListActivity"></activity>
         <activity
             android:name=".activities.AllNotesActivity"
             android:configChanges="orientation|screenSize">
@@ -18,7 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.EditNoteActivity"
+        <activity
+            android:name=".activities.EditNoteActivity"
             android:parentActivityName=".activities.AllNotesActivity" />
     </application>
 

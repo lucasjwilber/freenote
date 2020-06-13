@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.lucasjwilber.freenote.activities.EditListActivity
 import com.lucasjwilber.freenote.activities.EditNoteActivity
 import com.lucasjwilber.freenote.models.NoteDescriptor
 
@@ -33,11 +34,15 @@ class AllNotesAdapter(private var allNoteDescriptors: List<NoteDescriptor>, priv
     }
 
     private fun goToNoteDetails(holder: NoteDescriptorViewHolder) {
-        val intent = Intent(context, EditNoteActivity::class.java)
-        currentNote =
-            CurrentNote()
-        currentNote.id = allNoteDescriptors[holder.adapterPosition].id
-        currentNote.type = allNoteDescriptors[holder.adapterPosition].type
+        val id = allNoteDescriptors[holder.adapterPosition].id
+        val type = allNoteDescriptors[holder.adapterPosition].type
+
+        val destination =
+            if (type == NOTE) EditNoteActivity::class.java
+            else EditListActivity::class.java
+
+        val intent = Intent(context, destination)
+        intent.putExtra("id", id)
         context.startActivity(intent)
     }
 

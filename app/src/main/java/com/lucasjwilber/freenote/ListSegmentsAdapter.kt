@@ -1,6 +1,5 @@
 package com.lucasjwilber.freenote
 
-import android.content.Context
 import android.graphics.Paint
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,42 +11,38 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.lucasjwilber.freenote.viewmodels.EditNoteViewModel
 import java.util.*
 
 // it's important that the LiveData is passed in here instead of its value so that updates here are reflected in the ViewModel
-class EditNoteAdapter(var segmentsLD: MutableLiveData<List<String>>?, var deletedSegmentsLD: MutableLiveData<Stack<DeletedSegment>>?) :
-    RecyclerView.Adapter<EditNoteAdapter.MyViewHolder>() {
+class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var deletedSegmentsLD: MutableLiveData<Stack<DeletedSegment>>) :
+    RecyclerView.Adapter<ListSegmentsAdapter.MyViewHolder>() {
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         setUpSwipeListener(recyclerView)
+        Log.i("ljw", "attached to RV")
+        Log.i("ljw", segments.toString())
     }
 
     private val SEGMENT: Int = 0
     private val NEW_SEGMENT: Int = 1
-    private val NOTE_BODY: Int = 2
     private class CurrentEditedSegment(var editText: EditText, var textView: TextView, var button: Button, var position: Int, var isStruckThrough: Boolean)
     private var currentEditedSegment: CurrentEditedSegment? = null
     private var deletedSegments = Stack<DeletedSegment>()
-    private var segments = segmentsLD?.value as ArrayList<String>
+    private var segments = segmentsLD.value as ArrayList<String>
 
 
 
     class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout)
 
     override fun getItemViewType(position: Int): Int {
-        return if (currentNote.type == LIST) {
-            if (position == segments.size)
-                NEW_SEGMENT
-            else
-                SEGMENT
-        } else {
-            NOTE_BODY
-        }
+//        return if (position == segments.size)
+//            NEW_SEGMENT
+//        else
+//            SEGMENT
+        return NEW_SEGMENT
     }
 
     override fun onCreateViewHolder(parent: ViewGroup,
@@ -60,7 +55,8 @@ class EditNoteAdapter(var segmentsLD: MutableLiveData<List<String>>?, var delete
                 constraintLayout
             )
         }
-        else if (viewType == NEW_SEGMENT) {
+//        else if (viewType == NEW_SEGMENT) {
+        else {
             val constraintLayout = LayoutInflater.from(parent.context)
                 .inflate(R.layout.new_segment, parent, false) as ConstraintLayout
 
@@ -71,12 +67,6 @@ class EditNoteAdapter(var segmentsLD: MutableLiveData<List<String>>?, var delete
                 makeTextWatcher(TW_NEW_SEGMENT)
             )
 
-            return MyViewHolder(
-                constraintLayout
-            )
-        } else { // if (viewType == NOTE_BODY) {
-            val constraintLayout = LayoutInflater.from(parent.context)
-                .inflate(R.layout.note_body, parent, false) as ConstraintLayout
             return MyViewHolder(
                 constraintLayout
             )
@@ -109,24 +99,16 @@ class EditNoteAdapter(var segmentsLD: MutableLiveData<List<String>>?, var delete
 
             newSegmentEditText = editText
 
-            if (currentNote.titleWasSet) {
-                editText.requestFocus()
-            }
+//            if (currentNote.titleWasSet) {
+//                editText.requestFocus()
+//            }
 
             editText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) {
-                    currentNote.titleWasSet = true
+//                    currentNote.titleWasSet = true
                     hideLastEditedSegment()
                 }
             }
-        } else { //if (getItemViewType(position) == NOTE_BODY) {
-            val editText: EditText = holder.constraintLayout.findViewById(R.id.noteBodyEditText)
-            editText.setText(currentNote.body)
-            editText.addTextChangedListener(
-                makeTextWatcher(
-                    TW_NOTE_BODY
-                )
-            )
         }
     }
 
@@ -141,7 +123,7 @@ class EditNoteAdapter(var segmentsLD: MutableLiveData<List<String>>?, var delete
         // don't use notifyItemInserted() here, in order to keep the keyboard open and the edit text focused
         notifyDataSetChanged()
 
-        currentNote.newSegmentText = ""
+//        currentNote.newSegmentText = ""
 
     }
 
@@ -160,10 +142,10 @@ class EditNoteAdapter(var segmentsLD: MutableLiveData<List<String>>?, var delete
                 segments[position]
             )
         )
-        deletedSegmentsLD?.value = deletedSegments
+        deletedSegmentsLD.value = deletedSegments
 
         segments.removeAt(position)
-        segmentsLD?.value = segments
+        segmentsLD.value = segments
 
         // update currentlyEditedSegmentPosition accordingly.
         // can't use simple ++ or -- operators for some reason

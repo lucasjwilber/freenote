@@ -142,11 +142,12 @@ class AllNotesActivity : AppCompatActivity() {
 
 
     private fun goToEditNoteActivity(type: Int) {
-        intent = Intent(applicationContext, EditNoteActivity::class.java)
-        currentNote =
-            CurrentNote()
-        currentNote.type = type
-        currentNote.isNew = true
+        val destination =
+            if (type == NOTE) EditNoteActivity::class.java
+            else EditListActivity::class.java
+        intent = Intent(applicationContext, destination)
+//        intent.putExtra("id", -1L)
+
         binding.selectTypeBackground.visibility = View.GONE
         startActivity(intent)
     }
