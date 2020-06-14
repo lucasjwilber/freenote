@@ -9,7 +9,9 @@
         android:roundIcon="@mipmap/freenote_logo_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.EditListActivity"></activity>
+        <activity android:name=".activities.BaseActivity"></activity>
+        <activity android:name=".activities.EditListActivity"
+            android:parentActivityName=".activities.AllNotesActivity" />
         <activity
             android:name=".activities.AllNotesActivity"
             android:configChanges="orientation|screenSize">

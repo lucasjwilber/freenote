@@ -1,6 +1,7 @@
 package com.lucasjwilber.freenote.database
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import com.lucasjwilber.freenote.models.Note
 import com.lucasjwilber.freenote.models.NoteDescriptor

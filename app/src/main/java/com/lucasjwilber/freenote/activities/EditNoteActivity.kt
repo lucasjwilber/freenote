@@ -13,21 +13,17 @@ import com.lucasjwilber.freenote.databinding.ActivityEditNoteBinding
 import com.lucasjwilber.freenote.models.Note
 import com.lucasjwilber.freenote.viewmodels.EditNoteViewModel
 
-open class EditNoteActivity : AppCompatActivity() {
+open class EditNoteActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityEditNoteBinding
+    private val binding = ActivityEditNoteBinding.inflate(layoutInflater)
     private lateinit var viewModel: EditNoteViewModel
-    lateinit var noteObserver: Observer<in Note>
-    var id: Long = -1
-    var saveOnStop: Boolean = true
-    var deleteButton: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityEditNoteBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+
 
         viewModel = ViewModelProviders.of(this).get(EditNoteViewModel::class.java)
 
@@ -47,7 +43,7 @@ open class EditNoteActivity : AppCompatActivity() {
         if (id >= 0) {
             supportActionBar?.title = getString(R.string.edit_note)
 
-            viewModel.setNote(id)
+            viewModel.getNote(id)
 
             // update the UI when the note is retrieved from the db
             noteObserver = Observer { note ->
@@ -55,13 +51,15 @@ open class EditNoteActivity : AppCompatActivity() {
                     Log.i("ljw", "note is null")
                     return@Observer
                 }
-                setTitle(note.title)
 
-                val bodyText = note.segments
-                binding.noteBodyEditText.setText(bodyText)
+                viewModel.titleHasBeenSet = true
+                viewModel.note = note
+
+                setTitle(note.title)
+                binding.noteBodyEditText.setText(note.segments)
             }
 
-            viewModel.note?.observe(this, noteObserver)
+            viewModel.noteLiveData?.observe(this, noteObserver)
 
         } else { //if we got here from clicking the 'new note' button:
 
@@ -75,14 +73,17 @@ open class EditNoteActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        Log.i("ljw", "onstop")
         super.onStop()
         //todo: store title in VM instead of passing it here:
         if (saveOnStop) {
-            viewModel.saveNote(
-                binding.noteTitleEditText.text.toString(),
-                binding.noteBodyEditText.text.toString()
-            )
+            val title: String = binding.noteTitleEditText.text.toString()
+            val body: String = binding.noteBodyEditText.text.toString()
+
+            viewModel.note.title = title
+            viewModel.note.segments = body
+
+            viewModel.saveNote()
+
             deleteButton?.isVisible = true
         }
     }
@@ -96,7 +97,7 @@ open class EditNoteActivity : AppCompatActivity() {
         menu?.findItem(R.id.action_undo)?.isVisible = false
 
         //hide the delete option on notes that haven't been saved yet
-        if (viewModel.note?.value == null) {
+        if (viewModel.noteLiveData?.value == null) {
             deleteButton?.isVisible = false
         }
         return super.onCreateOptionsMenu(menu)
@@ -120,6 +121,7 @@ open class EditNoteActivity : AppCompatActivity() {
         viewModel.titleHasBeenSet = true
     }
 
+
     fun onDeleteNoteClicked() {
         Log.i("ljw", "delete note clicked")
         saveOnStop = false
@@ -127,17 +129,9 @@ open class EditNoteActivity : AppCompatActivity() {
         finish()
     }
 
-    fun getIdFromIntent() {
-        val extras: Bundle? = intent.extras
-        if (extras != null) {
-            id = extras.getLong("id")
-        }
-    }
-
     fun setTitle(title: String) {
         val titleText = if (title.isEmpty()) getString(R.string.untitled) else title
         binding.noteTitleTV.text = titleText
         binding.noteTitleEditText.setText(titleText)
     }
-
 }

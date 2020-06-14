@@ -21,20 +21,20 @@ var newSegmentEditText: EditText? = null
 
 
 class DeletedSegment(val position: Int, val text: String)
-class CurrentNote(
-    var id: Long? = null,
-    var type: Int = NOTE,
-    var isNew: Boolean = false,
-    var title: String = "",
-    var body: String = "",
-    var segments: ArrayList<String> = ArrayList(),
-    var deletedSegments: Stack<DeletedSegment> = Stack(),
-    var newSegmentText: String = "",
-    var currentlyEditedSegmentPosition: Int? = null,
-    var hasBeenChanged: Boolean = false,
-    var titleWasSet: Boolean = false //this is used to focus the title ET on new Lists, but only one time, so new segment auto focus still works
-)
-var currentNote: CurrentNote = CurrentNote()
+//class CurrentNote(
+//    var id: Long? = null,
+//    var type: Int = NOTE,
+//    var isNew: Boolean = false,
+//    var title: String = "",
+//    var body: String = "",
+//    var segments: ArrayList<String> = ArrayList(),
+//    var deletedSegments: Stack<DeletedSegment> = Stack(),
+//    var newSegmentText: String = "",
+//    var currentlyEditedSegmentPosition: Int? = null,
+//    var hasBeenChanged: Boolean = false,
+//    var titleWasSet: Boolean = false //this is used to focus the title ET on new Lists, but only one time, so new segment auto focus still works
+//)
+//var currentNote: CurrentNote = CurrentNote()
 
 fun showToast(context: Context, message: String) {
     val toast: Toast = Toast.makeText(
@@ -47,37 +47,37 @@ fun showToast(context: Context, message: String) {
     toast.show()
 }
 
-fun makeTextWatcher(type: Int): TextWatcher? {
-    if (type == TW_NEW_SEGMENT) {
-        return object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                currentNote.newSegmentText = s.toString()
-            }
-            override fun afterTextChanged(s: Editable) {}
-        }
-    } else if (type == TW_UPDATED_SEGMENT) {
-        return object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                if (currentNote.segments[currentNote.currentlyEditedSegmentPosition!!].contains(
-                        STRIKE_THROUGH_INDICATOR)) {
-                    currentNote.segments[currentNote.currentlyEditedSegmentPosition!!] = STRIKE_THROUGH_INDICATOR + s.toString()
-                } else {
-                    currentNote.segments[currentNote.currentlyEditedSegmentPosition!!] = s.toString()
-                }
-            }
-            override fun afterTextChanged(s: Editable) {}
-        }
-    } else {//if (type == TW_NOTE_BODY) {
-        return object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                currentNote.hasBeenChanged = true
-                currentNote.body = s.toString()
-            }
-            override fun afterTextChanged(s: Editable) {}
-        }
-    }
-}
+//fun makeTextWatcher(type: Int): TextWatcher? {
+//    if (type == TW_NEW_SEGMENT) {
+//        return object : TextWatcher {
+//            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+//            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+//                currentNote.newSegmentText = s.toString()
+//            }
+//            override fun afterTextChanged(s: Editable) {}
+//        }
+//    } else if (type == TW_UPDATED_SEGMENT) {
+//        return object : TextWatcher {
+//            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+//            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+//                if (currentNote.segments[currentNote.currentlyEditedSegmentPosition!!].contains(
+//                        STRIKE_THROUGH_INDICATOR)) {
+//                    currentNote.segments[currentNote.currentlyEditedSegmentPosition!!] = STRIKE_THROUGH_INDICATOR + s.toString()
+//                } else {
+//                    currentNote.segments[currentNote.currentlyEditedSegmentPosition!!] = s.toString()
+//                }
+//            }
+//            override fun afterTextChanged(s: Editable) {}
+//        }
+//    } else {//if (type == TW_NOTE_BODY) {
+//        return object : TextWatcher {
+//            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+//            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+//                currentNote.hasBeenChanged = true
+//                currentNote.body = s.toString()
+//            }
+//            override fun afterTextChanged(s: Editable) {}
+//        }
+//    }
+//}
 

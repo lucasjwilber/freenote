@@ -21,9 +21,7 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        setUpSwipeListener(recyclerView)
-        Log.i("ljw", "attached to RV")
-        Log.i("ljw", segments.toString())
+        initSwipeListener(recyclerView)
     }
 
     private val SEGMENT: Int = 0
@@ -31,22 +29,16 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
     private class CurrentEditedSegment(var editText: EditText, var textView: TextView, var button: Button, var position: Int, var isStruckThrough: Boolean)
     private var currentEditedSegment: CurrentEditedSegment? = null
     private var deletedSegments = Stack<DeletedSegment>()
-    private var segments = segmentsLD.value as ArrayList<String>
-
+    private var segments = ArrayList(segmentsLD.value!!)
 
 
     class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout)
 
     override fun getItemViewType(position: Int): Int {
-//        return if (position == segments.size)
-//            NEW_SEGMENT
-//        else
-//            SEGMENT
-        return NEW_SEGMENT
+        return if (position == segments.size) NEW_SEGMENT else SEGMENT
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup,
-                                    viewType: Int): MyViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         if (viewType == SEGMENT) {
             val constraintLayout = LayoutInflater.from(parent.context)
                 .inflate(R.layout.segment, parent, false) as ConstraintLayout
@@ -54,18 +46,15 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
             return MyViewHolder(
                 constraintLayout
             )
-        }
-//        else if (viewType == NEW_SEGMENT) {
-        else {
+        } else { // NEW_SEGMENT
             val constraintLayout = LayoutInflater.from(parent.context)
                 .inflate(R.layout.new_segment, parent, false) as ConstraintLayout
 
-            newSegmentEditText = constraintLayout.findViewById(
-                R.id.newSegmentEditText
-            )
-            newSegmentEditText!!.addTextChangedListener(
-                makeTextWatcher(TW_NEW_SEGMENT)
-            )
+            newSegmentEditText = constraintLayout.findViewById(R.id.newSegmentEditText)
+
+//            newSegmentEditText!!.addTextChangedListener(
+//                makeTextWatcher(TW_NEW_SEGMENT)
+//            )
 
             return MyViewHolder(
                 constraintLayout
@@ -73,7 +62,7 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
         }
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         if (getItemViewType(position) == SEGMENT) {
             val textView: TextView = holder.constraintLayout.findViewById(R.id.segmentTextView)
@@ -88,10 +77,10 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
                 textView.paintFlags = 0
             }
 
-            textView.setOnClickListener {updateSegment(holder, textView) }
+            textView.setOnClickListener { updateSegment(holder, textView) }
             textView.setOnLongClickListener { strikeThroughSegment(holder, textView) }
 
-        } else if (getItemViewType(position) == NEW_SEGMENT) {
+        } else { // if (getItemViewType(position) == NEW_SEGMENT)
             val editText: EditText = holder.constraintLayout.findViewById(R.id.newSegmentEditText)
 
             val saveButton: Button = holder.constraintLayout.findViewById(R.id.newSegmentSaveButton)
@@ -118,6 +107,8 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
         if (text.isEmpty()) return
 
         segments.add(text)
+        segmentsLD.value = segments
+
         newSegmentEditText!!.text.clear()
 
         // don't use notifyItemInserted() here, in order to keep the keyboard open and the edit text focused
@@ -149,15 +140,15 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
 
         // update currentlyEditedSegmentPosition accordingly.
         // can't use simple ++ or -- operators for some reason
-        if (currentNote.currentlyEditedSegmentPosition != null) {
-            if (currentNote.currentlyEditedSegmentPosition!! > position) {
-                currentNote.currentlyEditedSegmentPosition =
-                    currentNote.currentlyEditedSegmentPosition!! - 1
-            } else {
-                currentNote.currentlyEditedSegmentPosition =
-                    currentNote.currentlyEditedSegmentPosition!! + 1
-            }
-        }
+//        if (currentNote.currentlyEditedSegmentPosition != null) {
+//            if (currentNote.currentlyEditedSegmentPosition!! > position) {
+//                currentNote.currentlyEditedSegmentPosition =
+//                    currentNote.currentlyEditedSegmentPosition!! - 1
+//            } else {
+//                currentNote.currentlyEditedSegmentPosition =
+//                    currentNote.currentlyEditedSegmentPosition!! + 1
+//            }
+//        }
         notifyItemRemoved(position)
     }
 
@@ -179,11 +170,11 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
 
             ces.editText.visibility = View.GONE
             ces.button.visibility = View.GONE
-            ces.editText.removeTextChangedListener(
-                makeTextWatcher(
-                    TW_UPDATED_SEGMENT
-                )
-            )
+//            ces.editText.removeTextChangedListener(
+//                makeTextWatcher(
+//                    TW_UPDATED_SEGMENT
+//                )
+//            )
         }
     }
 
@@ -206,12 +197,12 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
             )
 
         val ces = currentEditedSegment
-        currentNote.currentlyEditedSegmentPosition = holder.adapterPosition
-        ces!!.editText.addTextChangedListener(
-            makeTextWatcher(
-                TW_UPDATED_SEGMENT
-            )
-        )
+//        currentNote.currentlyEditedSegmentPosition = holder.adapterPosition
+//        ces!!.editText.addTextChangedListener(
+//            makeTextWatcher(
+//                TW_UPDATED_SEGMENT
+//            )
+//        )
         editText.setText(textView.text.toString())
         editText.visibility = View.VISIBLE
         editText.requestFocus()
@@ -241,7 +232,7 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
         ces.button.visibility = View.GONE
 
         currentEditedSegment = null
-        currentNote.currentlyEditedSegmentPosition = null
+//        currentNote.currentlyEditedSegmentPosition = null
     }
 
     private fun strikeThroughSegment(holder: MyViewHolder, textView: TextView): Boolean {
@@ -259,7 +250,7 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
         return true
     }
 
-    private fun setUpSwipeListener(recyclerView: RecyclerView) {
+    private fun initSwipeListener(recyclerView: RecyclerView) {
         val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, viewHolder1: RecyclerView.ViewHolder): Boolean {
                 return false
@@ -273,7 +264,8 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
             }
 
             private fun createSwipeFlags(position: Int, viewHolder: RecyclerView.ViewHolder): Int {
-                return if (position == itemCount - 1 || position == currentNote.currentlyEditedSegmentPosition) {
+//                return if (position == itemCount - 1 || position == currentNote.currentlyEditedSegmentPosition) {
+                return if (position == itemCount - 1) {
                     //make the new segment EditText and any segments that are being edited un-swipable
                     0
                 } else {

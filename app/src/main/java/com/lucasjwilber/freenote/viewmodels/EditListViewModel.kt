@@ -3,10 +3,19 @@ package com.lucasjwilber.freenote.viewmodels
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import com.lucasjwilber.freenote.*
+import com.lucasjwilber.freenote.models.Note
 import java.util.*
 
-class EditListViewModel(application: Application): EditNoteViewModel(application) {
+class EditListViewModel(application: Application): BaseViewModel(application) {
     var undoButtonIsVisible: Boolean = false
+
+    override var note: Note = Note(
+        null,
+        LIST,
+        "",
+        "",
+        Date().time
+    )
 
     // segments is updated in the observer in EditNoteActivity
     var segments: MutableLiveData<List<String>> = MutableLiveData()
@@ -15,12 +24,6 @@ class EditListViewModel(application: Application): EditNoteViewModel(application
     init {
         segments.value = ArrayList<String>()
         deletedSegments.value = Stack<DeletedSegment>()
-    }
-
-    override fun setNote(noteId: Long) {
-        note = noteRepository.getNoteById(noteId)
-        titleHasBeenSet = true
-        segments.value = note?.value?.segments?.split(SEGMENT_DELIMITER)
     }
 
 }
