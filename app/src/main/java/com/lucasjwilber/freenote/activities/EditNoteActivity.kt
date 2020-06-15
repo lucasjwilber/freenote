@@ -1,6 +1,8 @@
 package com.lucasjwilber.freenote.activities
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -15,12 +17,13 @@ import com.lucasjwilber.freenote.viewmodels.EditNoteViewModel
 
 open class EditNoteActivity : BaseActivity() {
 
-    private val binding = ActivityEditNoteBinding.inflate(layoutInflater)
+    private lateinit var binding: ActivityEditNoteBinding
     private lateinit var viewModel: EditNoteViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        binding = ActivityEditNoteBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
 
@@ -119,6 +122,13 @@ open class EditNoteActivity : BaseActivity() {
         binding.noteTitleEditText.requestFocus()
         binding.noteTitleEditText.setSelection(binding.noteTitleEditText.text.length)
         viewModel.titleHasBeenSet = true
+        binding.noteTitleEditText.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.note.title = s.toString()
+            }
+        })
     }
 
 

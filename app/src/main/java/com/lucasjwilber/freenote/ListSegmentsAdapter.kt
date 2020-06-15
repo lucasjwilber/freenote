@@ -1,6 +1,8 @@
 package com.lucasjwilber.freenote
 
 import android.graphics.Paint
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,12 +13,14 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.lucasjwilber.freenote.viewmodels.EditListViewModel
 import java.util.*
 
 // it's important that the LiveData is passed in here instead of its value so that updates here are reflected in the ViewModel
-class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var deletedSegmentsLD: MutableLiveData<Stack<DeletedSegment>>) :
+class ListSegmentsAdapter(private val vm: EditListViewModel) :
     RecyclerView.Adapter<ListSegmentsAdapter.MyViewHolder>() {
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -28,8 +32,9 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
     private val NEW_SEGMENT: Int = 1
     private class CurrentEditedSegment(var editText: EditText, var textView: TextView, var button: Button, var position: Int, var isStruckThrough: Boolean)
     private var currentEditedSegment: CurrentEditedSegment? = null
-    private var deletedSegments = Stack<DeletedSegment>()
-    private var segments = ArrayList(segmentsLD.value!!)
+    private var deletedSegments = vm.deletedSegments
+    private var segments = ArrayList(vm.segments.value!!)
+    private var newSegmentEditText: EditText? = null
 
 
     class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout)
@@ -52,9 +57,15 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
 
             newSegmentEditText = constraintLayout.findViewById(R.id.newSegmentEditText)
 
-//            newSegmentEditText!!.addTextChangedListener(
-//                makeTextWatcher(TW_NEW_SEGMENT)
-//            )
+            newSegmentEditText!!.addTextChangedListener(
+                object: TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {}
+                    override fun beforeTextChanged(s: CharSequence?,start: Int,count: Int,after: Int) {}
+                    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                        vm.newSegmentText.value = s.toString()
+                    }
+                }
+            )
 
             return MyViewHolder(
                 constraintLayout
@@ -86,7 +97,7 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
             val saveButton: Button = holder.constraintLayout.findViewById(R.id.newSegmentSaveButton)
             saveButton.setOnClickListener { createNewSegment(editText.text.toString()) }
 
-            newSegmentEditText = editText
+//            newSegmentEditText = editText
 
 //            if (currentNote.titleWasSet) {
 //                editText.requestFocus()
@@ -103,11 +114,11 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
 
     override fun getItemCount() = segments.size + 1
 
-    private fun createNewSegment(text: String) {
+    fun createNewSegment(text: String) {
         if (text.isEmpty()) return
 
         segments.add(text)
-        segmentsLD.value = segments
+//        segmentsLD.value = segments
 
         newSegmentEditText!!.text.clear()
 
@@ -127,16 +138,16 @@ class ListSegmentsAdapter(var segmentsLD: MutableLiveData<List<String>>, var del
 //        )
 //        undoButton?.isVisible = true
 
-        deletedSegments.push(
+        vm.deletedSegments.value!!.push(
             DeletedSegment(
                 position,
                 segments[position]
             )
         )
-        deletedSegmentsLD.value = deletedSegments
+        vm.deletedSegments.value = vm.deletedSegments.value
 
-        segments.removeAt(position)
-        segmentsLD.value = segments
+        this.segments.removeAt(position)
+        vm.segments.value = this.segments
 
         // update currentlyEditedSegmentPosition accordingly.
         // can't use simple ++ or -- operators for some reason

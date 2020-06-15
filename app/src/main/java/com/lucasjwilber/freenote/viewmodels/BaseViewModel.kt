@@ -47,6 +47,7 @@ abstract class BaseViewModel(application: Application): AndroidViewModel(applica
 
 
     fun saveNote() {
+
         Log.i("ljw", "saving note ${note.id}")
         GlobalScope.launch(Dispatchers.IO) {
             if (note.id == null) { // save a new note

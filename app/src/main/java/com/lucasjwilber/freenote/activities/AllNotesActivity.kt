@@ -72,7 +72,7 @@ class AllNotesActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        newSegmentEditText = null
+//        newSegmentEditText = null
     }
 
 
