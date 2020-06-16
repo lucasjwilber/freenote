@@ -36,6 +36,9 @@ class EditListViewModel(application: Application): BaseViewModel(application) {
     }
 
     override fun saveNote() {
+        // don't save notes that haven't been changed, because this would make the sort-by-last-updated
+        // method effectively mean sort-by-last-viewed
+        if (!noteNeedsToBeSaved) return
 
         note.segments = segments.joinToString(SEGMENT_DELIMITER)
 
