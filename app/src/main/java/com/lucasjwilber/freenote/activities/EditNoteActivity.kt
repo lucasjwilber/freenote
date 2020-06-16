@@ -19,6 +19,13 @@ open class EditNoteActivity : BaseActivity() {
 
     private lateinit var binding: ActivityEditNoteBinding
     private lateinit var viewModel: EditNoteViewModel
+    private var titleTextWatcher: TextWatcher = object: TextWatcher {
+        override fun afterTextChanged(s: Editable?) {}
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            viewModel.note.title = s.toString()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,21 +34,26 @@ open class EditNoteActivity : BaseActivity() {
         val view = binding.root
         setContentView(view)
 
-
         viewModel = ViewModelProviders.of(this).get(EditNoteViewModel::class.java)
-
-        getIdFromIntent()
 
         binding.noteTitleTV.setOnClickListener { changeTitle() }
         binding.deleteModalLayout.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
         binding.cancelDeleteButton.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
         binding.confirmDeleteButton.setOnClickListener { onDeleteNoteClicked() }
+        binding.noteBodyEditText.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.note.segments = s.toString()
+            }
+        })
 
         setSupportActionBar(binding.toolbar)
         binding.toolbar.inflateMenu(R.menu.edit_note_menu)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
 
+        getIdFromIntent()
         // if the intent included an id, use it to load the note
         if (id >= 0) {
             supportActionBar?.title = getString(R.string.edit_note)
@@ -57,6 +69,8 @@ open class EditNoteActivity : BaseActivity() {
 
                 viewModel.titleHasBeenSet = true
                 viewModel.note = note
+                viewModel.titleOnStart = note.title
+                viewModel.segmentsOnStart = note.segments
 
                 setTitle(note.title)
                 binding.noteBodyEditText.setText(note.segments)
@@ -65,7 +79,6 @@ open class EditNoteActivity : BaseActivity() {
             viewModel.noteLiveData?.observe(this, noteObserver)
 
         } else { //if we got here from clicking the 'new note' button:
-
             supportActionBar?.title = getString(R.string.create_note)
 
             // todo: is this actually better than just leaving the title as an ET?
@@ -77,18 +90,8 @@ open class EditNoteActivity : BaseActivity() {
 
     override fun onStop() {
         super.onStop()
-        //todo: store title in VM instead of passing it here:
-        if (saveOnStop) {
-            val title: String = binding.noteTitleEditText.text.toString()
-            val body: String = binding.noteBodyEditText.text.toString()
-
-            viewModel.note.title = title
-            viewModel.note.segments = body
-
-            viewModel.saveNote()
-
-            deleteButton?.isVisible = true
-        }
+        viewModel.saveNote()
+        deleteButton?.isVisible = true
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -107,9 +110,6 @@ open class EditNoteActivity : BaseActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        if (item.itemId == R.id.action_save) {
-//            saveNote()
-//        } else
         if (item.itemId == R.id.action_delete) {
             binding.deleteModalLayout.visibility = View.VISIBLE
         }
@@ -122,24 +122,18 @@ open class EditNoteActivity : BaseActivity() {
         binding.noteTitleEditText.requestFocus()
         binding.noteTitleEditText.setSelection(binding.noteTitleEditText.text.length)
         viewModel.titleHasBeenSet = true
-        binding.noteTitleEditText.addTextChangedListener(object: TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.note.title = s.toString()
-            }
-        })
+
+        binding.noteTitleEditText.addTextChangedListener(titleTextWatcher)
     }
 
 
-    fun onDeleteNoteClicked() {
-        Log.i("ljw", "delete note clicked")
-        saveOnStop = false
+    private fun onDeleteNoteClicked() {
         viewModel.deleteNote()
+        viewModel.noteIsBeingDeleted = true
         finish()
     }
 
-    fun setTitle(title: String) {
+    private fun setTitle(title: String) {
         val titleText = if (title.isEmpty()) getString(R.string.untitled) else title
         binding.noteTitleTV.text = titleText
         binding.noteTitleEditText.setText(titleText)

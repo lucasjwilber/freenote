@@ -3,7 +3,6 @@ package com.lucasjwilber.freenote
 import android.graphics.Paint
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
@@ -12,12 +11,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.lucasjwilber.freenote.viewmodels.EditListViewModel
-import java.util.*
 
 class ListSegmentsAdapter(private val vm: EditListViewModel) :
     RecyclerView.Adapter<ListSegmentsAdapter.MyViewHolder>() {
@@ -29,10 +25,10 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
 
     private val SEGMENT: Int = 0
     private val NEW_SEGMENT: Int = 1
-    // keep a reference to the currently edited segment to allow only one to be edited at a time.
+    // keep a reference to the currently edited segment to allow only one to be edited at a time
     // this is just a design decision
     private class CurrentEditedSegment(var editText: EditText, var textView: TextView, var button: Button, var textWatcher: TextWatcher)
-    private var currentEditedSegment: CurrentEditedSegment? = null
+    private var lastEditedSegment: CurrentEditedSegment? = null
 
 
     class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout)
@@ -67,9 +63,7 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
                 }
             )
 
-            return MyViewHolder(
-                constraintLayout
-            )
+            return MyViewHolder(constraintLayout)
         }
     }
 
@@ -89,17 +83,17 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
             }
 
             textView.setOnClickListener {
-                saveLastSegmentChanges()
+                turnLastEditedSegmentBackIntoATextView()
                 updateSegment(holder, textView)
             }
 
-            textView.setOnLongClickListener { strikeThroughSegment(holder, textView) }
+            textView.setOnLongClickListener { toggleSegmentStrikeThrough(holder, textView) }
 
         } else {
             val newSegmentEditText: EditText = holder.constraintLayout.findViewById(R.id.newSegmentEditText)
 
             val saveButton: Button = holder.constraintLayout.findViewById(R.id.newSegmentSaveButton)
-            saveButton.setOnClickListener { createNewSegment(newSegmentEditText) }
+            saveButton.setOnClickListener { addSegment(newSegmentEditText) }
 
             // focus the title EditText by default on new notes only, and only once, for a better UX
             if (vm.titleHasBeenSet) newSegmentEditText.requestFocus()
@@ -107,7 +101,7 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
             newSegmentEditText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) {
                     vm.titleHasBeenSet = true
-                    saveLastSegmentChanges()
+                    turnLastEditedSegmentBackIntoATextView()
                 }
             }
         }
@@ -115,13 +109,10 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
 
     override fun getItemCount() = vm.segments.size + 1
 
-    fun createNewSegment(editText: EditText) {
+    private fun addSegment(editText: EditText) {
         if (editText.text.isEmpty()) return
 
-        val segs = ArrayList(vm.segments)
-        segs.add(editText.text.toString())
-        vm.segments = segs
-
+        vm.segments.add(editText.text.toString())
         editText.text.clear()
 
         // notifyItemInserted() is intentionally not used here, in order to keep the
@@ -149,6 +140,7 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
         val editText: EditText = holder.constraintLayout.findViewById(R.id.segmentEditText)
         val updateSegmentButton: Button = holder.constraintLayout.findViewById(R.id.updateSegmentButton)
 
+        // populate and show an EditText and hide the TextView of the segment
         editText.setText(textView.text.toString())
         editText.visibility = View.VISIBLE
         editText.requestFocus()
@@ -167,13 +159,13 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
                     }
 
                 textView.text = s
-                vm.noteNeedsToBeSaved = true
             }
             override fun afterTextChanged(s: Editable?) {}
         }
+
         editText.addTextChangedListener(textWatcher)
 
-        currentEditedSegment = CurrentEditedSegment(
+        lastEditedSegment = CurrentEditedSegment(
             editText,
             textView,
             updateSegmentButton,
@@ -181,13 +173,13 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
         )
 
         updateSegmentButton.setOnClickListener {
-            saveLastSegmentChanges()
+            turnLastEditedSegmentBackIntoATextView()
         }
     }
 
-    private fun saveLastSegmentChanges() {
-        if (currentEditedSegment != null) {
-            val ces = currentEditedSegment!!
+    private fun turnLastEditedSegmentBackIntoATextView() {
+        if (lastEditedSegment != null) {
+            val ces = lastEditedSegment!!
             ces.textView.visibility = View.VISIBLE
             ces.editText.visibility = View.GONE
             ces.button.visibility = View.GONE
@@ -195,7 +187,7 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
         }
     }
 
-    private fun strikeThroughSegment(holder: MyViewHolder, textView: TextView): Boolean {
+    private fun toggleSegmentStrikeThrough(holder: MyViewHolder, textView: TextView): Boolean {
         var affectedSegment = vm.segments[holder.adapterPosition]
 
         if (affectedSegment.contains( // remove strike-through
@@ -218,6 +210,7 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
     // todo: move this method to activity?
     private fun initSwipeListener(recyclerView: RecyclerView) {
         val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+
             override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, viewHolder1: RecyclerView.ViewHolder): Boolean {
                 return false
             }
@@ -231,7 +224,10 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
 
             private fun createSwipeFlags(position: Int, viewHolder: RecyclerView.ViewHolder): Int {
                 // the new segment viewholder at the bottom should not be swipeable
-                return if (position == itemCount - 1) 0 else super.getSwipeDirs(recyclerView, viewHolder)
+                return if (position == itemCount - 1)
+                    0
+                else
+                    super.getSwipeDirs(recyclerView, viewHolder)
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {

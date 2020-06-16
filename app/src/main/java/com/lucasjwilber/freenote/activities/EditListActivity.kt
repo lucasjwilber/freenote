@@ -24,6 +24,13 @@ class EditListActivity : BaseActivity() {
     private lateinit var viewManager: RecyclerView.LayoutManager
     private lateinit var deletedSegmentsObserver: Observer<in Stack<EditListViewModel.DeletedSegment>>
     private var undoButton: MenuItem? = null
+    private var titleTextWatcher: TextWatcher = object: TextWatcher {
+        override fun afterTextChanged(s: Editable?) {}
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            viewModel.note.title = s.toString()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +46,6 @@ class EditListActivity : BaseActivity() {
         viewModel = ViewModelProviders.of(this).get(EditListViewModel::class.java)
         viewManager = LinearLayoutManager(this)
 
-        getIdFromIntent()
 
         binding.noteTitleTV.setOnClickListener { changeTitle() }
         binding.deleteModalLayout.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
@@ -47,6 +53,7 @@ class EditListActivity : BaseActivity() {
         binding.confirmDeleteButton.setOnClickListener { onDeleteNoteClicked() }
 
 
+        getIdFromIntent()
         // if the intent included an id, use it to load the note
         if (id >= 0) {
             supportActionBar?.title = getString(R.string.edit_list)
@@ -60,14 +67,10 @@ class EditListActivity : BaseActivity() {
                     return@Observer
                 }
                 setTitle(note.title)
-
                 viewModel.note = note
-
-//                viewModel.segments.value = note.segments.split(SEGMENT_DELIMITER)
                 viewModel.segments = ArrayList(note.segments.split(viewModel.SEGMENT_DELIMITER))
 
                 viewAdapter = ListSegmentsAdapter(viewModel)
-
                 binding.noteSegmentsRV.apply {
                     setHasFixedSize(true)
                     layoutManager = viewManager
@@ -78,23 +81,20 @@ class EditListActivity : BaseActivity() {
             viewModel.noteLiveData?.observe(this, noteObserver)
 
         } else { //if we got here from clicking the 'new note' button:
-
             supportActionBar?.title = getString(R.string.create_list)
 
-            // todo: is this actually better than just leaving the title as an ET?
+            // "suggest" the user set the title first
             binding.noteTitleTV.visibility = View.GONE
             binding.noteTitleEditText.visibility = View.VISIBLE
             binding.noteTitleEditText.requestFocus()
 
             viewAdapter = ListSegmentsAdapter(viewModel)
-
             binding.noteSegmentsRV.apply {
                 setHasFixedSize(true)
                 layoutManager = viewManager
                 adapter = viewAdapter
             }
         }
-
 
         deletedSegmentsObserver = Observer { stack ->
             undoButton?.isVisible = stack.isNotEmpty()
@@ -104,45 +104,28 @@ class EditListActivity : BaseActivity() {
 
     override fun onStop() {
         super.onStop()
-        if (saveOnStop) {
-//            val title: String = binding.noteTitleEditText.text.toString()
-//            val body: String = viewModel.segments.joinToString(SEGMENT_DELIMITER)
-
-//            viewModel.note.title = title
-//            viewModel.note.segments = body
-
-            viewModel.saveNote()
-
-            deleteButton?.isVisible = true
-        }
+        viewModel.saveNote()
+        deleteButton?.isVisible = true
     }
 
 
     private fun changeTitle() {
-
         binding.noteTitleTV.visibility = View.INVISIBLE
         binding.noteTitleEditText.visibility = View.VISIBLE
         binding.noteTitleEditText.requestFocus()
         binding.noteTitleEditText.setSelection(binding.noteTitleEditText.text.length)
+        binding.noteTitleEditText.addTextChangedListener(titleTextWatcher)
         viewModel.titleHasBeenSet = true
-        binding.noteTitleEditText.addTextChangedListener(object: TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.note.title = s.toString()
-            }
-        })
     }
 
-    fun setTitle(title: String) {
+    private fun setTitle(title: String) {
         val titleText = if (title.isEmpty()) getString(R.string.untitled) else title
         binding.noteTitleTV.text = titleText
         binding.noteTitleEditText.setText(titleText)
     }
 
 
-    fun onDeleteNoteClicked() {
-        saveOnStop = false
+    private fun onDeleteNoteClicked() {
         viewModel.deleteNote()
         finish()
     }
@@ -164,9 +147,6 @@ class EditListActivity : BaseActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        if (item.itemId == R.id.action_save) {
-//            saveNote()
-//        } else
         if (item.itemId == R.id.action_delete) {
             binding.deleteModalLayout.visibility = View.VISIBLE
         } else if (item.itemId == R.id.action_undo) {
@@ -178,22 +158,7 @@ class EditListActivity : BaseActivity() {
     private fun undoSegmentDelete() {
         val delseg: EditListViewModel.DeletedSegment = viewModel.deletedSegments.value!!.pop()
         viewModel.deletedSegments.value = viewModel.deletedSegments.value
-
-//        val segs = ArrayList(viewModel.segments.value!!)
-//        segs.add(delseg.position, delseg.text)
-//        viewModel.segments.value = segs
         viewModel.segments.add(delseg.position, delseg.text)
         viewAdapter.notifyItemInserted(delseg.position)
-
-
-//        if (currentNote.currentlyEditedSegmentPosition != null) {
-//            if (currentNote.currentlyEditedSegmentPosition!! > delseg.position) {
-//                currentNote.currentlyEditedSegmentPosition =
-//                    currentNote.currentlyEditedSegmentPosition!! + 1
-//            } else {
-//                currentNote.currentlyEditedSegmentPosition =
-//                    currentNote.currentlyEditedSegmentPosition!! - 1
-//            }
-//        }
     }
 }

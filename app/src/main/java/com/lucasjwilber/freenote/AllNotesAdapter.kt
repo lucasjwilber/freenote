@@ -19,7 +19,7 @@ class AllNotesAdapter(private var allNoteDescriptors: List<NoteDescriptor>, priv
     override fun onCreateViewHolder(parent: ViewGroup,
                                     viewType: Int): NoteDescriptorViewHolder {
         val cardView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.note_title, parent, false) as CardView
+            .inflate(R.layout.note_descriptor, parent, false) as CardView
 
         return NoteDescriptorViewHolder(
             cardView
@@ -27,7 +27,7 @@ class AllNotesAdapter(private var allNoteDescriptors: List<NoteDescriptor>, priv
     }
 
     override fun onBindViewHolder(holder: NoteDescriptorViewHolder, position: Int) {
-        val titleTextView: TextView = holder.cardView.findViewById(R.id.noteTitleTextView)
+        val titleTextView: TextView = holder.cardView.findViewById(R.id.noteDescriptorTextView)
         val title = allNoteDescriptors[position].title
         titleTextView.text = title
         holder.cardView.setOnClickListener { goToNoteDetails(holder)}

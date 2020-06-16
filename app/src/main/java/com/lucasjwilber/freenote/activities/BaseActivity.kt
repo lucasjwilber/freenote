@@ -13,7 +13,6 @@ import com.lucasjwilber.freenote.models.Note
 abstract class BaseActivity : AppCompatActivity() {
 
     var id: Long = -1
-    var saveOnStop: Boolean = true
     var deleteButton: MenuItem? = null
     lateinit var noteObserver: Observer<in Note>
 
@@ -24,7 +23,6 @@ abstract class BaseActivity : AppCompatActivity() {
             id = extras.getLong("id")
         }
     }
-
 
 
 }
