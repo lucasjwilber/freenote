@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 abstract class BaseViewModel(application: Application): AndroidViewModel(application)  {
-    private val noteRepository: NoteRepository
+    val noteRepository: NoteRepository
     var noteLiveData: LiveData<Note>? = null
     var noteNeedsToBeSaved: Boolean = false
     //todo: rename to something more descriptive eg "segmentGetsFocus"
@@ -46,7 +46,7 @@ abstract class BaseViewModel(application: Application): AndroidViewModel(applica
     }
 
 
-    fun saveNote() {
+    open fun saveNote() {
 
         Log.i("ljw", "saving note ${note.id}")
         GlobalScope.launch(Dispatchers.IO) {

@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.lucasjwilber.freenote.viewmodels.EditListViewModel
 import java.util.*
 
-// it's important that the LiveData is passed in here instead of its value so that updates here are reflected in the ViewModel
 class ListSegmentsAdapter(private val vm: EditListViewModel) :
     RecyclerView.Adapter<ListSegmentsAdapter.MyViewHolder>() {
 
@@ -30,17 +29,15 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
 
     private val SEGMENT: Int = 0
     private val NEW_SEGMENT: Int = 1
+    // 
     private class CurrentEditedSegment(var editText: EditText, var textView: TextView, var button: Button, var position: Int, var isStruckThrough: Boolean)
     private var currentEditedSegment: CurrentEditedSegment? = null
-    private var deletedSegments = vm.deletedSegments
-    private var segments = ArrayList(vm.segments.value!!)
-    private var newSegmentEditText: EditText? = null
 
 
     class MyViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout)
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == segments.size) NEW_SEGMENT else SEGMENT
+        return if (position == vm.segments.size) NEW_SEGMENT else SEGMENT
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -55,9 +52,11 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
             val constraintLayout = LayoutInflater.from(parent.context)
                 .inflate(R.layout.new_segment, parent, false) as ConstraintLayout
 
-            newSegmentEditText = constraintLayout.findViewById(R.id.newSegmentEditText)
+            val newSegmentEditText: EditText = constraintLayout.findViewById(R.id.newSegmentEditText)
 
-            newSegmentEditText!!.addTextChangedListener(
+            // the new segment EditText's content is tracked in the ViewModel so that it will be saved in case
+            // the user forgets to add it as a new segment
+            newSegmentEditText.addTextChangedListener(
                 object: TextWatcher {
                     override fun afterTextChanged(s: Editable?) {}
                     override fun beforeTextChanged(s: CharSequence?,start: Int,count: Int,after: Int) {}
@@ -78,13 +77,13 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
         if (getItemViewType(position) == SEGMENT) {
             val textView: TextView = holder.constraintLayout.findViewById(R.id.segmentTextView)
 
-            if (segments[position].contains(
-                    STRIKE_THROUGH_INDICATOR
-                )) {
+            if (vm.segments[position].contains(
+                    vm.STRIKE_THROUGH_INDICATOR
+            )) {
                 textView.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
-                textView.text = segments[position].substring(3)
+                textView.text = vm.segments[position].substring(3)
             } else {
-                textView.text = segments[position]
+                textView.text = vm.segments[position]
                 textView.paintFlags = 0
             }
 
@@ -92,62 +91,52 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
             textView.setOnLongClickListener { strikeThroughSegment(holder, textView) }
 
         } else { // if (getItemViewType(position) == NEW_SEGMENT)
-            val editText: EditText = holder.constraintLayout.findViewById(R.id.newSegmentEditText)
+            val newSegmentEditText: EditText = holder.constraintLayout.findViewById(R.id.newSegmentEditText)
 
             val saveButton: Button = holder.constraintLayout.findViewById(R.id.newSegmentSaveButton)
-            saveButton.setOnClickListener { createNewSegment(editText.text.toString()) }
+            saveButton.setOnClickListener { createNewSegment(newSegmentEditText) }
 
-//            newSegmentEditText = editText
+            if (vm.titleHasBeenSet) {
+                newSegmentEditText.requestFocus()
+            }
 
-//            if (currentNote.titleWasSet) {
-//                editText.requestFocus()
-//            }
-
-            editText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
+            newSegmentEditText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) {
-//                    currentNote.titleWasSet = true
+                    vm.titleHasBeenSet = true
                     hideLastEditedSegment()
                 }
             }
         }
     }
 
-    override fun getItemCount() = segments.size + 1
+    override fun getItemCount() = vm.segments.size + 1
 
-    fun createNewSegment(text: String) {
-        if (text.isEmpty()) return
+    fun createNewSegment(editText: EditText) {
+        if (editText.text.isEmpty()) return
 
-        segments.add(text)
-//        segmentsLD.value = segments
+        val segs = ArrayList(vm.segments)
+        segs.add(editText.text.toString())
+        vm.segments = segs
 
-        newSegmentEditText!!.text.clear()
+        editText.text.clear()
 
-        // don't use notifyItemInserted() here, in order to keep the keyboard open and the edit text focused
+        // notifyItemInserted() is intentionally not used here, in order to keep the
+        // keyboard open and the edit text focused for a better UX
         notifyDataSetChanged()
-
-//        currentNote.newSegmentText = ""
-
     }
 
     fun deleteSegment(position: Int) {
-//        currentNote.deletedSegments.push(
-//            DeletedSegment(
-//                position,
-//                segments[position]
-//            )
-//        )
-//        undoButton?.isVisible = true
 
-        vm.deletedSegments.value!!.push(
-            DeletedSegment(
+        var delSegs = vm.deletedSegments.value!!
+        delSegs.push(
+            EditListViewModel.DeletedSegment(
                 position,
-                segments[position]
+                vm.segments[position]
             )
         )
-        vm.deletedSegments.value = vm.deletedSegments.value
+        vm.deletedSegments.value = delSegs
 
-        this.segments.removeAt(position)
-        vm.segments.value = this.segments
+        vm.segments.removeAt(position)
 
         // update currentlyEditedSegmentPosition accordingly.
         // can't use simple ++ or -- operators for some reason
@@ -171,13 +160,16 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
 
             val updatedText: String = ces.editText.text.toString()
             ces.textView.text = updatedText
-            if (segments[ces.position].contains(
-                    STRIKE_THROUGH_INDICATOR
+
+            val segs = ArrayList(vm.segments)
+            if (vm.segments[ces.position].contains(
+                    vm.STRIKE_THROUGH_INDICATOR
                 )) {
-                segments[ces.position] = STRIKE_THROUGH_INDICATOR + updatedText
+                segs[ces.position] = vm.STRIKE_THROUGH_INDICATOR + updatedText
             } else {
-                segments[ces.position] = updatedText
+                segs[ces.position] = updatedText
             }
+            vm.segments = segs
 
             ces.editText.visibility = View.GONE
             ces.button.visibility = View.GONE
@@ -190,77 +182,69 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
     }
 
     private fun updateSegment(holder: MyViewHolder, textView: TextView) {
-        //if the last edited segment wasn't 'saved', save the changes and update the textview
-        hideLastEditedSegment()
-
+        // hide the TextView, show the EditText and button to save changes
         val editText: EditText = holder.constraintLayout.findViewById(R.id.segmentEditText)
         val updateSegmentButton: Button = holder.constraintLayout.findViewById(R.id.updateSegmentButton)
 
-        currentEditedSegment =
-            CurrentEditedSegment(
-                editText,
-                textView,
-                updateSegmentButton,
-                holder.adapterPosition,
-                segments[holder.adapterPosition].contains(
-                    STRIKE_THROUGH_INDICATOR
-                )
-            )
-
-        val ces = currentEditedSegment
-//        currentNote.currentlyEditedSegmentPosition = holder.adapterPosition
-//        ces!!.editText.addTextChangedListener(
-//            makeTextWatcher(
-//                TW_UPDATED_SEGMENT
-//            )
-//        )
         editText.setText(textView.text.toString())
         editText.visibility = View.VISIBLE
         editText.requestFocus()
         editText.setSelection(editText.text.length)
-        updateSegmentButton.visibility = View.VISIBLE
         textView.visibility = View.GONE
+        updateSegmentButton.visibility = View.VISIBLE
+
+        var text = vm.segments[holder.adapterPosition]
+        if (text.contains(vm.STRIKE_THROUGH_INDICATOR)) text = text.substring(3)
+
+        val textWatcher = object: TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?,start: Int,count: Int,after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                text = s.toString()
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        }
+        editText.addTextChangedListener(textWatcher)
+
 
         updateSegmentButton.setOnClickListener {
-            saveSegmentEdits()
-        }
-    }
+            textView.text = text
 
-    private fun saveSegmentEdits() {
-        val ces: CurrentEditedSegment = currentEditedSegment!!
-        if (ces.textView.text.toString() != ces.editText.text.toString()) {
-            //reapply the strike-through indicator
-            if (ces.isStruckThrough) {
-                segments[ces.position] = STRIKE_THROUGH_INDICATOR + ces.editText.text.toString()
-            } else {
-                segments[ces.position] = ces.editText.text.toString()
+            if (vm.segments[holder.adapterPosition].contains(
+                    vm.STRIKE_THROUGH_INDICATOR
+                )) {
+                text = vm.STRIKE_THROUGH_INDICATOR + text
             }
-            ces.textView.text = ces.editText.text.toString()
+            vm.segments[holder.adapterPosition] = text
+
+            textView.visibility = View.VISIBLE
+            editText.visibility = View.GONE
+            updateSegmentButton.visibility = View.GONE
+            editText.removeTextChangedListener(textWatcher)
         }
-
-        ces.textView.visibility = View.VISIBLE
-        ces.editText.visibility = View.GONE
-        ces.button.visibility = View.GONE
-
-        currentEditedSegment = null
-//        currentNote.currentlyEditedSegmentPosition = null
     }
 
     private fun strikeThroughSegment(holder: MyViewHolder, textView: TextView): Boolean {
-        if (segments[holder.adapterPosition].contains(
-                STRIKE_THROUGH_INDICATOR
+        var affectedSegment = vm.segments[holder.adapterPosition]
+
+        // remove strike-through
+        if (affectedSegment.contains(
+                vm.STRIKE_THROUGH_INDICATOR
             )) {
-            segments[holder.adapterPosition] = segments[holder.adapterPosition].substring(3)
+            affectedSegment = affectedSegment.substring(3)
             textView.paintFlags = 0
+        // apply strike-through
         } else {
-            segments[holder.adapterPosition] = STRIKE_THROUGH_INDICATOR + segments[holder.adapterPosition]
+            affectedSegment = vm.STRIKE_THROUGH_INDICATOR + affectedSegment
             textView.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
         }
+
+        vm.segments[holder.adapterPosition] = affectedSegment
         notifyItemChanged(holder.adapterPosition)
 
         return true
     }
 
+    // todo: move to activity?
     private fun initSwipeListener(recyclerView: RecyclerView) {
         val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, viewHolder1: RecyclerView.ViewHolder): Boolean {
@@ -275,13 +259,8 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
             }
 
             private fun createSwipeFlags(position: Int, viewHolder: RecyclerView.ViewHolder): Int {
-//                return if (position == itemCount - 1 || position == currentNote.currentlyEditedSegmentPosition) {
-                return if (position == itemCount - 1) {
-                    //make the new segment EditText and any segments that are being edited un-swipable
-                    0
-                } else {
-                    super.getSwipeDirs(recyclerView, viewHolder)
-                }
+                // the new segment viewholder at the bottom should not be swipeable
+                return if (position == itemCount - 1) 0 else super.getSwipeDirs(recyclerView, viewHolder)
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {

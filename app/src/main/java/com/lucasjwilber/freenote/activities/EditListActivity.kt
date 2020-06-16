@@ -11,10 +11,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.lucasjwilber.freenote.DeletedSegment
 import com.lucasjwilber.freenote.ListSegmentsAdapter
 import com.lucasjwilber.freenote.R
-import com.lucasjwilber.freenote.SEGMENT_DELIMITER
 import com.lucasjwilber.freenote.databinding.ActivityEditListBinding
 import com.lucasjwilber.freenote.viewmodels.EditListViewModel
 import java.util.*
@@ -24,7 +22,7 @@ class EditListActivity : BaseActivity() {
     private lateinit var viewModel: EditListViewModel
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
-    private lateinit var deletedSegmentsObserver: Observer<in Stack<DeletedSegment>>
+    private lateinit var deletedSegmentsObserver: Observer<in Stack<EditListViewModel.DeletedSegment>>
     private var undoButton: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +63,8 @@ class EditListActivity : BaseActivity() {
 
                 viewModel.note = note
 
-                viewModel.segments.value = note.segments.split(SEGMENT_DELIMITER)
+//                viewModel.segments.value = note.segments.split(SEGMENT_DELIMITER)
+                viewModel.segments = ArrayList(note.segments.split(viewModel.SEGMENT_DELIMITER))
 
                 viewAdapter = ListSegmentsAdapter(viewModel)
 
@@ -107,10 +106,10 @@ class EditListActivity : BaseActivity() {
         super.onStop()
         if (saveOnStop) {
 //            val title: String = binding.noteTitleEditText.text.toString()
-            val body: String = viewModel.segments.value!!.joinToString(SEGMENT_DELIMITER)
+//            val body: String = viewModel.segments.joinToString(SEGMENT_DELIMITER)
 
 //            viewModel.note.title = title
-            viewModel.note.segments = body
+//            viewModel.note.segments = body
 
             viewModel.saveNote()
 
@@ -143,7 +142,6 @@ class EditListActivity : BaseActivity() {
 
 
     fun onDeleteNoteClicked() {
-        Log.i("ljw", "delete note clicked")
         saveOnStop = false
         viewModel.deleteNote()
         finish()
@@ -156,10 +154,9 @@ class EditListActivity : BaseActivity() {
         deleteButton = menu?.getItem(1)
 
         // the same menu is used for notes and lists. notes don't have an undo feature, so hide it.
-//        menu?.findItem(R.id.action_undo)?.isVisible = false
         undoButton = menu?.findItem(R.id.action_undo)
 
-        //hide the delete option on notes that haven't been saved yet
+        // hide the delete option on notes that haven't been saved yet
         if (viewModel.noteLiveData?.value == null) {
             deleteButton?.isVisible = false
         }
@@ -179,12 +176,13 @@ class EditListActivity : BaseActivity() {
     }
 
     private fun undoSegmentDelete() {
-        val delseg: DeletedSegment = viewModel.deletedSegments.value!!.pop()
+        val delseg: EditListViewModel.DeletedSegment = viewModel.deletedSegments.value!!.pop()
         viewModel.deletedSegments.value = viewModel.deletedSegments.value
 
-        val segs = viewModel.segments.value as ArrayList<String>
-        segs.add(delseg.position, delseg.text)
-        viewModel.segments.value = segs
+//        val segs = ArrayList(viewModel.segments.value!!)
+//        segs.add(delseg.position, delseg.text)
+//        viewModel.segments.value = segs
+        viewModel.segments.add(delseg.position, delseg.text)
         viewAdapter.notifyItemInserted(delseg.position)
 
 
