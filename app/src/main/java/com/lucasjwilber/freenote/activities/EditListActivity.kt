@@ -68,7 +68,13 @@ class EditListActivity : BaseActivity() {
                 }
                 setTitle(note.title)
                 viewModel.note = note
-                viewModel.segments = ArrayList(note.segments.split(viewModel.SEGMENT_DELIMITER))
+
+                // if note.segments is empty, splitting it will create an empty element, so use an
+                // empty ArrayList instead:
+                viewModel.segments = if (note.segments.isNotEmpty())
+                    ArrayList(note.segments.split(viewModel.SEGMENT_DELIMITER))
+                else
+                    ArrayList<String>()
 
                 viewAdapter = ListSegmentsAdapter(viewModel)
                 binding.noteSegmentsRV.apply {
@@ -87,6 +93,7 @@ class EditListActivity : BaseActivity() {
             binding.noteTitleTV.visibility = View.GONE
             binding.noteTitleEditText.visibility = View.VISIBLE
             binding.noteTitleEditText.requestFocus()
+            binding.noteTitleEditText.addTextChangedListener(titleTextWatcher)
 
             viewAdapter = ListSegmentsAdapter(viewModel)
             binding.noteSegmentsRV.apply {

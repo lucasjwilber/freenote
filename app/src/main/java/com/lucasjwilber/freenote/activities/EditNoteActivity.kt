@@ -74,6 +74,8 @@ open class EditNoteActivity : BaseActivity() {
 
                 setTitle(note.title)
                 binding.noteBodyEditText.setText(note.segments)
+                binding.noteBodyEditText.requestFocus()
+                binding.noteBodyEditText.setSelection(note.segments.length)
             }
 
             viewModel.noteLiveData?.observe(this, noteObserver)
@@ -85,6 +87,7 @@ open class EditNoteActivity : BaseActivity() {
             binding.noteTitleTV.visibility = View.GONE
             binding.noteTitleEditText.visibility = View.VISIBLE
             binding.noteTitleEditText.requestFocus()
+            binding.noteTitleEditText.addTextChangedListener(titleTextWatcher)
         }
     }
 
@@ -121,9 +124,8 @@ open class EditNoteActivity : BaseActivity() {
         binding.noteTitleEditText.visibility = View.VISIBLE
         binding.noteTitleEditText.requestFocus()
         binding.noteTitleEditText.setSelection(binding.noteTitleEditText.text.length)
-        viewModel.titleHasBeenSet = true
-
         binding.noteTitleEditText.addTextChangedListener(titleTextWatcher)
+        viewModel.titleHasBeenSet = true
     }
 
 

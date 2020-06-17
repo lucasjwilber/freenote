@@ -20,8 +20,8 @@ abstract class BaseViewModel(application: Application): AndroidViewModel(applica
     var noteLiveData: LiveData<Note>? = null
     var noteIsBeingDeleted: Boolean = false
     var titleHasBeenSet: Boolean = false
-    var titleOnStart: String? = null
-    var segmentsOnStart: String? = null
+    var titleOnStart: String = ""
+    var segmentsOnStart: String = ""
 
     open var note: Note = Note(
         null,

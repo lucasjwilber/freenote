@@ -1,6 +1,7 @@
 package com.lucasjwilber.freenote.viewmodels
 
 import android.app.Application
+import android.util.Log
 import com.lucasjwilber.freenote.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -10,10 +11,12 @@ class EditNoteViewModel(application: Application): BaseViewModel(application) {
 
 
     override fun saveNote() {
+        Log.i("ljw", "saveNote() title is $titleOnStart segs is $segmentsOnStart")
         if (noteIsBeingDeleted) return
 
         // don't save if nothing has changed
         if (note.title == titleOnStart && note.segments == segmentsOnStart) return
+
 
         GlobalScope.launch(Dispatchers.IO) {
             if (note.id == null) { // save a new note
