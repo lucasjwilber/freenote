@@ -9,6 +9,7 @@ import com.lucasjwilber.freenote.database.NoteDao
 import com.lucasjwilber.freenote.database.NoteDatabase
 import com.lucasjwilber.freenote.database.NoteRepository
 import com.lucasjwilber.freenote.models.Note
+import com.lucasjwilber.freenote.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -56,6 +57,8 @@ abstract class BaseViewModel(application: Application): AndroidViewModel(applica
                 Log.i("ljw", "deleting note " + noteLiveData?.value?.id)
                 noteRepository.deleteNoteById(noteLiveData?.value?.id!!)
             }
+
+            showToast(getApplication(), "Deleted")
         }
     }
 }

@@ -22,11 +22,11 @@ import kotlin.collections.List
 
 class AllNotesActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityAllNotesBinding
+    lateinit var binding: ActivityAllNotesBinding
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
-    private var allNotes: List<NoteDescriptor> = listOf()
     private var viewModel: AllNotesViewModel? = null
+    private var allNotes: List<NoteDescriptor> = listOf()
     private lateinit var observer: Observer<in List<NoteDescriptor>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +35,6 @@ class AllNotesActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        // toolbar
         setSupportActionBar(binding.toolbar)
         supportActionBar?.title = getString(R.string.my_notes)
         binding.toolbar.inflateMenu(R.menu.all_notes_menu)
@@ -58,7 +57,7 @@ class AllNotesActivity : AppCompatActivity() {
         viewModel?.allNoteDescriptors?.observe(this, observer)
 
         // event listeners
-        binding.createNoteButton.setOnClickListener { binding.selectTypeBackground.visibility = View.VISIBLE }
+        binding.createNewNoteOrListButton.setOnClickListener { binding.selectTypeBackground.visibility = View.VISIBLE }
         binding.selectTypeBackground.setOnClickListener { binding.selectTypeBackground.visibility = View.GONE }
         binding.selectNoteButton.setOnClickListener { goToEditNoteActivity(NOTE) }
         binding.selectListButton.setOnClickListener { goToEditNoteActivity(LIST) }
@@ -67,12 +66,6 @@ class AllNotesActivity : AppCompatActivity() {
         binding.confirmDeleteButton.setOnClickListener { deleteNote() }
         // swipe-to-delete recyclerview listener
         initSwipeListener()
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-//        newSegmentEditText = null
     }
 
 
@@ -104,7 +97,7 @@ class AllNotesActivity : AppCompatActivity() {
             item.itemId == R.id.menu_sort_newest_first
         ) {
             viewModel?.updateSortType(item.itemId)
-            // force an observer update to update the recyclerview
+            // force an observer update to update the recyclerview contents
             viewModel?.allNoteDescriptors?.observe(this, observer)
         }
 
@@ -131,13 +124,8 @@ class AllNotesActivity : AppCompatActivity() {
 
     private fun deleteNote() {
         viewModel?.deleteSwipedNote()
-
         binding.deleteModalLayout.visibility = View.GONE
-
-        showToast(
-            this,
-            getString(R.string.note_deleted)
-        )
+        showToast(this, getString(R.string.note_deleted))
     }
 
 
@@ -146,7 +134,6 @@ class AllNotesActivity : AppCompatActivity() {
             if (type == NOTE) EditNoteActivity::class.java
             else EditListActivity::class.java
         intent = Intent(applicationContext, destination)
-//        intent.putExtra("id", -1L)
 
         binding.selectTypeBackground.visibility = View.GONE
         startActivity(intent)
@@ -161,9 +148,9 @@ class AllNotesActivity : AppCompatActivity() {
 
             // display delete modal, hold a reference to the swiped away note
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val swipedNotePosition = viewHolder.adapterPosition
 
-                // cache the swiped note in the viewmodel
+                // cache the swiped note position/id in the viewmodel for deletion or re-insertion
+                val swipedNotePosition = viewHolder.adapterPosition
                 viewModel?.swipedNotePosition = swipedNotePosition
                 viewModel?.swipedNoteId = allNotes[swipedNotePosition].id
 
@@ -175,7 +162,6 @@ class AllNotesActivity : AppCompatActivity() {
         }
 
         val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
-
         itemTouchHelper.attachToRecyclerView(binding.allNotesRecyclerView)
     }
 }
