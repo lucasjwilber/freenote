@@ -11,4 +11,8 @@ class UnitTests {
         assertNotEquals(NOTE, LIST)
     }
 
+    //test segments-to-arraylist and back
+
+    //test strikethrough method
+
 }
