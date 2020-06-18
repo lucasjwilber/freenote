@@ -72,46 +72,42 @@ class NoteRepositoryTests {
     @Test
     @Throws(Exception::class)
     fun noteRepository_canUpdateExistingNotes() = testScope.runBlockingTest {
-        var note = Note(NOTE, "abc", "123")
+        var note = Note(NOTE, "first title", "first body")
         val id: Long = repo.insert(note)
 
-        // verify note was inserted with title "abc" and segments "123"
+        // verify note was inserted with title "first title" and segments "first body"
         note = repo.getNoteById(id).getOrAwaitValue()
-        assertEquals("abc", note.title)
-        assertEquals("123", note.segments)
+        assertEquals("first title", note.title)
+        assertEquals("first body", note.segments)
 
         // alter title and update in db
-        note.title = "def"
-        note.segments = "456"
+        note.title = "updated title"
+        note.segments = "updated body!"
         repo.update(note)
 
         // retrieve note and verify updates were saved
         note = repo.getNoteById(id).getOrAwaitValue()
-        assertEquals(note.title, "def")
-        assertEquals(note.segments, "456")
+        assertEquals(note.title, "updated title")
+        assertEquals(note.segments, "updated body!")
     }
 
-//    @Test
-//    @Throws(Exception::class)
-//    fun noteRepository_updateMethodUpdatesTimestamp() = testScope.runBlockingTest {
-//        var note = Note(NOTE, "abc", "123")
-//        val id: Long = repo.insert(note)
-//        println(Date().time)
-//        val firstTimestamp = repo.getNoteById(id).getOrAwaitValue().timestamp
-//
-//        note.title = "xyz"
-//        println(Date().time)
-//
-//        runBlockingTest {
-//            repo.update(note)
-//        }
-//        println(Date().time)
-//        val secondTimestamp = repo.getNoteById(id).getOrAwaitValue().timestamp
-//
-//        println("first is $firstTimestamp second is $secondTimestamp")
-//        println(Date().time)
-//        assert(secondTimestamp > firstTimestamp)
-//    }
+    @Test
+    @Throws(Exception::class)
+    fun noteRepository_updateMethodUpdatesTimestamp() = testScope.runBlockingTest {
+        val note = Note(NOTE, "abc", "123")
+        val initialTimestamp = note.timestamp
+        val id: Long = repo.insert(note)
+
+        val sameNote = repo.getNoteById(id).getOrAwaitValue()
+        sameNote.segments = "lalalalala"
+        // assert that timestamp hasn't changed until the repository's updated method is used
+        assertEquals(initialTimestamp, sameNote.timestamp)
+
+        repo.update(sameNote)
+        val updatedTimestamp = repo.getNoteById(id).getOrAwaitValue().timestamp
+
+        assert(updatedTimestamp > initialTimestamp)
+    }
 
     @Test
     @Throws(Exception::class)

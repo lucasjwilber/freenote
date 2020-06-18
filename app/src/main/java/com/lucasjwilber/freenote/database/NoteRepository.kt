@@ -3,13 +3,9 @@ package com.lucasjwilber.freenote.database
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.lucasjwilber.freenote.*
 import com.lucasjwilber.freenote.models.Note
 import com.lucasjwilber.freenote.models.NoteDescriptor
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.util.*
 
 class NoteRepository(private val noteDao: NoteDao, context: Context) {
