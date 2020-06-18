@@ -68,6 +68,8 @@ class EditListActivity : BaseActivity() {
                 }
                 setTitle(note.title)
                 viewModel.note = note
+                viewModel.titleOnStart = note.title
+                viewModel.segmentsOnStart = note.segments
 
                 // if note.segments is empty, splitting it will create an empty element, so use an
                 // empty ArrayList instead:

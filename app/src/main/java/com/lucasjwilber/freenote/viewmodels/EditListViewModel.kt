@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 class EditListViewModel(application: Application): BaseViewModel(application) {
-
     val SEGMENT_DELIMITER = "|{]"
     val STRIKE_THROUGH_INDICATOR = "[}|"
     override var note: Note = Note(
@@ -20,11 +19,10 @@ class EditListViewModel(application: Application): BaseViewModel(application) {
         "",
         ""
     )
-    class DeletedSegment(val position: Int, val text: String)
-
     var segments = ArrayList<String>()
     var deletedSegments: MutableLiveData<Stack<DeletedSegment>> = MutableLiveData()
-    var newSegmentText: MutableLiveData<String> = MutableLiveData()
+    var newSegmentText: String = ""
+    class DeletedSegment(val position: Int, val text: String)
 
     init {
         deletedSegments.value = Stack<DeletedSegment>()
@@ -35,9 +33,13 @@ class EditListViewModel(application: Application): BaseViewModel(application) {
         // method effectively mean sort-by-last-viewed
         if (noteIsBeingDeleted) return
 
-        // turn the segments ArrayList into a String
+        // add the contents of the newSegmentEditText to help people who forgot to save it
+        if (newSegmentText.isNotEmpty()) segments.add(newSegmentText)
+
+        // convert the segments ArrayList into a String for storage as a Note
         note.segments = segments.joinToString(SEGMENT_DELIMITER)
-        // don't save if nothing has changed
+
+        // if nothing has been changed, return here as to not update the timestamp
         if (note.title == titleOnStart && note.segments == segmentsOnStart) return
 
         GlobalScope.launch(Dispatchers.IO) {
