@@ -47,4 +47,24 @@ class NoteRepository(private val noteDao: NoteDao, context: Context) {
         noteDao.deleteNoteById(id)
     }
 
+    fun getAllDescriptorsNewestFirst(): LiveData<List<NoteDescriptor>> {
+        return noteDao.getAllDescriptorsNewestFirst()
+    }
+
+    fun getAllDescriptorsOldestFirst(): LiveData<List<NoteDescriptor>> {
+        return noteDao.getAllDescriptorsOldestFirst()
+    }
+
+    fun getAllDescriptorsLastUpdatedFirst(): LiveData<List<NoteDescriptor>> {
+        return noteDao.getAllDescriptorsLastUpdatedFirst()
+    }
+
+    fun getAllDescriptorsNotesFirst(): LiveData<List<NoteDescriptor>> {
+        return noteDao.getAllDescriptorsNotesFirst()
+    }
+
+    fun getAllDescriptorsListsFirst(): LiveData<List<NoteDescriptor>> {
+        return noteDao.getAllDescriptorsListsFirst()
+    }
+
 }

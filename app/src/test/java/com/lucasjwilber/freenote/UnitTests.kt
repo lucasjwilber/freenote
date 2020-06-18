@@ -15,7 +15,5 @@ class UnitTests {
 
     //test strikethrough method
 
-    //test autogenerate id
-
 
 }
