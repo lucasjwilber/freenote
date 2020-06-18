@@ -55,10 +55,10 @@ open class EditNoteActivity : BaseActivity() {
 
         getIdFromIntent()
         // if the intent included an id, use it to load the note
-        if (id >= 0) {
+        if (id != null) {
             supportActionBar?.title = getString(R.string.edit_note)
 
-            viewModel.getNote(id)
+            viewModel.getNote(id!!)
 
             // update the UI when the note is retrieved from the db
             noteObserver = Observer { note ->

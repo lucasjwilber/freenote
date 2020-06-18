@@ -11,7 +11,6 @@ class EditNoteViewModel(application: Application): BaseViewModel(application) {
 
 
     override fun saveNote() {
-        Log.i("ljw", "saveNote() title is $titleOnStart segs is $segmentsOnStart")
         if (noteIsBeingDeleted) return
 
         // don't save if nothing has changed

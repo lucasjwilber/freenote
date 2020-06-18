@@ -16,11 +16,9 @@ class EditListViewModel(application: Application): BaseViewModel(application) {
     val SEGMENT_DELIMITER = "|{]"
     val STRIKE_THROUGH_INDICATOR = "[}|"
     override var note: Note = Note(
-        null,
         LIST,
         "",
-        "",
-        Date().time
+        ""
     )
     class DeletedSegment(val position: Int, val text: String)
 

@@ -13,7 +13,6 @@ import com.lucasjwilber.freenote.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.util.*
 
 abstract class BaseViewModel(application: Application): AndroidViewModel(application)  {
     val noteRepository: NoteRepository
@@ -24,11 +23,9 @@ abstract class BaseViewModel(application: Application): AndroidViewModel(applica
     var segmentsOnStart: String = ""
 
     open var note: Note = Note(
-        null,
         NOTE,
         "",
-        "",
-        Date().time
+        ""
     )
 
     init {

@@ -2,10 +2,12 @@ package com.lucasjwilber.freenote
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.lucasjwilber.freenote.database.NoteDao
 import com.lucasjwilber.freenote.database.NoteDatabase
+import com.lucasjwilber.freenote.database.NoteRepository
 import com.lucasjwilber.freenote.models.Note
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineDispatcher
@@ -16,18 +18,17 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.io.IOException
 import java.util.*
-import kotlin.math.abs
 
 @RunWith(RobolectricTestRunner::class)
 @Config(maxSdk = Build.VERSION_CODES.P)
-class NoteDaoTests {
+class NoteRepositoryTests {
     private lateinit var noteDao: NoteDao
     private lateinit var db: NoteDatabase
+    private lateinit var repo: NoteRepository
     private val testDispatcher = TestCoroutineDispatcher()
     private val testScope = TestCoroutineScope(testDispatcher)
 
@@ -41,6 +42,7 @@ class NoteDaoTests {
             .setQueryExecutor(testDispatcher.asExecutor())
             .build()
         noteDao = db.noteDao()
+        repo = NoteRepository(noteDao, context)
     }
 
     @After
@@ -51,59 +53,79 @@ class NoteDaoTests {
 
     @Test
     @Throws(Exception::class)
-    fun noteDatabase_canGetNoteById() = testScope.runBlockingTest {
-        val id = 5792489L
-        val noteToBeInserted = Note(id, NOTE, "title", "text", 999)
-        noteDao.insert(noteToBeInserted)
+    fun noteRepository_canInsertAndGetNoteById() = testScope.runBlockingTest {
+        val note = Note(NOTE, "title", "text")
+        val id = repo.insert(note)
 
         // getNoteById() returns LiveData so a utility method is used to get the value
-        assertEquals(noteDao.getNoteById(id).getOrAwaitValue(), noteToBeInserted)
+        assertEquals(repo.getNoteById(id).getOrAwaitValue(), note)
     }
 
     @Test
     @Throws(Exception::class)
-    fun noteDatabase_insertGeneratesAndReturnsAnIDfromNull() = testScope.runBlockingTest {
-        val noteToBeInserted = Note(null, NOTE, "title", "text", 999)
+    fun noteRepository_insertGeneratesAndReturnsAnID() = testScope.runBlockingTest {
+        val note = Note(NOTE, "title", "text")
 
-        assertNotEquals(noteDao.insert(noteToBeInserted), null)
+        assertNotEquals(repo.insert(note), null)
     }
 
     @Test
     @Throws(Exception::class)
-    fun noteDatabase_canUpdateExistingNotes() = testScope.runBlockingTest {
-        val id = 232314132L
-        val note = Note(id, NOTE, "abc", "123", 999)
-        noteDao.insert(note)
+    fun noteRepository_canUpdateExistingNotes() = testScope.runBlockingTest {
+        var note = Note(NOTE, "abc", "123")
+        val id: Long = repo.insert(note)
 
         // verify note was inserted with title "abc" and segments "123"
-        val noteInserted: Note = noteDao.getNoteById(id).getOrAwaitValue()
-        assertEquals("abc", noteInserted.title)
-        assertEquals("123", noteInserted.segments)
+        note = repo.getNoteById(id).getOrAwaitValue()
+        assertEquals("abc", note.title)
+        assertEquals("123", note.segments)
 
         // alter title and update in db
         note.title = "def"
         note.segments = "456"
-        noteDao.update(note)
+        repo.update(note)
 
         // retrieve note and verify updates were saved
-        val noteUpdated = noteDao.getNoteById(id).getOrAwaitValue()
-        assertEquals(noteUpdated.title, "def")
-        assertEquals(noteUpdated.segments, "456")
+        note = repo.getNoteById(id).getOrAwaitValue()
+        assertEquals(note.title, "def")
+        assertEquals(note.segments, "456")
     }
+
+//    @Test
+//    @Throws(Exception::class)
+//    fun noteRepository_updateMethodUpdatesTimestamp() = testScope.runBlockingTest {
+//        var note = Note(NOTE, "abc", "123")
+//        val id: Long = repo.insert(note)
+//        println(Date().time)
+//        val firstTimestamp = repo.getNoteById(id).getOrAwaitValue().timestamp
+//
+//        note.title = "xyz"
+//        println(Date().time)
+//
+//        runBlockingTest {
+//            repo.update(note)
+//        }
+//        println(Date().time)
+//        val secondTimestamp = repo.getNoteById(id).getOrAwaitValue().timestamp
+//
+//        println("first is $firstTimestamp second is $secondTimestamp")
+//        println(Date().time)
+//        assert(secondTimestamp > firstTimestamp)
+//    }
 
     @Test
     @Throws(Exception::class)
-    fun noteDatabase_canDeleteNotes() = testScope.runBlockingTest {
-        val id = 928342L
-        val note = Note(id, NOTE, "delete test", "123", 999)
-        noteDao.insert(note)
+    fun noteRepository_canDeleteNotes() = testScope.runBlockingTest {
+        val note = Note(NOTE, "delete test", "123")
+        val id: Long = repo.insert(note)
 
         // verify the note was inserted
-        assertEquals("delete test", noteDao.getNoteById(id).getOrAwaitValue().title)
+        assertEquals("delete test", repo.getNoteById(id).getOrAwaitValue().title)
 
-        noteDao.deleteNoteById(note.id!!)
+        repo.deleteNoteById(id)
 
         // verify the note was deleted
-        assertNull(noteDao.getNoteById(id).getOrAwaitValue())
+        assertNull(repo.getNoteById(id).getOrAwaitValue())
     }
+
 }

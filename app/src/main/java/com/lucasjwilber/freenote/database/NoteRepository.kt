@@ -18,7 +18,6 @@ class NoteRepository(private val noteDao: NoteDao, context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("freenote_prefs", Context.MODE_PRIVATE)
     private var sortType: Int = prefs.getInt("sortType", R.id.menu_sort_last_updated_first)
 
-
     init {
         this.setSortedNoteDescriptors(sortType)
     }
@@ -38,20 +37,15 @@ class NoteRepository(private val noteDao: NoteDao, context: Context) {
         return noteDao.getNoteById(id)
     }
 
-
     suspend fun insert(note: Note): Long {
-        // update timestamp
-        note.timestamp = Date().time
         return noteDao.insert(note)
     }
-
 
     suspend fun update(note: Note) {
         // update timestamp
         note.timestamp = Date().time
         noteDao.update(note)
     }
-
 
     suspend fun deleteNoteById(id: Long) {
         noteDao.deleteNoteById(id)

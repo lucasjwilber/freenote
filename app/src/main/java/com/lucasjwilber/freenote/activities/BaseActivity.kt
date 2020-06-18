@@ -12,7 +12,7 @@ import com.lucasjwilber.freenote.models.Note
 
 abstract class BaseActivity : AppCompatActivity() {
 
-    var id: Long = -1
+    var id: Long? = null
     var deleteButton: MenuItem? = null
     lateinit var noteObserver: Observer<in Note>
 
