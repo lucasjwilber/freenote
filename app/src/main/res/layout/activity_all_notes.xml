@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/coffeeLightest"
     android:animateLayoutChanges="true"
     tools:context=".activities.AllNotesActivity">
 
@@ -13,7 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:theme="@style/ToolbarStyle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -23,7 +21,6 @@
         android:id="@+id/allNotesRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/coffeeLightest"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -92,7 +89,7 @@
                 android:layout_marginBottom="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:text="@android:string/cancel"
-                android:textColor="@color/coffeeDark"
+                android:textColor="@color/cafeDark"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -106,7 +103,7 @@
                 android:background="@drawable/rounded_square_coffeedark"
                 android:padding="4dp"
                 android:text="@string/delete"
-                android:textColor="@color/coffeeLightest"
+                android:textColor="@color/cafeLighter"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@+id/cancelDeleteButton"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -152,7 +149,7 @@
                     android:layout_gravity="center"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/new_note"
-                    android:textColor="@color/coffeeDarkest"
+                    android:textColor="@color/cafeDarkest"
                     android:textSize="30sp"
                     android:textStyle="bold" />
 
@@ -191,7 +188,7 @@
                     android:layout_gravity="center"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/new_list"
-                    android:textColor="@color/coffeeDarkest"
+                    android:textColor="@color/cafeDarkest"
                     android:textSize="30sp"
                     android:textStyle="bold" />
 

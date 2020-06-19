@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--    Cafe palette    -->
-    <color name="coffeeLighterest">#FFE4C6</color>
-    <color name="coffeeLightest">#FFDFC1</color>
-    <color name="coffeeLight">#FBB675</color>
-    <color name="coffeeMedium">#CB792A</color>
-    <color name="coffeeDark">#B36112</color>
-    <color name="coffeeDarkest">#844000</color>
+    <color name="colorPrimary">@color/cafeMedium</color>
+    <color name="colorPrimaryDark">@color/cafeDarkest</color>
+    <color name="colorAccent">@color/cafeMedium</color>
 
-    <color name="colorPrimary">@color/coffeeMedium</color>
-    <color name="colorPrimaryDark">@color/coffeeDarkest</color>
-    <color name="colorAccent">@color/coffeeMedium</color>
+    <!--    Cafe palette    -->
+    <color name="cafeLightest">#FFE4C6</color>
+    <color name="cafeLighter">#FFDFC1</color>
+    <color name="cafeLight">#FBB675</color>
+    <color name="cafeMedium">#CB792A</color>
+    <color name="cafeDark">#B36112</color>
+    <color name="cafeDarkest">#844000</color>
+
+    <!--    City palette    -->
+    <color name="cityLightGreen">#3DFF00</color>
+    <color name="cityDarkGreen">#377224</color>
+    <color name="cityLighterGray">#E2E7E7</color>
+    <color name="cityLightGray">#E2E2E2</color>
+    <color name="cityMediumGray">#A3A3A3</color>
+    <color name="cityDarkGray">#5A5A5A</color>
+
 </resources>

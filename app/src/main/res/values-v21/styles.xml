@@ -1,11 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="CafeTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:navigationBarColor">@color/coffeeDarkest</item>
+        <item name="android:navigationBarColor">@color/cafeDarkest</item>
+        <item name="titleTextColor">@android:color/white</item>
+        <item name="actionOverflowButtonStyle">@style/CafeOverflowButtonStyle</item>
+        <item name="toolbarNavigationButtonStyle">@style/CafeToolbarNavigationButtonStyle</item>
+        <item name="cardViewStyle">@style/CafeCardViewStyle</item>
+
+        <item name="android:colorBackground">@color/cafeLighter</item>
     </style>
+
+        <style name="CafeOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+            <item name="tint">@android:color/white</item>
+        </style>
+
+        <style name="CafeToolbarNavigationButtonStyle" parent="Widget.AppCompat.Toolbar.Button.Navigation">
+            <item name="tint">@android:color/white</item>
+        </style>
+
+        <style name="CafeCardViewStyle" parent="Widget.MaterialComponents.CardView">
+            <item name="cardBackgroundColor">@color/cafeLightest</item>
+        </style>
+
+
+<!--    city theme:-->
+    <style name="CityTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@color/cityDarkGray</item>
+        <item name="colorAccent">@color/cityDarkGreen</item>
+        <item name="colorPrimary">@color/cityMediumGray</item>
+        <item name="android:navigationBarColor">@color/cityDarkGray</item>
+        <item name="titleTextColor">@android:color/white</item>
+        <item name="actionOverflowButtonStyle">@style/CityOverflowButtonStyle</item>
+        <item name="toolbarNavigationButtonStyle">@style/CityToolbarNavigationButtonStyle</item>
+        <item name="cardViewStyle">@style/CityCardViewStyle</item>
+        <item name="android:colorBackground">@color/cityLightGray</item>
+    </style>
+
+        <style name="CityOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+            <item name="tint">@android:color/white</item>
+        </style>
+
+        <style name="CityToolbarNavigationButtonStyle" parent="Widget.AppCompat.Toolbar.Button.Navigation">
+            <item name="tint">@android:color/white</item>
+        </style>
+
+        <style name="CityCardViewStyle" parent="Widget.MaterialComponents.CardView">
+            <item name="cardBackgroundColor">@color/cityLighterGray</item>
+        </style>
+
+
 
 </resources>

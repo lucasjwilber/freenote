@@ -18,7 +18,7 @@
         android:layout_marginBottom="2dp"
         android:ems="10"
         android:hint="@string/enter_text"
-        android:backgroundTint="@color/coffeeMedium"
+        android:backgroundTint="@color/cafeMedium"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/newSegmentSaveButton"
@@ -29,9 +29,9 @@
         android:id="@+id/newSegmentSaveButton"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginBottom="6dp"
+        android:layout_marginBottom="4dp"
         android:background="?android:attr/selectableItemBackground"
-        android:drawableTop="@drawable/check"
+        android:drawableTop="@drawable/add"
         app:layout_constraintBottom_toBottomOf="@+id/newSegmentEditText"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
