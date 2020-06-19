@@ -18,8 +18,8 @@ import com.lucasjwilber.freenote.viewmodels.EditListViewModel
 import java.util.*
 
 class EditListActivity : BaseActivity() {
-    private lateinit var binding: ActivityEditListBinding
-    private lateinit var viewModel: EditListViewModel
+    lateinit var binding: ActivityEditListBinding
+    lateinit var viewModel: EditListViewModel
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
     private lateinit var deletedSegmentsObserver: Observer<in Stack<EditListViewModel.DeletedSegment>>
@@ -91,7 +91,7 @@ class EditListActivity : BaseActivity() {
         } else { //if we got here from clicking the 'new note' button:
             supportActionBar?.title = getString(R.string.create_list)
 
-            // "suggest" the user set the title first
+            // "suggest" the user set the title first by focusing it
             binding.noteTitleTV.visibility = View.GONE
             binding.noteTitleEditText.visibility = View.VISIBLE
             binding.noteTitleEditText.requestFocus()
@@ -131,6 +131,7 @@ class EditListActivity : BaseActivity() {
         val titleText = if (title.isEmpty()) getString(R.string.untitled) else title
         binding.noteTitleTV.text = titleText
         binding.noteTitleEditText.setText(titleText)
+        viewModel.note.title = titleText
     }
 
 

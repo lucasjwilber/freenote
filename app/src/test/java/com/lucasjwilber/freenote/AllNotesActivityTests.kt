@@ -1,16 +1,13 @@
 package com.lucasjwilber.freenote
 
-import android.app.Application
 import android.content.Intent
 import android.os.Build
 import android.view.View
 import com.lucasjwilber.freenote.activities.AllNotesActivity
 import com.lucasjwilber.freenote.activities.EditListActivity
 import com.lucasjwilber.freenote.activities.EditNoteActivity
-import com.lucasjwilber.freenote.models.NoteDescriptor
 import com.lucasjwilber.freenote.viewmodels.AllNotesViewModel
 import kotlinx.android.synthetic.main.activity_all_notes.*
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -21,7 +18,6 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(maxSdk = Build.VERSION_CODES.P)
-
 class AllNotesActivityTests {
 
     private val activity: AllNotesActivity = Robolectric.setupActivity(AllNotesActivity::class.java)

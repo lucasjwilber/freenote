@@ -87,7 +87,7 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
                 updateSegment(holder, textView)
             }
 
-            textView.setOnLongClickListener { toggleSegmentStrikeThrough(holder, textView) }
+            textView.setOnLongClickListener { toggleSegmentStrikeThrough(position, textView) }
 
         } else {
             val newSegmentEditText: EditText = holder.constraintLayout.findViewById(R.id.newSegmentEditText)
@@ -187,8 +187,8 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
         }
     }
 
-    private fun toggleSegmentStrikeThrough(holder: MyViewHolder, textView: TextView): Boolean {
-        var affectedSegment = vm.segments[holder.adapterPosition]
+    private fun toggleSegmentStrikeThrough(position: Int, textView: TextView): Boolean {
+        var affectedSegment = vm.segments[position]
 
         if (affectedSegment.contains( // remove strike-through
                 vm.STRIKE_THROUGH_INDICATOR
@@ -201,8 +201,8 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
             textView.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
         }
 
-        vm.segments[holder.adapterPosition] = affectedSegment
-        notifyItemChanged(holder.adapterPosition)
+        vm.segments[position] = affectedSegment
+        notifyItemChanged(position)
 
         return true
     }
