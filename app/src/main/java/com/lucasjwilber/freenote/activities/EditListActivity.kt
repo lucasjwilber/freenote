@@ -1,5 +1,6 @@
 package com.lucasjwilber.freenote.activities
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,8 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.lucasjwilber.freenote.ListSegmentsAdapter
-import com.lucasjwilber.freenote.R
+import com.lucasjwilber.freenote.*
 import com.lucasjwilber.freenote.databinding.ActivityEditListBinding
 import com.lucasjwilber.freenote.viewmodels.EditListViewModel
 import java.util.*
@@ -33,6 +33,14 @@ class EditListActivity : BaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val theme = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).getInt("theme", THEME_CAFE)
+        Log.i("ljw", "theme in prefs is $theme, in app is " + getTheme().toString())
+        when (theme) {
+            THEME_CAFE -> setTheme(R.style.CafeTheme)
+            THEME_CITY -> setTheme(R.style.CityTheme)
+        }
+        Log.i("ljw", "theme in prefs is $theme, in app is " + getTheme().toString())
+
         super.onCreate(savedInstanceState)
 
         binding = ActivityEditListBinding.inflate(layoutInflater)

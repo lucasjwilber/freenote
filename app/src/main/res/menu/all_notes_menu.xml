@@ -2,7 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/menu_sort_options"
+    <item
+        android:id="@+id/menu_sort_options"
         android:title="@string/sort_options"
         app:showAsAction="never" >
 
@@ -19,6 +20,19 @@
                 android:title="@string/notes_first" />
         </menu>
 
+    </item>
+
+    <item
+        android:id="@+id/menu_theme_options"
+        android:title="Theme"
+        app:showAsAction="never"
+        >
+        <menu>
+            <item android:id="@+id/menu_theme_cafe"
+                android:title="Cafe" />
+            <item android:id="@+id/menu_theme_city"
+                android:title="City" />
+        </menu>
     </item>
 
 </menu>

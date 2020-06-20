@@ -1,6 +1,8 @@
 package com.lucasjwilber.freenote
 
+import android.content.Context
 import android.graphics.Paint
+import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -9,8 +11,10 @@ import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.lucasjwilber.freenote.viewmodels.EditListViewModel
@@ -41,6 +45,9 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
         if (viewType == SEGMENT) {
             val constraintLayout = LayoutInflater.from(parent.context)
                 .inflate(R.layout.segment, parent, false) as ConstraintLayout
+
+            constraintLayout.findViewById<TextView>(R.id.segmentTextView).setBackgroundResource(vm.getSegmentBackgroundDrawable())
+            constraintLayout.findViewById<ImageView>(R.id.segmentBulletPoint).setImageResource(vm.getSegmentBulletDrawable())
 
             return MyViewHolder(
                 constraintLayout

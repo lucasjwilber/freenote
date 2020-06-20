@@ -1,8 +1,14 @@
 package com.lucasjwilber.freenote.viewmodels
 
 import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import com.lucasjwilber.freenote.PREFERENCES
+import com.lucasjwilber.freenote.R
+import com.lucasjwilber.freenote.THEME_CAFE
+import com.lucasjwilber.freenote.THEME_CITY
 import com.lucasjwilber.freenote.models.NoteDescriptor
 import com.lucasjwilber.freenote.database.NoteRepository
 import com.lucasjwilber.freenote.database.NoteDao
@@ -17,6 +23,8 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     var allNoteDescriptors: LiveData<List<NoteDescriptor>>
     var swipedNoteId: Long? = null
     var swipedNotePosition: Int? = null
+    val app = application
+    private val prefs: SharedPreferences = application.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
 
     init {
         val noteDao: NoteDao = NoteDatabase.getDatabase(application).noteDao()
@@ -42,6 +50,23 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
             NoteDatabase.getDatabase(
                 getApplication()
             ).noteDao().deleteNoteById(swipedNoteId!!)
+        }
+    }
+
+    fun setThemeInPrefs(id: Int) {
+        when (id) {
+            R.id.menu_theme_cafe -> {
+                prefs.edit().putInt("theme", THEME_CAFE).apply()
+                app.setTheme(R.style.CafeTheme)
+            }
+            R.id.menu_theme_city -> {
+                prefs.edit().putInt("theme", THEME_CITY).apply()
+                app.setTheme(R.style.CityTheme)
+            }
+            else -> {
+                prefs.edit().putInt("theme", THEME_CAFE).apply()
+                app.setTheme(R.style.CafeTheme)
+            }
         }
     }
 

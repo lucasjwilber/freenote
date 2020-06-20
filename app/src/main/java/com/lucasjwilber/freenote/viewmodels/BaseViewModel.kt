@@ -58,4 +58,5 @@ abstract class BaseViewModel(application: Application): AndroidViewModel(applica
             showToast(getApplication(), "Deleted")
         }
     }
+
 }

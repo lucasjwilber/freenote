@@ -1,5 +1,6 @@
 package com.lucasjwilber.freenote.activities
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -28,6 +29,15 @@ open class EditNoteActivity : BaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        val theme = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).getInt("theme", THEME_CAFE)
+        Log.i("ljw", "theme in prefs is $theme, in app is " + getTheme().toString())
+        when (theme) {
+            THEME_CAFE -> setTheme(R.style.CafeTheme)
+            THEME_CITY -> setTheme(R.style.CityTheme)
+        }
+        Log.i("ljw", "theme in prefs is $theme, in app is " + getTheme().toString())
+
         super.onCreate(savedInstanceState)
 
         binding = ActivityEditNoteBinding.inflate(layoutInflater)

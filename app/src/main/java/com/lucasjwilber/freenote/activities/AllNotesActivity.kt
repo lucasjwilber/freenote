@@ -1,9 +1,12 @@
 package com.lucasjwilber.freenote.activities
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -30,6 +33,14 @@ class AllNotesActivity : AppCompatActivity() {
     private lateinit var observer: Observer<in List<NoteDescriptor>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val theme = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).getInt("theme", THEME_CAFE)
+        Log.i("ljw", "theme in prefs is $theme, in app is " + getTheme().toString())
+        when (theme) {
+            THEME_CAFE -> setTheme(R.style.CafeTheme)
+            THEME_CITY -> setTheme(R.style.CityTheme)
+        }
+        Log.i("ljw", "theme in prefs is $theme, in app is " + getTheme().toString())
+
         super.onCreate(savedInstanceState)
         binding = ActivityAllNotesBinding.inflate(layoutInflater)
         val view = binding.root
@@ -88,9 +99,7 @@ class AllNotesActivity : AppCompatActivity() {
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_sort_options) {
-            return false
-        } else if (item.itemId == R.id.menu_sort_lists_first ||
+        if (item.itemId == R.id.menu_sort_lists_first ||
             item.itemId == R.id.menu_sort_notes_first ||
             item.itemId == R.id.menu_sort_last_updated_first ||
             item.itemId == R.id.menu_sort_oldest_first ||
@@ -99,6 +108,10 @@ class AllNotesActivity : AppCompatActivity() {
             viewModel?.updateSortType(item.itemId)
             // force an observer update to update the recyclerview contents
             viewModel?.allNoteDescriptors?.observe(this, observer)
+        } else if (item.itemId == R.id.menu_theme_cafe ||
+                item.itemId == R.id.menu_theme_city) {
+            viewModel?.setThemeInPrefs(item.itemId)
+            recreate()
         }
 
         return super.onOptionsItemSelected(item)

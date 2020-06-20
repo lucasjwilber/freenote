@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/newSegment"
     android:layout_width="match_parent"
@@ -8,7 +9,6 @@
     android:layout_marginLeft="12dp"
     android:layout_marginEnd="12dp"
     android:layout_marginRight="12dp" >
-
 
     <EditText
         android:id="@+id/newSegmentEditText"
@@ -33,4 +33,5 @@
         android:drawableTop="@drawable/add"
         app:layout_constraintBottom_toBottomOf="@+id/newSegmentEditText"
         app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
