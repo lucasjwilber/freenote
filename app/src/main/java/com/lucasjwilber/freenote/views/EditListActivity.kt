@@ -1,4 +1,4 @@
-package com.lucasjwilber.freenote.activities
+package com.lucasjwilber.freenote.views
 
 import android.content.Context
 import android.os.Bundle
@@ -8,6 +8,8 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,15 +33,15 @@ class EditListActivity : BaseActivity() {
             viewModel.note.title = s.toString()
         }
     }
+    private lateinit var deleteModal: ConstraintLayout
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val theme = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).getInt("theme", THEME_CAFE)
-        Log.i("ljw", "theme in prefs is $theme, in app is " + getTheme().toString())
         when (theme) {
             THEME_CAFE -> setTheme(R.style.CafeTheme)
             THEME_CITY -> setTheme(R.style.CityTheme)
         }
-        Log.i("ljw", "theme in prefs is $theme, in app is " + getTheme().toString())
 
         super.onCreate(savedInstanceState)
 
@@ -54,12 +56,11 @@ class EditListActivity : BaseActivity() {
         viewModel = ViewModelProviders.of(this).get(EditListViewModel::class.java)
         viewManager = LinearLayoutManager(this)
 
-
         binding.noteTitleTV.setOnClickListener { changeTitle() }
-        binding.deleteModalLayout.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
-        binding.cancelDeleteButton.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
-        binding.confirmDeleteButton.setOnClickListener { onDeleteNoteClicked() }
-
+        deleteModal = findViewById(R.id.deleteModalFragment)
+        deleteModal.setOnClickListener { deleteModal.visibility = View.GONE }
+        deleteModal.findViewById<Button>(R.id.cancelDeleteButton).setOnClickListener { deleteModal.visibility = View.GONE }
+        deleteModal.findViewById<Button>(R.id.confirmDeleteButton).setOnClickListener { onDeleteNoteClicked() }
 
         getIdFromIntent()
         // if the intent included an id, use it to load the note
@@ -166,7 +167,7 @@ class EditListActivity : BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.action_delete) {
-            binding.deleteModalLayout.visibility = View.VISIBLE
+            deleteModal.visibility = View.VISIBLE
         } else if (item.itemId == R.id.action_undo) {
             undoSegmentDelete()
         }

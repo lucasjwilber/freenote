@@ -1,7 +1,7 @@
 package com.lucasjwilber.freenote
 
 import android.os.Build
-import com.lucasjwilber.freenote.activities.EditListActivity
+import com.lucasjwilber.freenote.views.EditListActivity
 import com.lucasjwilber.freenote.viewmodels.EditListViewModel
 import kotlinx.android.synthetic.main.activity_all_notes.*
 import org.junit.Test

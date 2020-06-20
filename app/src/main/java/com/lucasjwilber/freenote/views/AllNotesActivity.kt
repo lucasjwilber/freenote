@@ -1,8 +1,7 @@
-package com.lucasjwilber.freenote.activities
+package com.lucasjwilber.freenote.views
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,7 +9,10 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -31,15 +33,14 @@ class AllNotesActivity : AppCompatActivity() {
     private var viewModel: AllNotesViewModel? = null
     private var allNotes: List<NoteDescriptor> = listOf()
     private lateinit var observer: Observer<in List<NoteDescriptor>>
+    private lateinit var deleteModal: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val theme = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).getInt("theme", THEME_CAFE)
-        Log.i("ljw", "theme in prefs is $theme, in app is " + getTheme().toString())
         when (theme) {
             THEME_CAFE -> setTheme(R.style.CafeTheme)
             THEME_CITY -> setTheme(R.style.CityTheme)
         }
-        Log.i("ljw", "theme in prefs is $theme, in app is " + getTheme().toString())
 
         super.onCreate(savedInstanceState)
         binding = ActivityAllNotesBinding.inflate(layoutInflater)
@@ -67,14 +68,14 @@ class AllNotesActivity : AppCompatActivity() {
         }
         viewModel?.allNoteDescriptors?.observe(this, observer)
 
-        // event listeners
         binding.createNewNoteOrListButton.setOnClickListener { binding.selectTypeBackground.visibility = View.VISIBLE }
         binding.selectTypeBackground.setOnClickListener { binding.selectTypeBackground.visibility = View.GONE }
         binding.selectNoteButton.setOnClickListener { goToEditNoteActivity(NOTE) }
         binding.selectListButton.setOnClickListener { goToEditNoteActivity(LIST) }
-        binding.deleteModalLayout.setOnClickListener { cancelDeleteNote() }
-        binding.cancelDeleteButton.setOnClickListener { cancelDeleteNote() }
-        binding.confirmDeleteButton.setOnClickListener { deleteNote() }
+        deleteModal = findViewById(R.id.deleteModalFragment)
+        deleteModal.setOnClickListener { cancelDeleteNote() }
+        deleteModal.findViewById<Button>(R.id.cancelDeleteButton).setOnClickListener { cancelDeleteNote() }
+        deleteModal.findViewById<Button>(R.id.confirmDeleteButton).setOnClickListener { deleteNote() }
         // swipe-to-delete recyclerview listener
         initSwipeListener()
     }
@@ -129,7 +130,7 @@ class AllNotesActivity : AppCompatActivity() {
 
 
     private fun cancelDeleteNote() {
-        binding.deleteModalLayout.visibility = View.GONE
+        deleteModal.visibility = View.GONE
         // re-insert the swiped away view
         viewAdapter.notifyItemChanged(viewModel?.swipedNotePosition!!)
     }
@@ -137,7 +138,7 @@ class AllNotesActivity : AppCompatActivity() {
 
     private fun deleteNote() {
         viewModel?.deleteSwipedNote()
-        binding.deleteModalLayout.visibility = View.GONE
+        deleteModal.visibility = View.GONE
         showToast(this, getString(R.string.note_deleted))
     }
 
@@ -167,10 +168,10 @@ class AllNotesActivity : AppCompatActivity() {
                 viewModel?.swipedNotePosition = swipedNotePosition
                 viewModel?.swipedNoteId = allNotes[swipedNotePosition].id
 
-                binding.deleteModalLayout.visibility = View.VISIBLE
+                deleteModal.visibility = View.VISIBLE
                 val selectedNoteTitle = allNotes[swipedNotePosition].title
                 val prompt = "Permanently delete \"$selectedNoteTitle\"?"
-                binding.deleteModalTextView.text = prompt
+                deleteModal.findViewById<TextView>(R.id.deleteModalTextView).text = prompt
             }
         }
 

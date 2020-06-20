@@ -1,4 +1,4 @@
-package com.lucasjwilber.freenote.activities
+package com.lucasjwilber.freenote.views
 
 import android.content.Context
 import android.os.Bundle
@@ -8,12 +8,12 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.Button
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.lucasjwilber.freenote.*
 import com.lucasjwilber.freenote.databinding.ActivityEditNoteBinding
-import com.lucasjwilber.freenote.models.Note
 import com.lucasjwilber.freenote.viewmodels.EditNoteViewModel
 
 open class EditNoteActivity : BaseActivity() {
@@ -27,16 +27,14 @@ open class EditNoteActivity : BaseActivity() {
             viewModel.note.title = s.toString()
         }
     }
+    private lateinit var deleteModal: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         val theme = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).getInt("theme", THEME_CAFE)
-        Log.i("ljw", "theme in prefs is $theme, in app is " + getTheme().toString())
         when (theme) {
             THEME_CAFE -> setTheme(R.style.CafeTheme)
             THEME_CITY -> setTheme(R.style.CityTheme)
         }
-        Log.i("ljw", "theme in prefs is $theme, in app is " + getTheme().toString())
 
         super.onCreate(savedInstanceState)
 
@@ -46,10 +44,12 @@ open class EditNoteActivity : BaseActivity() {
 
         viewModel = ViewModelProviders.of(this).get(EditNoteViewModel::class.java)
 
+        deleteModal = findViewById(R.id.deleteModalFragment)
+        deleteModal.setOnClickListener { deleteModal.visibility = View.GONE }
+        deleteModal.findViewById<Button>(R.id.cancelDeleteButton).setOnClickListener { deleteModal.visibility = View.GONE }
+        deleteModal.findViewById<Button>(R.id.confirmDeleteButton).setOnClickListener { onDeleteNoteClicked() }
+
         binding.noteTitleTV.setOnClickListener { changeTitle() }
-        binding.deleteModalLayout.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
-        binding.cancelDeleteButton.setOnClickListener { binding.deleteModalLayout.visibility = View.GONE }
-        binding.confirmDeleteButton.setOnClickListener { onDeleteNoteClicked() }
         binding.noteBodyEditText.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -124,7 +124,7 @@ open class EditNoteActivity : BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.action_delete) {
-            binding.deleteModalLayout.visibility = View.VISIBLE
+            deleteModal.visibility = View.VISIBLE
         }
         return super.onOptionsItemSelected(item)
     }

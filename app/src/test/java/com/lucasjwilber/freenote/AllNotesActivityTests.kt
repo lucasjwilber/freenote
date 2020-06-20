@@ -3,9 +3,9 @@ package com.lucasjwilber.freenote
 import android.content.Intent
 import android.os.Build
 import android.view.View
-import com.lucasjwilber.freenote.activities.AllNotesActivity
-import com.lucasjwilber.freenote.activities.EditListActivity
-import com.lucasjwilber.freenote.activities.EditNoteActivity
+import com.lucasjwilber.freenote.views.AllNotesActivity
+import com.lucasjwilber.freenote.views.EditListActivity
+import com.lucasjwilber.freenote.views.EditNoteActivity
 import com.lucasjwilber.freenote.viewmodels.AllNotesViewModel
 import kotlinx.android.synthetic.main.activity_all_notes.*
 import org.junit.Test

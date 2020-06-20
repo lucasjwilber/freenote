@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    tools:context=".activities.AllNotesActivity">
+    tools:context=".views.AllNotesActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -40,73 +40,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/create_note_icon" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/deleteModalLayout"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#50000000"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="gone">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="240dp"
-            android:layout_height="180dp"
-            android:background="@drawable/rounded_square_dark_border"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/deleteModalTextView"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginBottom="4dp"
-                android:gravity="center_horizontal"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toTopOf="@+id/confirmDeleteButton"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text='Delete note "shopping"?' />
-
-            <Button
-                android:id="@+id/cancelDeleteButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginBottom="16dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:text="@android:string/cancel"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <Button
-                android:id="@+id/confirmDeleteButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
-                android:padding="4dp"
-                android:text="@string/delete"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="@+id/cancelDeleteButton"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/cancelDeleteButton" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <fragment android:name="com.lucasjwilber.freenote.views.DeleteModalFragment"
+        android:id="@+id/deleteModalFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/selectTypeBackground"
@@ -133,7 +70,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/rounded_square_dark_border"
+                android:background="@drawable/rounded_square_bordered_cafe"
                 android:orientation="vertical"
                 app:layout_constraintBottom_toTopOf="@+id/space"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -172,7 +109,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/rounded_square_dark_border"
+                android:background="@drawable/rounded_square_bordered_cafe"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

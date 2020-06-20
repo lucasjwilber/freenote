@@ -6,7 +6,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.lucasjwilber.freenote.activities.EditListActivity
+import com.lucasjwilber.freenote.views.EditListActivity
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric

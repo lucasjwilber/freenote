@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.lucasjwilber.freenote.activities.EditListActivity
-import com.lucasjwilber.freenote.activities.EditNoteActivity
+import com.lucasjwilber.freenote.views.EditListActivity
+import com.lucasjwilber.freenote.views.EditNoteActivity
 import com.lucasjwilber.freenote.models.NoteDescriptor
 
 class AllNotesAdapter(private var allNoteDescriptors: List<NoteDescriptor>, private var context: Context) :
