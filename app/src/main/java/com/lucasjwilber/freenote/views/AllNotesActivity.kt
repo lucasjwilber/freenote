@@ -36,11 +36,8 @@ class AllNotesActivity : AppCompatActivity() {
     private lateinit var deleteModal: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val theme = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).getInt("theme", THEME_CAFE)
-        when (theme) {
-            THEME_CAFE -> setTheme(R.style.CafeTheme)
-            THEME_CITY -> setTheme(R.style.CityTheme)
-        }
+        ThemeManager.init(application)
+        setTheme(ThemeManager.currentTheme)
 
         super.onCreate(savedInstanceState)
         binding = ActivityAllNotesBinding.inflate(layoutInflater)
@@ -111,7 +108,7 @@ class AllNotesActivity : AppCompatActivity() {
             viewModel?.allNoteDescriptors?.observe(this, observer)
         } else if (item.itemId == R.id.menu_theme_cafe ||
                 item.itemId == R.id.menu_theme_city) {
-            viewModel?.setThemeInPrefs(item.itemId)
+            ThemeManager.changeTheme(item.itemId)
             recreate()
         }
 

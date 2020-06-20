@@ -27,7 +27,6 @@ class EditListViewModel(application: Application): BaseViewModel(application) {
     var deletedSegments: MutableLiveData<Stack<DeletedSegment>> = MutableLiveData()
     var newSegmentText: String = ""
     class DeletedSegment(val position: Int, val text: String)
-    private val prefs = application.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
 
     init {
         deletedSegments.value = Stack<DeletedSegment>()
@@ -57,22 +56,6 @@ class EditListViewModel(application: Application): BaseViewModel(application) {
         }
 
         showToast(getApplication(), "Saved")
-    }
-
-    fun getSegmentBackgroundDrawable(): Int {
-        return when (prefs.getInt("theme", THEME_CAFE)) {
-            THEME_CAFE -> R.drawable.border_bottom_segment_cafe
-            THEME_CITY -> R.drawable.border_bottom_segment_city
-            else -> R.drawable.border_bottom_segment_cafe
-        }
-    }
-
-    fun getSegmentBulletDrawable(): Int {
-        return when (prefs.getInt("theme", THEME_CAFE)) {
-            THEME_CAFE -> R.drawable.bullet_point_cafe
-            THEME_CITY -> R.drawable.bullet_point_city
-            else -> R.drawable.bullet_point_cafe
-        }
     }
 
 }

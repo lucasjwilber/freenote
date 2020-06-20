@@ -15,8 +15,10 @@ fun showToast(context: Context, message: String) {
         message,
         Toast.LENGTH_SHORT
     )
-    val toastView = toast.view
-    toastView.background = context.resources.getDrawable(R.drawable.toast_background)
+    toast.view.background = context.resources.getDrawable(ThemeManager.getToastBackground())
     toast.show()
 }
+
+
+
 

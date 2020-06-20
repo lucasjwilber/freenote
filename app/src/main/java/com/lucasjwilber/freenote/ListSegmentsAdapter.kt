@@ -46,8 +46,8 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
             val constraintLayout = LayoutInflater.from(parent.context)
                 .inflate(R.layout.segment, parent, false) as ConstraintLayout
 
-            constraintLayout.findViewById<TextView>(R.id.segmentTextView).setBackgroundResource(vm.getSegmentBackgroundDrawable())
-            constraintLayout.findViewById<ImageView>(R.id.segmentBulletPoint).setImageResource(vm.getSegmentBulletDrawable())
+            constraintLayout.findViewById<TextView>(R.id.segmentTextView).setBackgroundResource(ThemeManager.getSegmentBackgroundDrawable())
+            constraintLayout.findViewById<ImageView>(R.id.segmentBulletPoint).setImageResource(ThemeManager.getSegmentBulletDrawable())
 
             return MyViewHolder(
                 constraintLayout

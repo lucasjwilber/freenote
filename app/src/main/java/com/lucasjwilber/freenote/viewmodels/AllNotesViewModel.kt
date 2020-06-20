@@ -24,7 +24,6 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
     var swipedNoteId: Long? = null
     var swipedNotePosition: Int? = null
     val app = application
-    private val prefs: SharedPreferences = application.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
 
     init {
         val noteDao: NoteDao = NoteDatabase.getDatabase(application).noteDao()
@@ -50,23 +49,6 @@ class AllNotesViewModel(application: Application) : AndroidViewModel(application
             NoteDatabase.getDatabase(
                 getApplication()
             ).noteDao().deleteNoteById(swipedNoteId!!)
-        }
-    }
-
-    fun setThemeInPrefs(id: Int) {
-        when (id) {
-            R.id.menu_theme_cafe -> {
-                prefs.edit().putInt("theme", THEME_CAFE).apply()
-                app.setTheme(R.style.CafeTheme)
-            }
-            R.id.menu_theme_city -> {
-                prefs.edit().putInt("theme", THEME_CITY).apply()
-                app.setTheme(R.style.CityTheme)
-            }
-            else -> {
-                prefs.edit().putInt("theme", THEME_CAFE).apply()
-                app.setTheme(R.style.CafeTheme)
-            }
         }
     }
 

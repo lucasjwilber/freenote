@@ -37,11 +37,7 @@ class EditListActivity : BaseActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val theme = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).getInt("theme", THEME_CAFE)
-        when (theme) {
-            THEME_CAFE -> setTheme(R.style.CafeTheme)
-            THEME_CITY -> setTheme(R.style.CityTheme)
-        }
+        setTheme(ThemeManager.currentTheme)
 
         super.onCreate(savedInstanceState)
 
