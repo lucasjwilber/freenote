@@ -8,8 +8,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/freenote_logo_round"
         android:supportsRtl="true"
-        android:theme="@style/CafeTheme">
-        <activity android:name=".views.BaseActivity"></activity>
+        android:theme="@style/Theme.AppCompat" >
+
+        <activity android:name=".views.BaseActivity" />
         <activity android:name=".views.EditListActivity"
             android:parentActivityName=".views.AllNotesActivity" />
         <activity

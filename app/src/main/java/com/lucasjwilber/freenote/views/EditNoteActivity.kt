@@ -30,7 +30,7 @@ open class EditNoteActivity : BaseActivity() {
     private lateinit var deleteModal: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(ThemeManager.currentTheme)
+        setTheme(ThemeManager.getTheme())
 
         super.onCreate(savedInstanceState)
 

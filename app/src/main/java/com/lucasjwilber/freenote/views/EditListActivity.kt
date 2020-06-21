@@ -37,8 +37,7 @@ class EditListActivity : BaseActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(ThemeManager.currentTheme)
-
+        setTheme(ThemeManager.getTheme())
         super.onCreate(savedInstanceState)
 
         binding = ActivityEditListBinding.inflate(layoutInflater)
@@ -122,7 +121,6 @@ class EditListActivity : BaseActivity() {
         deleteButton?.isVisible = true
     }
 
-
     private fun changeTitle() {
         binding.noteTitleTV.visibility = View.INVISIBLE
         binding.noteTitleEditText.visibility = View.VISIBLE
@@ -139,12 +137,10 @@ class EditListActivity : BaseActivity() {
         viewModel.note.title = titleText
     }
 
-
     private fun onDeleteNoteClicked() {
         viewModel.deleteNote()
         finish()
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.edit_note_menu, menu)
@@ -153,6 +149,7 @@ class EditListActivity : BaseActivity() {
 
         // the same menu is used for notes and lists. notes don't have an undo feature, so hide it.
         undoButton = menu?.findItem(R.id.action_undo)
+        undoButton!!.isVisible = viewModel.deletedSegments.value!!.isNotEmpty()
 
         // hide the delete option on notes that haven't been saved yet
         if (viewModel.noteLiveData?.value == null) {

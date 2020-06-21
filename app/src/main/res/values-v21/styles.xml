@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+differences from the root stylesheet:
+* android:navigationBarColor
+-->
 <resources>
 
     <style name="CafeTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -10,40 +14,40 @@
         <item name="actionOverflowButtonStyle">@style/CafeOverflowButtonStyle</item>
         <item name="toolbarNavigationButtonStyle">@style/CafeToolbarNavigationButtonStyle</item>
         <item name="cardViewStyle">@style/CafeCardViewStyle</item>
-        <item name="editTextStyle">@style/CafeEditTextStyle</item>
-        <item name="android:colorBackground">@color/cafeLighter</item>
+        <item name="android:colorBackground">@color/cafeLightest</item>
         <item name="drawableTint">@color/cafeMedium</item>
+        <item name="editTextStyle">@style/CafeEditTextStyle</item>
         <item name="floatingActionButtonStyle">@style/CafeFABStyle</item>
-        <item name="buttonStyle">@style/CafeButtonStyle</item>
+        <item name="actionButtonStyle">@style/CafeActionButtonStyle</item>
     </style>
 
-        <style name="CafeButtonStyle" parent="Widget.AppCompat.Button.Colored">
-            <item name="android:colorBackground">@color/cafeDark</item>
-            <item name="android:textColor">@color/cafeLighter</item>
-        </style>
 
-        <style name="CafeFABStyle" parent="Widget.Design.FloatingActionButton">
-            <item name="tint">@color/cafeLighter</item>
-        </style>
+    <style name="CafeActionButtonStyle" parent="Widget.AppCompat.ActionButton">
+        <item name="drawableTint">@android:color/white</item>
+    </style>
 
-        <style name="CafeOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
-            <item name="tint">@android:color/white</item>
-        </style>
+    <style name="CafeFABStyle" parent="Widget.Design.FloatingActionButton">
+        <item name="tint">@color/cafeLighter</item>
+    </style>
 
-        <style name="CafeEditTextStyle" parent="Widget.AppCompat.EditText">
-            <item name="backgroundTint">@color/cafeMedium</item>
-        </style>
+    <style name="CafeOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="tint">@android:color/white</item>
+    </style>
 
-        <style name="CafeToolbarNavigationButtonStyle" parent="Widget.AppCompat.Toolbar.Button.Navigation">
-            <item name="tint">@android:color/white</item>
-        </style>
+    <style name="CafeEditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="backgroundTint">@color/cafeMedium</item>
+    </style>
 
-        <style name="CafeCardViewStyle" parent="Widget.MaterialComponents.CardView">
-            <item name="cardBackgroundColor">@color/cafeLightest</item>
-        </style>
+    <style name="CafeToolbarNavigationButtonStyle" parent="Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="tint">@android:color/white</item>
+    </style>
+
+    <style name="CafeCardViewStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/cafeLightest</item>
+    </style>
 
 
-<!--    city theme:-->
+
     <style name="CityTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimaryDark">@color/cityDarkGray</item>
         <item name="colorAccent">@color/cityDarkGreen</item>
@@ -57,33 +61,32 @@
         <item name="drawableTint">@color/cityDarkGreen</item>
         <item name="editTextStyle">@style/CityEditTextStyle</item>
         <item name="floatingActionButtonStyle">@style/CityFABStyle</item>
-        <item name="buttonStyle">@style/CityButtonStyle</item>
+        <item name="actionButtonStyle">@style/CityActionButtonStyle</item>
     </style>
 
-        <style name="CityButtonStyle" parent="Widget.AppCompat.Button.Colored">
-            <item name="android:colorBackground">@color/cityDarkGreen</item>
-            <item name="android:textColor">@color/cityLightGray</item>
-        </style>
+    <style name="CityActionButtonStyle" parent="Widget.AppCompat.ActionButton">
+        <item name="drawableTint">@android:color/white</item>
+    </style>
 
-        <style name="CityFABStyle" parent="Widget.Design.FloatingActionButton">
-            <item name="tint">@color/cityLighterGray</item>
-        </style>
+    <style name="CityFABStyle" parent="Widget.Design.FloatingActionButton">
+        <item name="tint">@color/cityLighterGray</item>
+    </style>
 
-        <style name="CityOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
-            <item name="tint">@android:color/white</item>
-        </style>
+    <style name="CityOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="tint">@android:color/white</item>
+    </style>
 
-        <style name="CityEditTextStyle" parent="Widget.AppCompat.EditText">
-            <item name="backgroundTint">@color/cityDarkGreen</item>
-        </style>
+    <style name="CityEditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="backgroundTint">@color/cityDarkGreen</item>
+    </style>
 
-        <style name="CityToolbarNavigationButtonStyle" parent="Widget.AppCompat.Toolbar.Button.Navigation">
-            <item name="tint">@android:color/white</item>
-        </style>
+    <style name="CityToolbarNavigationButtonStyle" parent="Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="tint">@android:color/white</item>
+    </style>
 
-        <style name="CityCardViewStyle" parent="Widget.MaterialComponents.CardView">
-            <item name="cardBackgroundColor">@color/cityLighterGray</item>
-        </style>
+    <style name="CityCardViewStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/cityLighterGray</item>
+    </style>
 
 
 

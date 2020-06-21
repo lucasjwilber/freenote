@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -34,10 +35,11 @@ class AllNotesActivity : AppCompatActivity() {
     private var allNotes: List<NoteDescriptor> = listOf()
     private lateinit var observer: Observer<in List<NoteDescriptor>>
     private lateinit var deleteModal: ConstraintLayout
+    private lateinit var selectTypeModal: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeManager.init(application)
-        setTheme(ThemeManager.currentTheme)
+        setTheme(ThemeManager.getTheme())
 
         super.onCreate(savedInstanceState)
         binding = ActivityAllNotesBinding.inflate(layoutInflater)
@@ -65,10 +67,14 @@ class AllNotesActivity : AppCompatActivity() {
         }
         viewModel?.allNoteDescriptors?.observe(this, observer)
 
-        binding.createNewNoteOrListButton.setOnClickListener { binding.selectTypeBackground.visibility = View.VISIBLE }
-        binding.selectTypeBackground.setOnClickListener { binding.selectTypeBackground.visibility = View.GONE }
-        binding.selectNoteButton.setOnClickListener { goToEditNoteActivity(NOTE) }
-        binding.selectListButton.setOnClickListener { goToEditNoteActivity(LIST) }
+        selectTypeModal = findViewById(R.id.selectTypeModalFragment)
+        binding.createNewNoteOrListButton.setOnClickListener {
+            selectTypeModal.visibility = View.VISIBLE
+        }
+        selectTypeModal.setOnClickListener { selectTypeModal.visibility = View.GONE }
+        selectTypeModal.findViewById<ImageButton>(R.id.selectNoteButton).setOnClickListener { goToEditNoteActivity(NOTE) }
+        selectTypeModal.findViewById<ImageButton>(R.id.selectListButton).setOnClickListener { goToEditNoteActivity(LIST) }
+
         deleteModal = findViewById(R.id.deleteModalFragment)
         deleteModal.setOnClickListener { cancelDeleteNote() }
         deleteModal.findViewById<Button>(R.id.cancelDeleteButton).setOnClickListener { cancelDeleteNote() }
@@ -80,13 +86,12 @@ class AllNotesActivity : AppCompatActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-
         // change the layout of the note type options to best fit the screen
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            binding.selectTypeOptionsContainer.orientation = LinearLayout.HORIZONTAL
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            binding.selectTypeOptionsContainer.orientation = LinearLayout.VERTICAL
-        }
+        selectTypeModal.findViewById<LinearLayout>(R.id.selectTypeOptionsContainer).orientation =
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+                LinearLayout.HORIZONTAL
+            else
+                LinearLayout.VERTICAL
     }
 
 
@@ -117,8 +122,8 @@ class AllNotesActivity : AppCompatActivity() {
 
 
     override fun onBackPressed() {
-        if (binding.selectTypeBackground.visibility == View.VISIBLE) {
-            binding.selectTypeBackground.visibility = View.GONE
+        if (selectTypeModal.visibility == View.VISIBLE) {
+            selectTypeModal.visibility = View.GONE
             return
         } else {
             finish()
@@ -146,7 +151,7 @@ class AllNotesActivity : AppCompatActivity() {
             else EditListActivity::class.java
         intent = Intent(applicationContext, destination)
 
-        binding.selectTypeBackground.visibility = View.GONE
+        selectTypeModal.visibility = View.GONE
         startActivity(intent)
     }
 

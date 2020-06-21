@@ -13,11 +13,12 @@
     <color name="cafeDarkest">#844000</color>
 
     <!--    City palette    -->
-    <color name="cityLightGreen">#3DFF00</color>
-    <color name="cityDarkGreen">#377224</color>
+    <color name="cityLightGreen">#92d37d</color>
+    <color name="cityDarkGreen">#49a02d</color>
     <color name="cityLighterGray">#E2E7E7</color>
     <color name="cityLightGray">#E2E2E2</color>
     <color name="cityMediumGray">#A3A3A3</color>
     <color name="cityDarkGray">#5A5A5A</color>
+
 
 </resources>
