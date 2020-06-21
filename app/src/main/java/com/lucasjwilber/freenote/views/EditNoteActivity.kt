@@ -17,7 +17,6 @@ import com.lucasjwilber.freenote.databinding.ActivityEditNoteBinding
 import com.lucasjwilber.freenote.viewmodels.EditNoteViewModel
 
 open class EditNoteActivity : BaseActivity() {
-
     private lateinit var binding: ActivityEditNoteBinding
     private lateinit var viewModel: EditNoteViewModel
     private var titleTextWatcher: TextWatcher = object: TextWatcher {
@@ -28,6 +27,7 @@ open class EditNoteActivity : BaseActivity() {
         }
     }
     private lateinit var deleteModal: ConstraintLayout
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(ThemeManager.getTheme())
@@ -97,11 +97,22 @@ open class EditNoteActivity : BaseActivity() {
         }
     }
 
+
     override fun onStop() {
         super.onStop()
         viewModel.saveNote()
         deleteButton?.isVisible = true
     }
+
+
+    override fun onBackPressed() {
+        if (deleteModal.visibility == View.VISIBLE) {
+            deleteModal.visibility = View.GONE
+        } else {
+            finish()
+        }
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.edit_note_menu, menu)
@@ -118,12 +129,14 @@ open class EditNoteActivity : BaseActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.action_delete) {
             deleteModal.visibility = View.VISIBLE
         }
         return super.onOptionsItemSelected(item)
     }
+
 
     private fun changeTitle() {
         binding.noteTitleTV.visibility = View.INVISIBLE
@@ -141,9 +154,11 @@ open class EditNoteActivity : BaseActivity() {
         finish()
     }
 
+
     private fun setTitle(title: String) {
         val titleText = if (title.isEmpty()) getString(R.string.untitled) else title
         binding.noteTitleTV.text = titleText
         binding.noteTitleEditText.setText(titleText)
     }
+
 }

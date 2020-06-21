@@ -1,5 +1,6 @@
 package com.lucasjwilber.freenote
 
+import android.app.Application
 import android.content.Context
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
@@ -46,7 +47,6 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
             val constraintLayout = LayoutInflater.from(parent.context)
                 .inflate(R.layout.segment, parent, false) as ConstraintLayout
 
-            constraintLayout.findViewById<TextView>(R.id.segmentTextView).setBackgroundResource(ThemeManager.getSegmentBackgroundDrawable())
             constraintLayout.findViewById<ImageView>(R.id.segmentBulletPoint).setImageResource(ThemeManager.getSegmentBulletDrawable())
 
             return MyViewHolder(

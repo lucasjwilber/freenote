@@ -27,7 +27,6 @@ import com.lucasjwilber.freenote.viewmodels.AllNotesViewModel
 import kotlin.collections.List
 
 class AllNotesActivity : AppCompatActivity() {
-
     lateinit var binding: ActivityAllNotesBinding
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
@@ -36,6 +35,7 @@ class AllNotesActivity : AppCompatActivity() {
     private lateinit var observer: Observer<in List<NoteDescriptor>>
     private lateinit var deleteModal: ConstraintLayout
     private lateinit var selectTypeModal: ConstraintLayout
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeManager.init(application)
@@ -47,10 +47,11 @@ class AllNotesActivity : AppCompatActivity() {
         setContentView(view)
 
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = getString(R.string.my_notes)
         binding.toolbar.inflateMenu(R.menu.all_notes_menu)
+        supportActionBar?.title = getString(R.string.my_notes)
 
         // init recyclerview and add a LiveData observer to the dataset
+        binding.allNotesRecyclerView.setBackgroundColor(resources.getColor(ThemeManager.getRecyclerViewBackgroundColor()))
         viewManager = LinearLayoutManager(this)
         viewModel = ViewModelProviders.of(this).get(AllNotesViewModel::class.java)
         observer = Observer { data ->
@@ -112,7 +113,11 @@ class AllNotesActivity : AppCompatActivity() {
             // force an observer update to update the recyclerview contents
             viewModel?.allNoteDescriptors?.observe(this, observer)
         } else if (item.itemId == R.id.menu_theme_cafe ||
-                item.itemId == R.id.menu_theme_city) {
+                item.itemId == R.id.menu_theme_city ||
+                item.itemId == R.id.menu_theme_rose ||
+                item.itemId == R.id.menu_theme_lavender ||
+                item.itemId == R.id.menu_theme_arctic ||
+                item.itemId == R.id.menu_theme_honey) {
             ThemeManager.changeTheme(item.itemId)
             recreate()
         }
@@ -125,6 +130,8 @@ class AllNotesActivity : AppCompatActivity() {
         if (selectTypeModal.visibility == View.VISIBLE) {
             selectTypeModal.visibility = View.GONE
             return
+        } else if (deleteModal.visibility == View.VISIBLE) {
+            cancelDeleteNote()
         } else {
             finish()
         }
@@ -180,4 +187,5 @@ class AllNotesActivity : AppCompatActivity() {
         val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
         itemTouchHelper.attachToRecyclerView(binding.allNotesRecyclerView)
     }
+
 }

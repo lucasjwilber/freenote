@@ -11,12 +11,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 new theme checklist:
 * add the colors in res/values/colors
 * add the style XML in res/values/styles and in the v21 file
-* create a new toast_background_[theme] drawable
-* create a new rounded_square_bordered_[theme] drawable
-* create a new border_bottom_segment_[theme] drawable
-* create new images for the List/Note selection options
 * add an option for it in res/menu/all_notes_menu
 * add the option to the if-block in AllNotesActivity's onOptionsItemSelected()
+* create the necessary background layouts in res/drawable
+* create the necessary select type images in res/drawable
 * add new blocks to the when() flows in each method below
 */
 
@@ -44,6 +42,10 @@ object ThemeManager {
         currentTheme = when (menuId) {
             R.id.menu_theme_cafe -> R.style.CafeTheme
             R.id.menu_theme_city -> R.style.CityTheme
+            R.id.menu_theme_rose -> R.style.RoseTheme
+            R.id.menu_theme_lavender -> R.style.LavenderTheme
+            R.id.menu_theme_arctic -> R.style.ArcticTheme
+            R.id.menu_theme_honey -> R.style.HoneyTheme
             else -> R.style.CafeTheme
         }
         prefs!!.edit().putInt("theme", currentTheme).apply()
@@ -53,15 +55,11 @@ object ThemeManager {
         return when (currentTheme) {
             R.style.CafeTheme -> R.drawable.toast_background_cafe
             R.style.CityTheme -> R.drawable.toast_background_city
+            R.style.RoseTheme -> R.drawable.toast_background_rose
+            R.style.LavenderTheme -> R.drawable.toast_background_lavender
+            R.style.ArcticTheme -> R.drawable.toast_background_arctic
+            R.style.HoneyTheme -> R.drawable.toast_background_honey
             else -> R.drawable.toast_background_cafe
-        }
-    }
-
-    fun getSegmentBackgroundDrawable(): Int {
-        return when (currentTheme) {
-            R.style.CafeTheme -> R.drawable.border_bottom_segment_cafe
-            R.style.CityTheme -> R.drawable.border_bottom_segment_city
-            else -> R.drawable.border_bottom_segment_cafe
         }
     }
 
@@ -69,6 +67,10 @@ object ThemeManager {
         return when (currentTheme) {
             R.style.CafeTheme -> R.drawable.bullet_point_cafe
             R.style.CityTheme -> R.drawable.bullet_point_city
+            R.style.RoseTheme -> R.drawable.bullet_point_rose
+            R.style.LavenderTheme -> R.drawable.bullet_point_lavender
+            R.style.ArcticTheme -> R.drawable.bullet_point_arctic
+            R.style.HoneyTheme -> R.drawable.bullet_point_honey
             else -> R.drawable.bullet_point_cafe
         }
     }
@@ -77,6 +79,10 @@ object ThemeManager {
         return when (currentTheme) {
             R.style.CafeTheme -> R.drawable.rounded_square_bordered_cafe
             R.style.CityTheme -> R.drawable.rounded_square_bordered_city
+            R.style.RoseTheme -> R.drawable.rounded_square_bordered_rose
+            R.style.LavenderTheme -> R.drawable.rounded_square_bordered_lavender
+            R.style.ArcticTheme -> R.drawable.rounded_square_bordered_arctic
+            R.style.HoneyTheme -> R.drawable.rounded_square_bordered_honey
             else -> R.drawable.rounded_square_bordered_cafe
         }
     }
@@ -85,6 +91,10 @@ object ThemeManager {
         return when (currentTheme) {
             R.style.CafeTheme -> R.color.cafeDark
             R.style.CityTheme -> R.color.cityDarkGreen
+            R.style.RoseTheme -> R.color.roseRed
+            R.style.LavenderTheme -> R.color.lavenderPurple
+            R.style.ArcticTheme -> R.color.arcticBlue
+            R.style.HoneyTheme -> R.color.honeyGold
             else -> R.color.cafeDark
         }
     }
@@ -93,6 +103,10 @@ object ThemeManager {
         return when (currentTheme) {
             R.style.CafeTheme -> R.color.cafeLighter
             R.style.CityTheme -> R.color.cityLighterGray
+            R.style.RoseTheme -> R.color.roseLighter
+            R.style.LavenderTheme -> R.color.lavenderLighter
+            R.style.ArcticTheme -> R.color.arcticLighter
+            R.style.HoneyTheme -> R.color.honeyLighter
             else -> R.color.cafeLighter
         }
     }
@@ -101,6 +115,10 @@ object ThemeManager {
         return when (currentTheme) {
             R.style.CafeTheme -> R.color.cafeDark
             R.style.CityTheme -> R.color.cityDarkGray
+            R.style.RoseTheme -> R.color.roseDarkRed
+            R.style.LavenderTheme -> R.color.lavenderDarkPurple
+            R.style.ArcticTheme -> R.color.arcticDarkBlue
+            R.style.HoneyTheme -> R.color.honeyBrown
             else -> R.color.cafeDark
         }
     }
@@ -109,7 +127,23 @@ object ThemeManager {
         return when (currentTheme) {
             R.style.CafeTheme -> R.drawable.rounded_square_filled_cafe
             R.style.CityTheme -> R.drawable.rounded_square_filled_city
+            R.style.RoseTheme -> R.drawable.rounded_square_filled_rose
+            R.style.LavenderTheme -> R.drawable.rounded_square_filled_lavender
+            R.style.ArcticTheme -> R.drawable.rounded_square_filled_arctic
+            R.style.HoneyTheme -> R.drawable.rounded_square_filled_honey
             else -> R.drawable.rounded_square_filled_cafe
+        }
+    }
+
+    fun getRecyclerViewBackgroundColor(): Int {
+        return when (currentTheme) {
+            R.style.CafeTheme -> R.color.cafeLighter
+            R.style.CityTheme -> R.color.cityLightGray
+            R.style.RoseTheme -> R.color.roseLight
+            R.style.LavenderTheme -> R.color.lavenderLight
+            R.style.ArcticTheme -> R.color.arcticLight
+            R.style.HoneyTheme -> R.color.honeyLight
+            else -> R.color.white
         }
     }
 
@@ -117,6 +151,10 @@ object ThemeManager {
         return when (currentTheme) {
             R.style.CafeTheme -> R.drawable.new_note_image_cafe
             R.style.CityTheme -> R.drawable.new_note_image_city
+            R.style.RoseTheme -> R.drawable.new_note_image_rose
+            R.style.LavenderTheme -> R.drawable.new_note_image_lavender
+            R.style.ArcticTheme -> R.drawable.new_note_image_arctic
+            R.style.HoneyTheme -> R.drawable.new_note_image_honey
             else -> R.drawable.new_note_image_cafe
         }
     }
@@ -125,6 +163,10 @@ object ThemeManager {
         return when (currentTheme) {
             R.style.CafeTheme -> R.drawable.new_list_image_cafe
             R.style.CityTheme -> R.drawable.new_list_image_city
+            R.style.RoseTheme -> R.drawable.new_list_image_rose
+            R.style.LavenderTheme -> R.drawable.new_list_image_lavender
+            R.style.ArcticTheme -> R.drawable.new_list_image_arctic
+            R.style.HoneyTheme -> R.drawable.new_list_image_honey
             else -> R.drawable.new_list_image_cafe
         }
     }

@@ -32,6 +32,14 @@
                 android:title="Cafe" />
             <item android:id="@+id/menu_theme_city"
                 android:title="City" />
+            <item android:id="@+id/menu_theme_rose"
+                android:title="Rose" />
+            <item android:id="@+id/menu_theme_lavender"
+                android:title="Lavender" />
+            <item android:id="@+id/menu_theme_arctic"
+                android:title="Arctic" />
+            <item android:id="@+id/menu_theme_honey"
+                android:title="Honey" />
         </menu>
     </item>
 

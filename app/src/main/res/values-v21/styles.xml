@@ -5,6 +5,8 @@ differences from the root stylesheet:
 -->
 <resources>
 
+    <!--    ######################################################################-->
+    <!--    Cafe Theme-->
     <style name="CafeTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -17,17 +19,11 @@ differences from the root stylesheet:
         <item name="android:colorBackground">@color/cafeLightest</item>
         <item name="drawableTint">@color/cafeMedium</item>
         <item name="editTextStyle">@style/CafeEditTextStyle</item>
-        <item name="floatingActionButtonStyle">@style/CafeFABStyle</item>
         <item name="actionButtonStyle">@style/CafeActionButtonStyle</item>
     </style>
 
-
     <style name="CafeActionButtonStyle" parent="Widget.AppCompat.ActionButton">
         <item name="drawableTint">@android:color/white</item>
-    </style>
-
-    <style name="CafeFABStyle" parent="Widget.Design.FloatingActionButton">
-        <item name="tint">@color/cafeLighter</item>
     </style>
 
     <style name="CafeOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
@@ -47,7 +43,8 @@ differences from the root stylesheet:
     </style>
 
 
-
+    <!--    ######################################################################-->
+    <!--    City Theme-->
     <style name="CityTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimaryDark">@color/cityDarkGray</item>
         <item name="colorAccent">@color/cityDarkGreen</item>
@@ -60,16 +57,11 @@ differences from the root stylesheet:
         <item name="android:colorBackground">@color/cityLightGray</item>
         <item name="drawableTint">@color/cityDarkGreen</item>
         <item name="editTextStyle">@style/CityEditTextStyle</item>
-        <item name="floatingActionButtonStyle">@style/CityFABStyle</item>
         <item name="actionButtonStyle">@style/CityActionButtonStyle</item>
     </style>
 
     <style name="CityActionButtonStyle" parent="Widget.AppCompat.ActionButton">
         <item name="drawableTint">@android:color/white</item>
-    </style>
-
-    <style name="CityFABStyle" parent="Widget.Design.FloatingActionButton">
-        <item name="tint">@color/cityLighterGray</item>
     </style>
 
     <style name="CityOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
@@ -88,6 +80,156 @@ differences from the root stylesheet:
         <item name="cardBackgroundColor">@color/cityLighterGray</item>
     </style>
 
+    <!--    ######################################################################-->
+    <!--    Rose Theme-->
+    <style name="RoseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@color/roseDarkRed</item>
+        <item name="colorAccent">@color/roseRed</item>
+        <item name="colorPrimary">@color/roseRed</item>
+        <item name="android:navigationBarColor">@color/roseDarkRed</item>
+        <item name="titleTextColor">@android:color/white</item>
+        <item name="actionOverflowButtonStyle">@style/RoseOverflowButtonStyle</item>
+        <item name="toolbarNavigationButtonStyle">@style/RoseToolbarNavigationButtonStyle</item>
+        <item name="cardViewStyle">@style/RoseCardViewStyle</item>
+        <item name="android:colorBackground">@color/roseLighter</item>
+        <item name="drawableTint">@color/roseRed</item>
+        <item name="editTextStyle">@style/RoseEditTextStyle</item>
+        <item name="actionButtonStyle">@style/RoseActionButtonStyle</item>
+    </style>
+
+    <style name="RoseActionButtonStyle" parent="Widget.AppCompat.ActionButton">
+        <item name="drawableTint">@android:color/white</item>
+    </style>
+
+    <style name="RoseOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="tint">@android:color/white</item>
+    </style>
+
+    <style name="RoseEditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="backgroundTint">@color/roseRed</item>
+    </style>
+
+    <style name="RoseToolbarNavigationButtonStyle" parent="Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="tint">@android:color/white</item>
+    </style>
+
+    <style name="RoseCardViewStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/roseLighter</item>
+    </style>
+
+
+    <!--    ######################################################################-->
+    <!--    Lavender Theme-->
+    <style name="LavenderTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@color/lavenderDarkPurple</item>
+        <item name="colorAccent">@color/lavenderPurple</item>
+        <item name="colorPrimary">@color/lavenderPurple</item>
+        <item name="android:navigationBarColor">@color/lavenderDarkPurple</item>
+        <item name="titleTextColor">@android:color/white</item>
+        <item name="actionOverflowButtonStyle">@style/LavenderOverflowButtonStyle</item>
+        <item name="toolbarNavigationButtonStyle">@style/LavenderToolbarNavigationButtonStyle</item>
+        <item name="cardViewStyle">@style/LavenderCardViewStyle</item>
+        <item name="android:colorBackground">@color/lavenderLighter</item>
+        <item name="drawableTint">@color/lavenderPurple</item>
+        <item name="editTextStyle">@style/LavenderEditTextStyle</item>
+        <item name="actionButtonStyle">@style/LavenderActionButtonStyle</item>
+    </style>
+
+    <style name="LavenderActionButtonStyle" parent="Widget.AppCompat.ActionButton">
+        <item name="drawableTint">@android:color/white</item>
+    </style>
+
+    <style name="LavenderOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="tint">@android:color/white</item>
+    </style>
+
+    <style name="LavenderEditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="backgroundTint">@color/lavenderPurple</item>
+    </style>
+
+    <style name="LavenderToolbarNavigationButtonStyle" parent="Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="tint">@android:color/white</item>
+    </style>
+
+    <style name="LavenderCardViewStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/lavenderLighter</item>
+    </style>
+
+
+    <!--    ######################################################################-->
+    <!--    Arctic Theme-->
+    <style name="ArcticTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@color/arcticDarkBlue</item>
+        <item name="colorAccent">@color/arcticBlue</item>
+        <item name="colorPrimary">@color/arcticBlue</item>
+        <item name="android:navigationBarColor">@color/arcticDarkBlue</item>
+        <item name="titleTextColor">@android:color/white</item>
+        <item name="actionOverflowButtonStyle">@style/ArcticOverflowButtonStyle</item>
+        <item name="toolbarNavigationButtonStyle">@style/ArcticToolbarNavigationButtonStyle</item>
+        <item name="cardViewStyle">@style/ArcticCardViewStyle</item>
+        <item name="android:colorBackground">@color/arcticLighter</item>
+        <item name="drawableTint">@color/arcticBlue</item>
+        <item name="editTextStyle">@style/ArcticEditTextStyle</item>
+        <item name="actionButtonStyle">@style/ArcticActionButtonStyle</item>
+    </style>
+
+    <style name="ArcticActionButtonStyle" parent="Widget.AppCompat.ActionButton">
+        <item name="drawableTint">@android:color/white</item>
+    </style>
+
+    <style name="ArcticOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="tint">@android:color/white</item>
+    </style>
+
+    <style name="ArcticEditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="backgroundTint">@color/arcticBlue</item>
+    </style>
+
+    <style name="ArcticToolbarNavigationButtonStyle" parent="Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="tint">@android:color/white</item>
+    </style>
+
+    <style name="ArcticCardViewStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/arcticLighter</item>
+    </style>
+
+
+    <!--    ######################################################################-->
+    <!--    Honey Theme-->
+    <style name="HoneyTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@color/honeyBrown</item>
+        <item name="colorAccent">@color/honeyGold</item>
+        <item name="colorPrimary">@color/honeyGold</item>
+        <item name="android:navigationBarColor">@color/honeyBrown</item>
+        <item name="titleTextColor">@android:color/white</item>
+        <item name="actionOverflowButtonStyle">@style/HoneyOverflowButtonStyle</item>
+        <item name="toolbarNavigationButtonStyle">@style/HoneyToolbarNavigationButtonStyle</item>
+        <item name="cardViewStyle">@style/HoneyCardViewStyle</item>
+        <item name="android:colorBackground">@color/honeyLighter</item>
+        <item name="drawableTint">@color/honeyGold</item>
+        <item name="editTextStyle">@style/HoneyEditTextStyle</item>
+        <item name="actionButtonStyle">@style/HoneyActionButtonStyle</item>
+    </style>
+
+    <style name="HoneyActionButtonStyle" parent="Widget.AppCompat.ActionButton">
+        <item name="drawableTint">@android:color/white</item>
+    </style>
+
+    <style name="HoneyOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="tint">@android:color/white</item>
+    </style>
+
+    <style name="HoneyEditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="backgroundTint">@color/honeyGold</item>
+    </style>
+
+    <style name="HoneyToolbarNavigationButtonStyle" parent="Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="tint">@android:color/white</item>
+    </style>
+
+    <style name="HoneyCardViewStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/honeyLighter</item>
+    </style>
 
 
 </resources>

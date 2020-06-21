@@ -3,6 +3,7 @@
     <color name="colorPrimary">@color/cafeMedium</color>
     <color name="colorPrimaryDark">@color/cafeDarkest</color>
     <color name="colorAccent">@color/cafeMedium</color>
+    <color name="white">@android:color/white</color>
 
     <!--    Cafe palette    -->
     <color name="cafeLightest">#FFE4C6</color>
@@ -20,5 +21,32 @@
     <color name="cityMediumGray">#A3A3A3</color>
     <color name="cityDarkGray">#5A5A5A</color>
 
+    <!--    Rose palette    -->
+    <color name="roseLighter">#F9E1E2</color>
+    <color name="roseLight">#F9D9E0</color>
+    <color name="rosePink">#FBA0A5</color>
+    <color name="roseRed">#C23B22</color>
+    <color name="roseDarkRed">#800000</color>
+
+    <!--    Lavender palette    -->
+    <color name="lavenderLighter">#f5e1fd</color>
+    <color name="lavenderLight">#f5e1fd</color>
+    <color name="lavenderLightPurple">#bba1dc</color>
+    <color name="lavenderPurple">#9A4EAE</color>
+    <color name="lavenderDarkPurple">#6C3082</color>
+
+    <!--    Blue palette    -->
+    <color name="arcticLighter">#ffffff</color>
+    <color name="arcticLight">#f9ffff</color>
+    <color name="arcticLightBlue">#b1d1ff</color>
+    <color name="arcticBlue">#53a0de</color>
+    <color name="arcticDarkBlue">#476e9b</color>
+
+    <!--    Honey palette    -->
+    <color name="honeyLighter">#ffffe8</color>
+    <color name="honeyLight">#ffffd6</color>
+    <color name="honeyLightGold">#ffcf40</color>
+    <color name="honeyGold">#ffbf00</color>
+    <color name="honeyBrown">#966c00</color>
 
 </resources>

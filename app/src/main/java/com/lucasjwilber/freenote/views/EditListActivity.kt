@@ -115,11 +115,22 @@ class EditListActivity : BaseActivity() {
         viewModel.deletedSegments.observe(this, deletedSegmentsObserver)
     }
 
+
     override fun onStop() {
         super.onStop()
         viewModel.saveNote()
         deleteButton?.isVisible = true
     }
+
+
+    override fun onBackPressed() {
+        if (deleteModal.visibility == View.VISIBLE) {
+            deleteModal.visibility = View.GONE
+        } else {
+            finish()
+        }
+    }
+
 
     private fun changeTitle() {
         binding.noteTitleTV.visibility = View.INVISIBLE
@@ -130,6 +141,7 @@ class EditListActivity : BaseActivity() {
         viewModel.titleHasBeenSet = true
     }
 
+
     private fun setTitle(title: String) {
         val titleText = if (title.isEmpty()) getString(R.string.untitled) else title
         binding.noteTitleTV.text = titleText
@@ -137,10 +149,12 @@ class EditListActivity : BaseActivity() {
         viewModel.note.title = titleText
     }
 
+
     private fun onDeleteNoteClicked() {
         viewModel.deleteNote()
         finish()
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.edit_note_menu, menu)
@@ -158,6 +172,7 @@ class EditListActivity : BaseActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.action_delete) {
             deleteModal.visibility = View.VISIBLE
@@ -167,10 +182,12 @@ class EditListActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+
     private fun undoSegmentDelete() {
         val delseg: EditListViewModel.DeletedSegment = viewModel.deletedSegments.value!!.pop()
         viewModel.deletedSegments.value = viewModel.deletedSegments.value
         viewModel.segments.add(delseg.position, delseg.text)
         viewAdapter.notifyItemInserted(delseg.position)
     }
+
 }

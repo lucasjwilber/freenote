@@ -17,7 +17,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
         android:layout_marginLeft="6dp"
-        android:background="@drawable/border_bottom_segment_cafe"
         android:paddingBottom="10dp"
         android:textColor="#000000"
         android:textSize="20sp"
