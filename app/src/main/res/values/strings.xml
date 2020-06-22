@@ -24,4 +24,11 @@
     <string name="lists_first">Lists first</string>
     <string name="notes_first">Notes first</string>
     <string name="last_updated_first">Last updated first</string>
+    <string name="theme">Theme</string>
+    <string name="cafe">Cafe</string>
+    <string name="city">City</string>
+    <string name="rose">Rose</string>
+    <string name="lavender">Lavender</string>
+    <string name="arctic">Arctic</string>
+    <string name="honey">Honey</string>
 </resources>

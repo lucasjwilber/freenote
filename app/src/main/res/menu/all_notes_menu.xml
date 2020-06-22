@@ -24,22 +24,22 @@
 
     <item
         android:id="@+id/menu_theme_options"
-        android:title="Theme"
+        android:title="@string/theme"
         app:showAsAction="never"
         >
         <menu>
             <item android:id="@+id/menu_theme_cafe"
-                android:title="Cafe" />
+                android:title="@string/cafe" />
             <item android:id="@+id/menu_theme_city"
-                android:title="City" />
+                android:title="@string/city" />
             <item android:id="@+id/menu_theme_rose"
-                android:title="Rose" />
+                android:title="@string/rose" />
             <item android:id="@+id/menu_theme_lavender"
-                android:title="Lavender" />
+                android:title="@string/lavender" />
             <item android:id="@+id/menu_theme_arctic"
-                android:title="Arctic" />
+                android:title="@string/arctic" />
             <item android:id="@+id/menu_theme_honey"
-                android:title="Honey" />
+                android:title="@string/honey" />
         </menu>
     </item>
 
