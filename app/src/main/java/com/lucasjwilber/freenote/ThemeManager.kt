@@ -3,9 +3,6 @@ package com.lucasjwilber.freenote
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
-import android.widget.Button
-import androidx.constraintlayout.widget.ConstraintLayout
 
 /*
 new theme checklist:
@@ -14,7 +11,7 @@ new theme checklist:
 * add an option for it in res/menu/all_notes_menu
 * add the option to the if-block in AllNotesActivity's onOptionsItemSelected()
 * create the necessary background layouts in res/drawable
-* create the necessary select type images in res/drawable
+* create the 'select type' images in res/drawable
 * add new blocks to the when() flows in each method below
 */
 
@@ -113,13 +110,13 @@ object ThemeManager {
 
     fun getTitleTextColor(): Int {
         return when (currentTheme) {
-            R.style.CafeTheme -> R.color.cafeDark
+            R.style.CafeTheme -> R.color.cafeDarkest
             R.style.CityTheme -> R.color.cityDarkGray
             R.style.RoseTheme -> R.color.roseDarkRed
             R.style.LavenderTheme -> R.color.lavenderDarkPurple
             R.style.ArcticTheme -> R.color.arcticDarkBlue
             R.style.HoneyTheme -> R.color.honeyBrown
-            else -> R.color.cafeDark
+            else -> R.color.cafeDarkest
         }
     }
 

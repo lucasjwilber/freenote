@@ -22,15 +22,15 @@
     <color name="cityDarkGray">#5A5A5A</color>
 
     <!--    Rose palette    -->
-    <color name="roseLighter">#F9E1E2</color>
+    <color name="roseLighter">#F8E0E1</color>
     <color name="roseLight">#F9D9E0</color>
     <color name="rosePink">#FBA0A5</color>
-    <color name="roseRed">#C23B22</color>
+    <color name="roseRed">#C85250</color>
     <color name="roseDarkRed">#800000</color>
 
     <!--    Lavender palette    -->
-    <color name="lavenderLighter">#f5e1fd</color>
-    <color name="lavenderLight">#f5e1fd</color>
+    <color name="lavenderLighter">#f8e4ff</color>
+    <color name="lavenderLight">#f3dffb</color>
     <color name="lavenderLightPurple">#bba1dc</color>
     <color name="lavenderPurple">#9A4EAE</color>
     <color name="lavenderDarkPurple">#6C3082</color>

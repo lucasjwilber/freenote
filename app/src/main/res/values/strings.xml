@@ -18,7 +18,7 @@
     <string name="delete_this_note">Delete this note</string>
     <string name="enter_text">Enter text…</string>
     <string name="undo">UNDO</string>
-    <string name="sort_options">Sort Options</string>
+    <string name="sort">Sort</string>
     <string name="oldest_first">Oldest first</string>
     <string name="newest_first">Newest first</string>
     <string name="lists_first">Lists first</string>

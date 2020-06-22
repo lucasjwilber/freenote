@@ -1,14 +1,8 @@
 package com.lucasjwilber.freenote.viewmodels
 
 import android.app.Application
-import android.content.Context
-import android.content.SharedPreferences
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.lucasjwilber.freenote.PREFERENCES
-import com.lucasjwilber.freenote.R
-import com.lucasjwilber.freenote.THEME_CAFE
-import com.lucasjwilber.freenote.THEME_CITY
 import com.lucasjwilber.freenote.models.NoteDescriptor
 import com.lucasjwilber.freenote.database.NoteRepository
 import com.lucasjwilber.freenote.database.NoteDao

@@ -1,6 +1,5 @@
 package com.lucasjwilber.freenote.views
 
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity

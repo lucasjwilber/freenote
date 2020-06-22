@@ -1,9 +1,6 @@
 package com.lucasjwilber.freenote
 
-import android.app.Application
-import android.content.Context
 import android.graphics.Paint
-import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -15,7 +12,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.lucasjwilber.freenote.viewmodels.EditListViewModel
