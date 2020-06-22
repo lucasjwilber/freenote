@@ -29,7 +29,7 @@ class AllNotesAdapter(private var allNoteDescriptors: List<NoteDescriptor>, priv
     override fun onBindViewHolder(holder: NoteDescriptorViewHolder, position: Int) {
         val titleTextView: TextView = holder.cardView.findViewById(R.id.noteDescriptorTextView)
         val title = allNoteDescriptors[position].title
-        titleTextView.text = title
+        titleTextView.text = if (title.isNotEmpty()) title else "Untitled"
         holder.cardView.setOnClickListener { goToNoteDetails(holder)}
     }
 
