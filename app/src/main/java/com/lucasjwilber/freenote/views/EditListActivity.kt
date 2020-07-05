@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -33,6 +34,7 @@ class EditListActivity : BaseActivity() {
         }
     }
     private lateinit var deleteModal: ConstraintLayout
+    private var newSegmentET: EditText? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,7 +83,7 @@ class EditListActivity : BaseActivity() {
                 else
                     ArrayList<String>()
 
-                viewAdapter = ListSegmentsAdapter(viewModel)
+                viewAdapter = ListSegmentsAdapter(viewModel, newSegmentET)
                 binding.noteSegmentsRV.apply {
                     setHasFixedSize(true)
                     layoutManager = viewManager
@@ -100,7 +102,7 @@ class EditListActivity : BaseActivity() {
             binding.noteTitleEditText.requestFocus()
             binding.noteTitleEditText.addTextChangedListener(titleTextWatcher)
 
-            viewAdapter = ListSegmentsAdapter(viewModel)
+            viewAdapter = ListSegmentsAdapter(viewModel, newSegmentET)
             binding.noteSegmentsRV.apply {
                 setHasFixedSize(true)
                 layoutManager = viewManager
@@ -118,6 +120,7 @@ class EditListActivity : BaseActivity() {
     override fun onStop() {
         super.onStop()
         viewModel.saveNote()
+        if (newSegmentET != null) newSegmentET!!.setText("")
         deleteButton?.isVisible = true
     }
 

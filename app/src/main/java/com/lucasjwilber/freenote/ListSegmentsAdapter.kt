@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.lucasjwilber.freenote.viewmodels.EditListViewModel
 
-class ListSegmentsAdapter(private val vm: EditListViewModel) :
+class ListSegmentsAdapter(private val vm: EditListViewModel, var newSegmentET: EditText?) :
     RecyclerView.Adapter<ListSegmentsAdapter.MyViewHolder>() {
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -27,7 +27,6 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
     private val SEGMENT: Int = 0
     private val NEW_SEGMENT: Int = 1
     // keep a reference to the currently edited segment to allow only one to be edited at a time
-    // this is just a design decision
     private class CurrentEditedSegment(var editText: EditText, var textView: TextView, var button: Button, var textWatcher: TextWatcher)
     private var lastEditedSegment: CurrentEditedSegment? = null
 
@@ -53,6 +52,8 @@ class ListSegmentsAdapter(private val vm: EditListViewModel) :
                 .inflate(R.layout.new_segment, parent, false) as ConstraintLayout
 
             val newSegmentEditText: EditText = constraintLayout.findViewById(R.id.newSegmentEditText)
+            // newSegmentET is a reference the activity uses to clear the text after a new segment is added from an onStop() save
+            newSegmentET = newSegmentEditText
 
             // the new segment EditText's content is tracked in the ViewModel so that it will be saved in case
             // the user forgets to add it as a new segment

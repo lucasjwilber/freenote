@@ -32,7 +32,10 @@ class EditListViewModel(application: Application): BaseViewModel(application) {
         if (noteIsBeingDeleted) return
 
         // add the contents of the newSegmentEditText to help people who forgot to save it
-        if (newSegmentText.isNotEmpty()) segments.add(newSegmentText)
+        if (newSegmentText.isNotEmpty()) {
+            segments.add(newSegmentText)
+            newSegmentText = ""
+        }
 
         // convert the segments ArrayList into a String for storage as a Note
         note.segments = segments.joinToString(SEGMENT_DELIMITER)
