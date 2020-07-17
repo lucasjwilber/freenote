@@ -19,11 +19,6 @@ import com.lucasjwilber.freenote.viewmodels.EditListViewModel
 class ListSegmentsAdapter(private val vm: EditListViewModel, var newSegmentET: EditText?) :
     RecyclerView.Adapter<ListSegmentsAdapter.MyViewHolder>() {
 
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        initSwipeListener(recyclerView)
-    }
-
     private val SEGMENT: Int = 0
     private val NEW_SEGMENT: Int = 1
     // keep a reference to the currently edited segment to allow only one to be edited at a time
@@ -124,19 +119,19 @@ class ListSegmentsAdapter(private val vm: EditListViewModel, var newSegmentET: E
         notifyDataSetChanged()
     }
 
-    fun deleteSegment(position: Int) {
-        val delSegs = vm.deletedSegments.value!!
-        delSegs.push(
-            EditListViewModel.DeletedSegment(
-                position,
-                vm.segments[position]
-            )
-        )
-        vm.deletedSegments.value = delSegs
-
-        vm.segments.removeAt(position)
-        notifyItemRemoved(position)
-    }
+//    fun deleteSegment(position: Int) {
+//        val delSegs = vm.deletedSegments.value!!
+//        delSegs.push(
+//            EditListViewModel.DeletedSegment(
+//                position,
+//                vm.segments[position]
+//            )
+//        )
+//        vm.deletedSegments.value = delSegs
+//
+//        vm.segments.removeAt(position)
+//        notifyItemRemoved(position)
+//    }
 
 
     private fun updateSegment(holder: MyViewHolder, textView: TextView) {
@@ -211,35 +206,4 @@ class ListSegmentsAdapter(private val vm: EditListViewModel, var newSegmentET: E
         return true
     }
 
-    // todo: move this method to activity?
-    private fun initSwipeListener(recyclerView: RecyclerView) {
-        val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-
-            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, viewHolder1: RecyclerView.ViewHolder): Boolean {
-                return false
-            }
-
-            override fun getSwipeDirs(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder
-            ): Int {
-                return createSwipeFlags(viewHolder.adapterPosition, viewHolder)
-            }
-
-            private fun createSwipeFlags(position: Int, viewHolder: RecyclerView.ViewHolder): Int {
-                // the new segment viewholder at the bottom should not be swipeable
-                return if (position == itemCount - 1)
-                    0
-                else
-                    super.getSwipeDirs(recyclerView, viewHolder)
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                deleteSegment(viewHolder.adapterPosition)
-            }
-        }
-
-        val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
-    }
 }

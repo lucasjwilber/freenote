@@ -12,11 +12,13 @@ import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lucasjwilber.freenote.*
 import com.lucasjwilber.freenote.databinding.ActivityEditListBinding
 import com.lucasjwilber.freenote.viewmodels.EditListViewModel
+import kotlinx.android.synthetic.main.activity_edit_list.*
 import java.util.*
 
 class EditListActivity : BaseActivity() {
@@ -57,6 +59,9 @@ class EditListActivity : BaseActivity() {
         deleteModal.setOnClickListener { deleteModal.visibility = View.GONE }
         deleteModal.findViewById<Button>(R.id.cancelDeleteButton).setOnClickListener { deleteModal.visibility = View.GONE }
         deleteModal.findViewById<Button>(R.id.confirmDeleteButton).setOnClickListener { onDeleteNoteClicked() }
+
+        //attach swipe-to-delete listener
+        ItemTouchHelper(itemTouchCallback).attachToRecyclerView(noteSegmentsRV)
 
         getIdFromIntent()
         // if the intent included an id, use it to load the note
@@ -190,6 +195,45 @@ class EditListActivity : BaseActivity() {
         viewModel.deletedSegments.value = viewModel.deletedSegments.value
         viewModel.segments.add(delseg.position, delseg.text)
         viewAdapter.notifyItemInserted(delseg.position)
+    }
+
+
+    private val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, viewHolder1: RecyclerView.ViewHolder): Boolean {
+            return false
+        }
+
+        override fun getSwipeDirs(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ): Int {
+            return createSwipeFlags(viewHolder.adapterPosition, viewHolder)
+        }
+
+        private fun createSwipeFlags(position: Int, viewHolder: RecyclerView.ViewHolder): Int {
+            // the new segment viewholder at the bottom should not be swipeable
+            return if (position == viewAdapter.itemCount - 1)
+                0
+            else
+                super.getSwipeDirs(binding.noteSegmentsRV, viewHolder)
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            deleteSegment(viewHolder.adapterPosition)
+        }
+    }
+
+    private fun deleteSegment(position: Int) {
+        val delSegs = viewModel.deletedSegments.value!!
+        delSegs.push(
+            EditListViewModel.DeletedSegment(
+                position,
+                viewModel.segments[position]
+            )
+        )
+        viewModel.deletedSegments.value = delSegs
+        viewModel.segments.removeAt(position)
+        viewAdapter.notifyItemRemoved(position)
     }
 
 }
